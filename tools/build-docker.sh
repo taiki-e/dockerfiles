@@ -6,18 +6,19 @@ IFS=$'\n\t'
 
 cd "$(cd "$(dirname "$0")" && pwd)"/..
 
-OWNER=taiki-e
-
 export DOCKER_BUILDKIT=1
+
+platform=linux/amd64,linux/arm64
 
 build() {
     local name="${1:?}"
     shift
     echo "Building docker image for ${name}"
-    docker build -t "${name}" -f "${name}/Dockerfile" . "$@"
 
-    if [[ -n "${CI:-}" ]]; then
-        docker tag "${name}" "ghcr.io/${OWNER}/${name}:latest"
+    if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
+        docker buildx build --push -t "ghcr.io/${OWNER}/${name}:latest" -f "${name}/Dockerfile" --platform "${platform}" . "$@"
+    else
+        docker buildx build -t "${name}" -f "${name}/Dockerfile" --platform "${platform}" . "$@"
     fi
 }
 

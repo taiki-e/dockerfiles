@@ -12,7 +12,7 @@ PACKAGE="$(basename "$(dirname "$0")")"
 PLATFORM=linux/amd64,linux/arm64/v8
 
 build() {
-    local base="${1:?}"
+    local base="$1"
     shift
     local dockerfile="${PACKAGE}/${base}.Dockerfile"
     local build_args=(
@@ -41,6 +41,7 @@ for ubuntu_version in 20.04 18.04; do
         build_args+=(
             --tag "${base_tag}:ubuntu"
             --tag "${base_tag}:ubuntu-latest"
+            --tag "${base_tag}:latest"
         )
     fi
     build "ubuntu" "${build_args[@]}" 2>&1 | tee "tmp/log/build-docker.${PACKAGE}.log"
@@ -55,7 +56,6 @@ for alpine_version in 3.14 3.13; do
         build_args+=(
             --tag "${base_tag}:alpine"
             --tag "${base_tag}:alpine-latest"
-            --tag "${base_tag}:latest"
         )
     fi
     build "alpine" "${build_args[@]}" 2>&1 | tee "tmp/log/build-docker.${PACKAGE}.log"

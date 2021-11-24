@@ -1,11 +1,12 @@
 # syntax=docker/dockerfile:1.3-labs
 
-FROM alpine
+ARG ALPINE_VERSION=3.14
 
+FROM alpine:"${ALPINE_VERSION}"
+SHELL ["/bin/sh", "-eux", "-c"]
 RUN <<EOF
-set -ex
-apk update
-apk --no-cache upgrade
+apk update --no-cache
+apk upgrade --no-cache
 apk add --no-cache \
     aria2 \
     bash \
@@ -13,12 +14,10 @@ apk add --no-cache \
     ca-certificates \
     curl \
     dpkg \
+    git \
     libarchive-tools \
+    unzip \
     wget \
     xz \
-    zlib \
     zstd
-aria2c --version
-curl --version
-wget --version
 EOF

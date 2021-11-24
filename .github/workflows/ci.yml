@@ -13,8 +13,16 @@ on:
     - cron: '0 0 1 * *'
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   docker:
+    strategy:
+      matrix:
+        include:
+          - package: downloader
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,11 +30,21 @@ jobs:
           persist-credentials: false
       - uses: docker/setup-qemu-action@v1
       - uses: docker/setup-buildx-action@v1
-      - run: tools/build-docker.sh
       - run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-          tools/build-docker.sh
+          echo "PUSH_TO_GHCR=1" >> "${GITHUB_ENV}"
+        if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+      - run: ${{ matrix.package }}/build-docker.sh
         env:
           OWNER: ${{ github.repository_owner }}
-          PUSH_TO_GHCR: 1
-        if: github.repository_owner == 'taiki-e' && github.event_name != 'pull_request'
+
+  tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - run: shellcheck $(git ls-files '*.sh')
+        if: always()
+      - run: shellcheck -e SC2148 $(git ls-files '*.Dockerfile')
+        if: always()

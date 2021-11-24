@@ -6,8 +6,8 @@ FROM ubuntu:"${UBUNTU_VERSION}"
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 RUN <<EOF
-apt-get update
-apt-get install -y --no-install-recommends \
+apt-get -o Dpkg::Use-Pty=0 update -qq
+apt-get -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     aria2 \
     bzip2 \
     ca-certificates \

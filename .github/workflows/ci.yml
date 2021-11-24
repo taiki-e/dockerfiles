@@ -22,6 +22,7 @@ jobs:
     strategy:
       matrix:
         include:
+          - package: build-base
           - package: downloader
     runs-on: ubuntu-latest
     steps:
@@ -46,5 +47,6 @@ jobs:
           persist-credentials: false
       - run: shellcheck $(git ls-files '*.sh')
         if: always()
-      - run: shellcheck -e SC2148 $(git ls-files '*.Dockerfile')
+      # SC2154 doesn't seem to work on dockerfile.
+      - run: shellcheck -e SC2148,SC2154 $(git ls-files '*.Dockerfile')
         if: always()

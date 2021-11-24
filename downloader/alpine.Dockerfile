@@ -5,9 +5,9 @@ ARG ALPINE_VERSION=3.14
 FROM alpine:"${ALPINE_VERSION}"
 SHELL ["/bin/sh", "-eux", "-c"]
 RUN <<EOF
-apk update --no-cache
-apk upgrade --no-cache
-apk add --no-cache \
+apk --no-cache update -q
+apk --no-cache upgrade
+apk --no-cache add \
     aria2 \
     bash \
     bzip2 \

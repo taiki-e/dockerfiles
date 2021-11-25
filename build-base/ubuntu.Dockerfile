@@ -68,7 +68,6 @@ for tool in /usr/bin/clang* /usr/bin/llvm-* /usr/bin/*lld-* /usr/bin/wasm-ld-*; 
     ln -s "${tool}" "${tool%"-${LLVM_VERSION}"}"
 done
 apt-get -o Dpkg::Use-Pty=0 purge -y --auto-remove \
-    curl \
     gnupg
 rm -rf \
     /var/lib/apt/lists/* \

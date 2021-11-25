@@ -24,6 +24,7 @@ apk --no-cache add \
     ca-certificates \
     clang \
     cmake \
+    curl \
     file \
     g++ \
     git \

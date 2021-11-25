@@ -2,11 +2,16 @@
 
 ARG UBUNTU_VERSION=20.04
 
-FROM ghcr.io/taiki-e/downloader as downloader
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # https://github.com/Kitware/CMake/releases
 # Use the same major & minor version as alpine: https://pkgs.alpinelinux.org/package/edge/main/x86_64/cmake
 ARG CMAKE_VERSION=3.21.4
+# https://apt.llvm.org
+# Use the same major version as alpine: https://pkgs.alpinelinux.org/package/edge/main/x86_64/clang
+ARG LLVM_VERSION=12
+
+FROM ghcr.io/taiki-e/downloader as downloader
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+ARG CMAKE_VERSION
 RUN <<EOF
 dpkg_arch="$(dpkg --print-architecture)"
 case "${dpkg_arch##*-}" in
@@ -28,9 +33,7 @@ EOF
 FROM ubuntu:"${UBUNTU_VERSION}"
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
-# https://apt.llvm.org
-# Use the same major version as alpine: https://pkgs.alpinelinux.org/package/edge/main/x86_64/clang
-ARG LLVM_VERSION=12
+ARG LLVM_VERSION
 RUN <<EOF
 apt-get -o Dpkg::Use-Pty=0 update -qq
 apt-get -o Dpkg::Use-Pty=0 install -y --no-install-recommends \

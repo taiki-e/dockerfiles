@@ -17,10 +17,7 @@ dpkg_arch="$(dpkg --print-architecture)"
 case "${dpkg_arch##*-}" in
     amd64) cmake_arch=x86_64 ;;
     arm64) cmake_arch=aarch64 ;;
-    *)
-        echo >&2 "unsupported architecture '${dpkg_arch}'"
-        exit 1
-        ;;
+    *) echo >&2 "unsupported architecture '${dpkg_arch}'" && exit 1 ;;
 esac
 mkdir -p cmake
 curl --proto '=https' --tlsv1.2 -fsSL --retry 10 "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-${cmake_arch}.tar.gz" \

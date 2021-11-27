@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - main
+      - dev
   schedule:
     - cron: '0 0 1 * *'
   workflow_dispatch:
@@ -28,6 +29,7 @@ jobs:
           - alpine
         include:
           - package: downloader
+          - package: qemu-user
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

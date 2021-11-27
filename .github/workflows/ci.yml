@@ -23,8 +23,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           persist-credentials: false
-      - run: shellcheck $(git ls-files '*.sh')
-        if: always()
-      # SC2154 doesn't seem to work on dockerfile.
-      - run: shellcheck -e SC2148,SC2154 $(git ls-files '*.Dockerfile')
-        if: always()
+      - name: Install prettier
+        run: npm install prettier
+      - name: Install shfmt
+        run: |
+          "${GOROOT_1_17_X64}"/bin/go install mvdan.cc/sh/v3/cmd/shfmt@latest
+          echo "${HOME}/go/bin" >>"${GITHUB_PATH}"
+      - run: tools/tidy.sh

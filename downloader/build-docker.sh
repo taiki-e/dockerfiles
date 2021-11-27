@@ -2,5 +2,16 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+cd "$(cd "$(dirname "$0")" && pwd)"/..
+
+if [[ $# -gt 0 ]]; then
+    cat <<EOF
+USAGE:
+    $0
+EOF
+    exit 1
+fi
+set -x
+
 package="$(basename "$(dirname "$0")")"
-"$(cd "$(dirname "$0")" && pwd)"/../tools/build-docker-single.sh "${package}" "$@"
+./tools/build-docker-single.sh "${package}" "$@"

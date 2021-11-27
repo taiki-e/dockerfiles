@@ -7,7 +7,7 @@ cd "$(cd "$(dirname "$0")" && pwd)"/..
 if [[ $# -gt 1 ]]; then
     cat <<EOF
 USAGE:
-    $0
+    $0 <PACKAGE>
 EOF
     exit 1
 fi

@@ -1,8 +1,17 @@
 #!/bin/bash
-set -euxo pipefail
+set -euo pipefail
 IFS=$'\n\t'
 
 cd "$(cd "$(dirname "$0")" && pwd)"/..
+
+if [[ $# -gt 0 ]]; then
+    cat <<EOF
+USAGE:
+    $0
+EOF
+    exit 1
+fi
+set -x
 
 export DOCKER_BUILDKIT=1
 

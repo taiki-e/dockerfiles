@@ -1,8 +1,18 @@
 #!/bin/bash
-set -euxo pipefail
+set -euo pipefail
 IFS=$'\n\t'
 
 cd "$(cd "$(dirname "$0")" && pwd)"/..
+
+if [[ $# -gt 1 ]]; then
+    cat <<EOF
+USAGE:
+    $0 <DISTRO>
+EOF
+    exit 1
+fi
+set -x
+distro="$1"
 
 export DOCKER_BUILDKIT=1
 
@@ -12,7 +22,6 @@ platform=linux/amd64,linux/arm64/v8
 base_tag="ghcr.io/${owner}/${package}"
 time="$(date --utc '+%Y-%m-%d-%H-%M-%S')"
 
-distro="${DISTRO:?}"
 distro_upper="$(tr '[:lower:]' '[:upper:]' <<<"${distro}")"
 default_distro=ubuntu
 # https://wiki.ubuntu.com/Releases

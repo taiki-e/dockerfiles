@@ -4,19 +4,24 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Usage:
-#    ./tools/tidy.sh
-#
 # NOTE: This script requires the following tools:
 # - shfmt
 # - prettier
 # - shellcheck
 
+cd "$(cd "$(dirname "$0")" && pwd)"/..
+
 if [[ "${1:-}" == "-v" ]]; then
+    shift
     set -x
 fi
-
-cd "$(cd "$(dirname "$0")" && pwd)"/..
+if [[ $# -gt 0 ]]; then
+    cat <<EOF
+USAGE:
+    $0 [-v]
+EOF
+    exit 1
+fi
 
 prettier=prettier
 if which npm &>/dev/null && which "$(npm bin)/prettier" &>/dev/null; then

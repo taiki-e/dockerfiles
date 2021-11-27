@@ -16,6 +16,7 @@ apk --no-cache add \
     dpkg \
     git \
     libarchive-tools \
+    tar \
     unzip \
     wget \
     xz \

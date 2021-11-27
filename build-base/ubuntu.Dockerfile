@@ -31,22 +31,28 @@ FROM ubuntu:"${UBUNTU_VERSION}"
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 ARG LLVM_VERSION
+# - Download-related packages (bzip2, curl, gnupg, libarchive-tools, unzip, xz-utils)
+#   are not necessarily needed for build, but they are small enough (< 10MB).
 RUN <<EOF
 apt-get -o Dpkg::Use-Pty=0 update -qq
 apt-get -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     autoconf \
     automake \
     binutils \
+    bzip2 \
     ca-certificates \
     curl \
     file \
     g++ \
     git \
     gnupg \
+    libarchive-tools \
     libtool \
     make \
     ninja-build \
-    pkg-config
+    pkg-config \
+    unzip \
+    xz-utils
 ubuntu_codename="$(grep </etc/os-release '^UBUNTU_CODENAME=' | sed 's/^UBUNTU_CODENAME=//')"
 cat >/etc/apt/sources.list.d/llvm.list <<EOF2
 deb http://apt.llvm.org/${ubuntu_codename}/ llvm-toolchain-${ubuntu_codename}-${LLVM_VERSION} main
@@ -64,8 +70,6 @@ apt-get -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
 for tool in /usr/bin/clang* /usr/bin/llvm-* /usr/bin/*lld-* /usr/bin/wasm-ld-*; do
     ln -s "${tool}" "${tool%"-${LLVM_VERSION}"}"
 done
-apt-get -o Dpkg::Use-Pty=0 purge -y --auto-remove \
-    gnupg
 rm -rf \
     /var/lib/apt/lists/* \
     /var/cache/* \

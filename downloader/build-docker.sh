@@ -1,16 +1,16 @@
 #!/bin/bash
-
 set -euxo pipefail
 IFS=$'\n\t'
 
 cd "$(cd "$(dirname "$0")" && pwd)"/..
 
+export DOCKER_BUILDKIT=1
+
 owner="${OWNER:-taiki-e}"
 package="$(basename "$(dirname "$0")")"
 platform=linux/amd64,linux/arm64/v8
 base_tag="ghcr.io/${owner}/${package}"
-
-export DOCKER_BUILDKIT=1
+time="$(date --utc '+%Y-%m-%d-%H-%M-%S')"
 
 build() {
     local dockerfile="${package}/Dockerfile"
@@ -33,7 +33,6 @@ build() {
     fi
 }
 
-time="$(date --utc '+%Y-%m-%d-%H-%M-%S')"
 log_dir="tmp/log/${package}"
 mkdir -p "${log_dir}"
 build "${build_args[@]}" 2>&1 | tee "${log_dir}/build-docker-${time}.log"

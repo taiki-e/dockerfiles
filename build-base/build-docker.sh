@@ -39,21 +39,22 @@ alpine_versions=(3.13 3.14 3.15)
 
 build() {
     local dockerfile="${package}/${base}.Dockerfile"
-    local full_tag="${base_tag}:${distro}-${distro_version/-slim/}"
+    local full_tag="${base_tag}:${distro}-${distro_version/-slim/}${mode:+"-${mode}"}"
     local build_args=(
         --file "${dockerfile}" "${package}/"
         --platform "${platform}"
         --tag "${full_tag}"
+        --build-arg "MODE=${mode}"
         --build-arg "DISTRO=${distro}"
         --build-arg "DISTRO_VERSION=${distro_version}"
         --build-arg "${distro_upper}_VERSION=${distro_version}"
     )
     if [[ "${distro_version}" == "${distro_latest}" ]]; then
         build_args+=(
-            --tag "${base_tag}:${distro}"
-            --tag "${base_tag}:${distro}-latest"
+            --tag "${base_tag}:${distro}${mode:+"-${mode}"}"
+            --tag "${base_tag}:${distro}-latest${mode:+"-${mode}"}"
         )
-        if [[ "${default_distro}" == "${distro}" ]]; then
+        if [[ -z "${mode:-}" ]] && [[ "${default_distro}" == "${distro}" ]]; then
             build_args+=(--tag "${base_tag}:latest")
         fi
     fi
@@ -70,33 +71,35 @@ build() {
     fi
 }
 
-case "${distro}" in
-    ubuntu)
-        base=apt
-        distro_latest="${ubuntu_latest}"
-        for distro_version in "${ubuntu_versions[@]}"; do
-            log_dir="tmp/log/${package}/${distro}-${distro_version}"
-            mkdir -p "${log_dir}"
-            build 2>&1 | tee "${log_dir}/build-docker-${time}.log"
-        done
-        ;;
-    debian)
-        base=apt
-        distro_latest="${debian_latest}"
-        for distro_version in "${debian_versions[@]}"; do
-            log_dir="tmp/log/${package}/${distro}-${distro_version}"
-            mkdir -p "${log_dir}"
-            build 2>&1 | tee "${log_dir}/build-docker-${time}.log"
-        done
-        ;;
-    alpine)
-        base=alpine
-        distro_latest="${alpine_latest}"
-        for distro_version in "${alpine_versions[@]}"; do
-            log_dir="tmp/log/${package}/${distro}-${distro_version}"
-            mkdir -p "${log_dir}"
-            build 2>&1 | tee "${log_dir}/build-docker-${time}.log"
-        done
-        ;;
-    *) echo >&2 "unrecognized distro '${distro}'" && exit 1 ;;
-esac
+for mode in slim ""; do
+    case "${distro}" in
+        ubuntu)
+            base=apt
+            distro_latest="${ubuntu_latest}"
+            for distro_version in "${ubuntu_versions[@]}"; do
+                log_dir="tmp/log/${package}/${distro}-${distro_version}"
+                mkdir -p "${log_dir}"
+                build 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+            done
+            ;;
+        debian)
+            base=apt
+            distro_latest="${debian_latest}"
+            for distro_version in "${debian_versions[@]}"; do
+                log_dir="tmp/log/${package}/${distro}-${distro_version}"
+                mkdir -p "${log_dir}"
+                build 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+            done
+            ;;
+        alpine)
+            base=alpine
+            distro_latest="${alpine_latest}"
+            for distro_version in "${alpine_versions[@]}"; do
+                log_dir="tmp/log/${package}/${distro}-${distro_version}"
+                mkdir -p "${log_dir}"
+                build 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+            done
+            ;;
+        *) echo >&2 "unrecognized distro '${distro}'" && exit 1 ;;
+    esac
+done

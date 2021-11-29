@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1.3-labs
 
+ARG MODE=base
 ARG ALPINE_VERSION=3.15
 
 # https://pkgs.alpinelinux.org/package/edge/main/x86_64/cmake
@@ -7,9 +8,8 @@ ARG CMAKE_VERSION=3.21
 # https://pkgs.alpinelinux.org/package/edge/main/x86_64/clang
 ARG LLVM_VERSION=12
 
-FROM alpine:"${ALPINE_VERSION}"
+FROM alpine:"${ALPINE_VERSION}" as slim
 SHELL ["/bin/sh", "-eux", "-c"]
-ARG LLVM_VERSION
 ARG CMAKE_VERSION
 # - As of alpine 3.15, the ninja package is an alias for samurai.
 # - Download-related packages (bzip2, curl, dpkg, libarchive-tools, tar, unzip, xz)
@@ -29,7 +29,6 @@ apk --no-cache add \
     binutils \
     bzip2 \
     ca-certificates \
-    clang \
     cmake \
     curl \
     dpkg \
@@ -38,8 +37,6 @@ apk --no-cache add \
     git \
     libarchive-tools \
     libtool \
-    lld \
-    llvm"${LLVM_VERSION}"-dev \
     make \
     patch \
     pkgconf \
@@ -47,10 +44,24 @@ apk --no-cache add \
     tar \
     unzip \
     xz
-if [[ "$(clang --version | grep 'clang version ' | sed 's/.* clang version //' | sed 's/\..*//')" != "${LLVM_VERSION}" ]]; then
-    exit 1
-fi
 if [[ "$(cmake --version | grep 'cmake version ' | sed 's/.*cmake version //' | sed -r 's/\.[0-9]+$//')" != "${CMAKE_VERSION}" ]]; then
     exit 1
 fi
 EOF
+
+FROM slim as base
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+ARG LLVM_VERSION
+RUN <<EOF
+apk --no-cache update -q
+apk --no-cache add \
+    clang \
+    lld \
+    llvm"${LLVM_VERSION}"-dev
+if [[ "$(clang --version | grep 'clang version ' | sed 's/.* clang version //' | sed 's/\..*//')" != "${LLVM_VERSION}" ]]; then
+    exit 1
+fi
+EOF
+
+FROM "${MODE:-base}"
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]

@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1.3-labs
 
+ARG MODE=base
 ARG DISTRO=ubuntu
 ARG DISTRO_VERSION=20.04
 
@@ -28,15 +29,14 @@ rm -rf \
     /cmake/bin/cmake-gui
 EOF
 
-FROM "${DISTRO}":"${DISTRO_VERSION}"
+FROM "${DISTRO}":"${DISTRO_VERSION}" as slim
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
-ARG LLVM_VERSION
 # - Download-related packages (bzip2, curl, gnupg, libarchive-tools, unzip, xz-utils)
 #   are not necessarily needed for build, but they are small enough (< 10MB).
 RUN <<EOF
-apt-get -o Dpkg::Use-Pty=0 update -qq
-apt-get -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
+apt-get -o Acquire::Retries=10 update -qq
+apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     autoconf \
     automake \
     binutils \
@@ -54,14 +54,26 @@ apt-get -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     pkg-config \
     unzip \
     xz-utils
+rm -rf \
+    /var/lib/apt/lists/* \
+    /var/cache/* \
+    /var/log/* \
+    /usr/share/{doc,man}
+EOF
+
+FROM slim as base
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
+ARG LLVM_VERSION
+RUN <<EOF
 codename="$(grep </etc/os-release '^VERSION_CODENAME=' | sed 's/^VERSION_CODENAME=//')"
 cat >/etc/apt/sources.list.d/llvm.list <<EOF2
 deb http://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-${LLVM_VERSION} main
 deb-src http://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-${LLVM_VERSION} main
 EOF2
 curl --proto '=https' --tlsv1.2 -fsSL --retry 10 https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-apt-get -o Dpkg::Use-Pty=0 update -qq
-apt-get -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
+apt-get -o Acquire::Retries=10 update -qq
+apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     clang-"${LLVM_VERSION}" \
     libc++-"${LLVM_VERSION}"-dev \
     libc++abi-"${LLVM_VERSION}"-dev \
@@ -77,4 +89,8 @@ rm -rf \
     /var/log/* \
     /usr/share/{doc,man}
 EOF
+
+FROM "${MODE:-base}"
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
 COPY --from=downloader /cmake/. /usr/local/

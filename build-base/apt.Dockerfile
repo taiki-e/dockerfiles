@@ -79,8 +79,9 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     libc++abi-"${LLVM_VERSION}"-dev \
     lld-"${LLVM_VERSION}" \
     llvm-"${LLVM_VERSION}"
-for tool in /usr/bin/clang* /usr/bin/llvm-* /usr/bin/*lld-* /usr/bin/wasm-ld-*; do
-    ln -s "${tool}" "${tool%"-${LLVM_VERSION}"}"
+for tool in /usr/bin/clang*-"${LLVM_VERSION}" /usr/bin/llvm-*-"${LLVM_VERSION}" /usr/bin/*lld*-"${LLVM_VERSION}" /usr/bin/wasm-ld-"${LLVM_VERSION}"; do
+    link="${tool%"-${LLVM_VERSION}"}"
+    update-alternatives --install "${link}" "${link##*/}" "${tool}" 10
 done
 rm -rf \
     /var/lib/apt/lists/* \

@@ -77,9 +77,8 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     clang-"${LLVM_VERSION}" \
     libc++-"${LLVM_VERSION}"-dev \
     libc++abi-"${LLVM_VERSION}"-dev \
-    libclang-"${LLVM_VERSION}"-dev \
     lld-"${LLVM_VERSION}" \
-    llvm-"${LLVM_VERSION}"-dev
+    llvm-"${LLVM_VERSION}"
 for tool in /usr/bin/clang* /usr/bin/llvm-* /usr/bin/*lld-* /usr/bin/wasm-ld-*; do
     ln -s "${tool}" "${tool%"-${LLVM_VERSION}"}"
 done

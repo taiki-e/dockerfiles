@@ -57,7 +57,7 @@ apk --no-cache update -q
 apk --no-cache add \
     clang \
     lld \
-    llvm"${LLVM_VERSION}"-dev
+    llvm"${LLVM_VERSION}"
 if [[ "$(clang --version | grep 'clang version ' | sed 's/.* clang version //' | sed 's/\..*//')" != "${LLVM_VERSION}" ]]; then
     exit 1
 fi

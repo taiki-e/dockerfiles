@@ -8,7 +8,7 @@ ARG QEMU_VERSION=6.1.0
 FROM alpine:"${ALPINE_VERSION}" as base
 SHELL ["/bin/sh", "-eux", "-c"]
 ARG QEMU_VERSION
-# arch list: https://git.alpinelinux.org/aports/tree/community/qemu/APKBUILD
+# architecture list: https://git.alpinelinux.org/aports/tree/community/qemu/APKBUILD
 RUN <<EOF
 apk --no-cache update -q
 apk --no-cache upgrade

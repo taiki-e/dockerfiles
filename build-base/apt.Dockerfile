@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1.3-labs
 
-ARG UBUNTU_VERSION=20.04
+ARG DISTRO=ubuntu
+ARG DISTRO_VERSION=20.04
 
 # https://github.com/Kitware/CMake/releases
 # Use the same major & minor version as alpine: https://pkgs.alpinelinux.org/package/edge/main/x86_64/cmake
@@ -27,7 +28,7 @@ rm -rf \
     /cmake/bin/cmake-gui
 EOF
 
-FROM ubuntu:"${UBUNTU_VERSION}"
+FROM "${DISTRO}":"${DISTRO_VERSION}"
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 ARG LLVM_VERSION
@@ -53,10 +54,10 @@ apt-get -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     pkg-config \
     unzip \
     xz-utils
-ubuntu_codename="$(grep </etc/os-release '^UBUNTU_CODENAME=' | sed 's/^UBUNTU_CODENAME=//')"
+codename="$(grep </etc/os-release '^VERSION_CODENAME=' | sed 's/^VERSION_CODENAME=//')"
 cat >/etc/apt/sources.list.d/llvm.list <<EOF2
-deb http://apt.llvm.org/${ubuntu_codename}/ llvm-toolchain-${ubuntu_codename}-${LLVM_VERSION} main
-deb-src http://apt.llvm.org/${ubuntu_codename}/ llvm-toolchain-${ubuntu_codename}-${LLVM_VERSION} main
+deb http://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-${LLVM_VERSION} main
+deb-src http://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-${LLVM_VERSION} main
 EOF2
 curl --proto '=https' --tlsv1.2 -fsSL --retry 10 https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 apt-get -o Dpkg::Use-Pty=0 update -qq

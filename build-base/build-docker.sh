@@ -28,19 +28,24 @@ default_distro=ubuntu
 # https://hub.docker.com/_/ubuntu
 ubuntu_latest=20.04
 ubuntu_versions=(18.04 20.04)
+# https://wiki.debian.org/DebianReleases
+# https://hub.docker.com/_/debian
+debian_latest=11-slim
+debian_versions=(10-slim 11-slim)
 # https://alpinelinux.org/releases
 # https://hub.docker.com/_/alpine
 alpine_latest=3.15
 alpine_versions=(3.13 3.14 3.15)
 
 build() {
-    local dockerfile="${package}/${distro}.Dockerfile"
-    local full_tag="${base_tag}:${distro}-${distro_version}"
+    local dockerfile="${package}/${base}.Dockerfile"
+    local full_tag="${base_tag}:${distro}-${distro_version/-slim/}"
     local build_args=(
         --file "${dockerfile}" "${package}/"
         --platform "${platform}"
         --tag "${full_tag}"
         --build-arg "DISTRO=${distro}"
+        --build-arg "DISTRO_VERSION=${distro_version}"
         --build-arg "${distro_upper}_VERSION=${distro_version}"
     )
     if [[ "${distro_version}" == "${distro_latest}" ]]; then
@@ -67,6 +72,7 @@ build() {
 
 case "${distro}" in
     ubuntu)
+        base=apt
         distro_latest="${ubuntu_latest}"
         for distro_version in "${ubuntu_versions[@]}"; do
             log_dir="tmp/log/${package}/${distro}-${distro_version}"
@@ -74,7 +80,17 @@ case "${distro}" in
             build 2>&1 | tee "${log_dir}/build-docker-${time}.log"
         done
         ;;
+    debian)
+        base=apt
+        distro_latest="${debian_latest}"
+        for distro_version in "${debian_versions[@]}"; do
+            log_dir="tmp/log/${package}/${distro}-${distro_version}"
+            mkdir -p "${log_dir}"
+            build 2>&1 | tee "${log_dir}/build-docker-${time}.log"
+        done
+        ;;
     alpine)
+        base=alpine
         distro_latest="${alpine_latest}"
         for distro_version in "${alpine_versions[@]}"; do
             log_dir="tmp/log/${package}/${distro}-${distro_version}"

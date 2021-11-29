@@ -26,6 +26,7 @@ jobs:
           - build-base
         distro:
           - ubuntu
+          - debian
           - alpine
         include:
           - package: downloader

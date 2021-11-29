@@ -19,6 +19,5 @@ apk --no-cache add \
     tar \
     unzip \
     wget \
-    xz \
-    zstd
+    xz
 EOF

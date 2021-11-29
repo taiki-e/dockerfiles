@@ -5,10 +5,8 @@ ARG DISTRO=ubuntu
 ARG DISTRO_VERSION=20.04
 
 # https://github.com/Kitware/CMake/releases
-# Use the same major & minor version as alpine: https://pkgs.alpinelinux.org/package/edge/main/x86_64/cmake
 ARG CMAKE_VERSION=3.21.4
 # https://apt.llvm.org
-# Use the same major version as alpine: https://pkgs.alpinelinux.org/package/edge/main/x86_64/clang
 ARG LLVM_VERSION=12
 
 FROM ghcr.io/taiki-e/downloader as downloader
@@ -88,6 +86,8 @@ rm -rf \
     /var/cache/* \
     /var/log/* \
     /usr/share/{doc,man}
+gcc --version
+clang --version
 EOF
 
 FROM "${MODE:-base}"

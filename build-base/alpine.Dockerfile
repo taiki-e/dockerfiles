@@ -3,14 +3,11 @@
 ARG MODE=base
 ARG ALPINE_VERSION=3.15
 
-# https://pkgs.alpinelinux.org/package/edge/main/x86_64/cmake
-ARG CMAKE_VERSION=3.21
 # https://pkgs.alpinelinux.org/package/edge/main/x86_64/clang
 ARG LLVM_VERSION=12
 
 FROM alpine:"${ALPINE_VERSION}" as slim
 SHELL ["/bin/sh", "-eux", "-c"]
-ARG CMAKE_VERSION
 # - As of alpine 3.15, the ninja package is an alias for samurai.
 # - Download-related packages (bzip2, curl, dpkg, libarchive-tools, tar, unzip, xz)
 #   are not necessarily needed for build, but they are small enough (about 4MB).
@@ -44,9 +41,6 @@ apk --no-cache add \
     tar \
     unzip \
     xz
-if [[ "$(cmake --version | grep 'cmake version ' | sed 's/.*cmake version //' | sed -r 's/\.[0-9]+$//')" != "${CMAKE_VERSION}" ]]; then
-    exit 1
-fi
 EOF
 
 FROM slim as base
@@ -58,9 +52,9 @@ apk --no-cache add \
     clang \
     lld \
     llvm"${LLVM_VERSION}"
-if [[ "$(clang --version | grep 'clang version ' | sed 's/.* clang version //' | sed 's/\..*//')" != "${LLVM_VERSION}" ]]; then
-    exit 1
-fi
+gcc --version
+clang --version
+cmake --version
 EOF
 
 FROM "${MODE:-base}"

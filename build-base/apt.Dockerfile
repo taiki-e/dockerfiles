@@ -7,7 +7,7 @@ ARG DISTRO_VERSION=20.04
 # https://github.com/Kitware/CMake/releases
 ARG CMAKE_VERSION=3.21.4
 # https://apt.llvm.org
-ARG LLVM_VERSION=12
+ARG LLVM_VERSION=13
 
 FROM ghcr.io/taiki-e/downloader as downloader
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]

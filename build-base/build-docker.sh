@@ -54,8 +54,8 @@ build() {
             --tag "${base_tag}:${distro}${mode:+"-${mode}"}"
             --tag "${base_tag}:${distro}-latest${mode:+"-${mode}"}"
         )
-        if [[ -z "${mode:-}" ]] && [[ "${default_distro}" == "${distro}" ]]; then
-            build_args+=(--tag "${base_tag}:latest")
+        if [[ "${default_distro}" == "${distro}" ]]; then
+            build_args+=(--tag "${base_tag}:${mode:-latest}")
         fi
     fi
 

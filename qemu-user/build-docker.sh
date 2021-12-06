@@ -2,6 +2,9 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# USAGE:
+#    ./qemu-user/build-docker.sh
+
 cd "$(cd "$(dirname "$0")" && pwd)"/..
 
 if [[ $# -gt 0 ]]; then

@@ -57,5 +57,5 @@ clang --version
 cmake --version
 EOF
 
-FROM "${MODE:-base}"
+FROM "${MODE:-base}" as final
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]

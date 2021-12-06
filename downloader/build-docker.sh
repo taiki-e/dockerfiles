@@ -2,6 +2,9 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# USAGE:
+#    ./downloader/build-docker.sh
+
 cd "$(cd "$(dirname "$0")" && pwd)"/..
 
 if [[ $# -gt 0 ]]; then

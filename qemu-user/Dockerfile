@@ -60,6 +60,6 @@ if file /usr/bin/qemu-* | grep -E 'dynamically linked' >/dev/null; then
 fi
 EOF
 
-FROM alpine:"${ALPINE_VERSION}"
+FROM alpine:"${ALPINE_VERSION}" as final
 SHELL ["/bin/sh", "-eux", "-c"]
 COPY --from=base /usr/bin/qemu-* /usr/bin

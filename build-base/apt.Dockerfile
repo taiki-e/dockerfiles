@@ -90,7 +90,7 @@ gcc --version
 clang --version
 EOF
 
-FROM "${MODE:-base}"
+FROM "${MODE:-base}" as final
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 COPY --from=downloader /cmake/. /usr/local/

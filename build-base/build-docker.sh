@@ -21,8 +21,9 @@ export DOCKER_BUILDKIT=1
 
 owner="${OWNER:-taiki-e}"
 package="$(basename "$(dirname "$0")")"
+registry="ghcr.io/${owner}"
+tag_base="${registry}/${package}:"
 platform=linux/amd64,linux/arm64/v8
-base_tag="ghcr.io/${owner}/${package}"
 time="$(date --utc '+%Y-%m-%d-%H-%M-%S')"
 
 distro_upper="$(tr '[:lower:]' '[:upper:]' <<<"${distro}")"
@@ -42,7 +43,7 @@ alpine_versions=(3.13 3.14 3.15)
 
 build() {
     local dockerfile="${package}/${base}.Dockerfile"
-    local full_tag="${base_tag}:${distro}-${distro_version/-slim/}${mode:+"-${mode}"}"
+    local full_tag="${tag_base}${distro}-${distro_version/-slim/}${mode:+"-${mode}"}"
     local build_args=(
         --file "${dockerfile}" "${package}/"
         --platform "${platform}"
@@ -54,11 +55,11 @@ build() {
     )
     if [[ "${distro_version}" == "${distro_latest}" ]]; then
         build_args+=(
-            --tag "${base_tag}:${distro}${mode:+"-${mode}"}"
-            --tag "${base_tag}:${distro}-latest${mode:+"-${mode}"}"
+            --tag "${tag_base}${distro}${mode:+"-${mode}"}"
+            --tag "${tag_base}${distro}-latest${mode:+"-${mode}"}"
         )
         if [[ "${default_distro}" == "${distro}" ]]; then
-            build_args+=(--tag "${base_tag}:${mode:-latest}")
+            build_args+=(--tag "${tag_base}${mode:-latest}")
         fi
     fi
 

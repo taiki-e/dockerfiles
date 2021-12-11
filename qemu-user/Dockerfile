@@ -2,58 +2,21 @@
 
 ARG ALPINE_VERSION=3.15
 
-# https://pkgs.alpinelinux.org/package/edge/community/x86_64/qemu
-ARG QEMU_VERSION=6.1.0
+# https://ftp.debian.org/debian/pool/main/q/qemu
+ARG QEMU_DPKG_VERSION=6.1+dfsg-8+b1
 
-FROM alpine:"${ALPINE_VERSION}" as base
-SHELL ["/bin/sh", "-eux", "-c"]
-ARG QEMU_VERSION
-# architecture list: https://git.alpinelinux.org/aports/tree/community/qemu/APKBUILD
+FROM ghcr.io/taiki-e/downloader as downloader
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+ARG QEMU_DPKG_VERSION
 RUN <<EOF
-apk --no-cache update -q
-apk --no-cache upgrade
-cat >>/etc/apk/repositories <<EOF2
-http://dl-cdn.alpinelinux.org/alpine/edge/community
-http://dl-cdn.alpinelinux.org/alpine/edge/main
-EOF2
-apk --no-cache add \
-    file \
-    qemu-aarch64 \
-    qemu-aarch64_be \
-    qemu-alpha \
-    qemu-arm \
-    qemu-armeb \
-    qemu-cris \
-    qemu-hppa \
-    qemu-i386 \
-    qemu-m68k \
-    qemu-microblaze \
-    qemu-microblazeel \
-    qemu-mips \
-    qemu-mips64 \
-    qemu-mips64el \
-    qemu-mipsel \
-    qemu-mipsn32 \
-    qemu-mipsn32el \
-    qemu-nios2 \
-    qemu-or1k \
-    qemu-ppc \
-    qemu-ppc64 \
-    qemu-ppc64le \
-    qemu-riscv32 \
-    qemu-riscv64 \
-    qemu-s390x \
-    qemu-sh4 \
-    qemu-sh4eb \
-    qemu-sparc \
-    qemu-sparc32plus \
-    qemu-sparc64 \
-    qemu-x86_64 \
-    qemu-xtensa \
-    qemu-xtensaeb
-if [[ "$(qemu-aarch64 --version | grep ' version ' | sed 's/.* version //')" != "${QEMU_VERSION}" ]]; then
-    exit 1
-fi
+dpkg_arch="$(dpkg --print-architecture)"
+curl --proto '=https' --tlsv1.2 -fsSL --retry 10 "https://ftp.debian.org/debian/pool/main/q/qemu/qemu-user-static_${QEMU_DPKG_VERSION}_${dpkg_arch##*-}.deb" \
+    | dpkg-deb --fsys-tarfile - \
+    | tar xf - --strip-components 3 -C /usr/bin --wildcards ./usr/bin/qemu-*-static
+for tool in /usr/bin/qemu-*-static; do
+    mv "${tool}" "${tool%-static}"
+done
+apk --no-cache add file
 file /usr/bin/qemu-*
 if file /usr/bin/qemu-* | grep -E 'dynamically linked' >/dev/null; then
     exit 1
@@ -62,4 +25,4 @@ EOF
 
 FROM alpine:"${ALPINE_VERSION}" as final
 SHELL ["/bin/sh", "-eux", "-c"]
-COPY --from=base /usr/bin/qemu-* /usr/bin
+COPY --from=downloader /usr/bin/qemu-* /usr/bin

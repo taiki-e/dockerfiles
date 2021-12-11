@@ -17,13 +17,14 @@ package="$1"
 export DOCKER_BUILDKIT=1
 
 owner="${OWNER:-taiki-e}"
+registry="ghcr.io/${owner}"
+tag_base="${registry}/${package}:"
 platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
-base_tag="ghcr.io/${owner}/${package}"
 time="$(date --utc '+%Y-%m-%d-%H-%M-%S')"
 
 build() {
     local dockerfile="${package}/Dockerfile"
-    local full_tag="${base_tag}:latest"
+    local full_tag="${tag_base}latest"
     local build_args=(
         --file "${dockerfile}" "${package}/"
         --platform "${platform}"

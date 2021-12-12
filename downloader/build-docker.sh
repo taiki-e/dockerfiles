@@ -14,7 +14,6 @@ USAGE:
 EOF
     exit 1
 fi
-set -x
 
 package="$(basename "$(dirname "$0")")"
 ./tools/build-docker-single.sh "${package}" "$@"

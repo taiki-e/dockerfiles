@@ -13,9 +13,9 @@ SHELL ["/bin/sh", "-eux", "-c"]
 #   are not necessarily needed for build, but they are small enough (about 4MB).
 RUN <<EOF
 cat >>/etc/apk/repositories <<EOF2
-http://dl-cdn.alpinelinux.org/alpine/edge/community
-http://dl-cdn.alpinelinux.org/alpine/edge/main
-http://dl-cdn.alpinelinux.org/alpine/edge/testing
+https://dl-cdn.alpinelinux.org/alpine/edge/community
+https://dl-cdn.alpinelinux.org/alpine/edge/main
+https://dl-cdn.alpinelinux.org/alpine/edge/testing
 EOF2
 apk --no-cache update -q
 apk --no-cache upgrade

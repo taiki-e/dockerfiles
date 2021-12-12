@@ -7,6 +7,15 @@ IFS=$'\n\t'
 
 cd "$(cd "$(dirname "$0")" && pwd)"/..
 
+x() {
+    local cmd="$1"
+    shift
+    (
+        set -x
+        "$cmd" "$@"
+    )
+}
+
 if [[ $# -gt 1 ]]; then
     cat <<EOF
 USAGE:
@@ -14,15 +23,14 @@ USAGE:
 EOF
     exit 1
 fi
-set -x
 distro="$1"
 
 export DOCKER_BUILDKIT=1
+export BUILDKIT_STEP_LOG_MAX_SIZE=10485760
 
 owner="${OWNER:-taiki-e}"
 package="$(basename "$(dirname "$0")")"
-registry="ghcr.io/${owner}"
-tag_base="${registry}/${package}:"
+repository="ghcr.io/${owner}/${package}"
 platform=linux/amd64,linux/arm64/v8
 time="$(date --utc '+%Y-%m-%d-%H-%M-%S')"
 
@@ -43,7 +51,7 @@ alpine_versions=(3.13 3.14 3.15)
 
 build() {
     local dockerfile="${package}/${base}.Dockerfile"
-    local full_tag="${tag_base}${distro}-${distro_version/-slim/}${mode:+"-${mode}"}"
+    local full_tag="${repository}:${distro}-${distro_version/-slim/}${mode:+"-${mode}"}"
     local build_args=(
         --file "${dockerfile}" "${package}/"
         --platform "${platform}"
@@ -55,23 +63,23 @@ build() {
     )
     if [[ "${distro_version}" == "${distro_latest}" ]]; then
         build_args+=(
-            --tag "${tag_base}${distro}${mode:+"-${mode}"}"
-            --tag "${tag_base}${distro}-latest${mode:+"-${mode}"}"
+            --tag "${repository}:${distro}${mode:+"-${mode}"}"
+            --tag "${repository}:${distro}-latest${mode:+"-${mode}"}"
         )
         if [[ "${default_distro}" == "${distro}" ]]; then
-            build_args+=(--tag "${tag_base}${mode:-latest}")
+            build_args+=(--tag "${repository}:${mode:-latest}")
         fi
     fi
 
     if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
-        docker buildx build --push "${build_args[@]}"
-        docker pull "${full_tag}"
-        docker history "${full_tag}"
+        x docker buildx build --push "${build_args[@]}" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
+        x docker pull "${full_tag}"
+        x docker history "${full_tag}"
     elif [[ "${platform}" == *","* ]]; then
-        docker buildx build "${build_args[@]}"
+        x docker buildx build "${build_args[@]}" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
     else
-        docker buildx build --load "${build_args[@]}"
-        docker history "${full_tag}"
+        x docker buildx build --load "${build_args[@]}" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
+        x docker history "${full_tag}"
     fi
 }
 
@@ -84,6 +92,7 @@ for mode in slim ""; do
                 log_dir="tmp/log/${package}/${distro}-${distro_version}"
                 mkdir -p "${log_dir}"
                 build 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+                echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
             done
             ;;
         debian)
@@ -93,6 +102,7 @@ for mode in slim ""; do
                 log_dir="tmp/log/${package}/${distro}-${distro_version}"
                 mkdir -p "${log_dir}"
                 build 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+                echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
             done
             ;;
         alpine)
@@ -102,8 +112,11 @@ for mode in slim ""; do
                 log_dir="tmp/log/${package}/${distro}-${distro_version}"
                 mkdir -p "${log_dir}"
                 build 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+                echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
             done
             ;;
-        *) echo >&2 "unrecognized distro '${distro}'" && exit 1 ;;
+        *) echo >&2 "error: unrecognized distro '${distro}'" && exit 1 ;;
     esac
 done
+
+x docker images "${repository}"

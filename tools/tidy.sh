@@ -13,10 +13,15 @@ IFS=$'\n\t'
 
 cd "$(cd "$(dirname "$0")" && pwd)"/..
 
-if [[ "${1:-}" == "-v" ]]; then
+x() {
+    local cmd="$1"
     shift
-    set -x
-fi
+    (
+        set -x
+        "$cmd" "$@"
+    )
+}
+
 if [[ $# -gt 0 ]]; then
     cat <<EOF
 USAGE:
@@ -32,26 +37,26 @@ fi
 
 if [[ -z "${CI:-}" ]]; then
     if type -P shfmt &>/dev/null; then
-        shfmt -l -w $(git ls-files '*.sh')
+        x shfmt -l -w $(git ls-files '*.sh')
     else
         echo >&2 "WARNING: 'shfmt' is not installed"
     fi
     if type -P "${prettier}" &>/dev/null; then
-        "${prettier}" -l -w $(git ls-files '*.yml')
+        x "${prettier}" -l -w $(git ls-files '*.yml')
     else
         echo >&2 "WARNING: 'prettier' is not installed"
     fi
     if type -P shellcheck &>/dev/null; then
-        shellcheck $(git ls-files '*.sh')
+        x shellcheck $(git ls-files '*.sh')
         # SC2154 doesn't seem to work on dockerfile.
-        shellcheck -e SC2148,SC2154 $(git ls-files '*Dockerfile')
+        x shellcheck -e SC2148,SC2154 $(git ls-files '*Dockerfile')
     else
         echo >&2 "WARNING: 'shellcheck' is not installed"
     fi
 else
-    shfmt -d $(git ls-files '*.sh')
-    "${prettier}" -c $(git ls-files '*.yml')
-    shellcheck $(git ls-files '*.sh')
+    x shfmt -d $(git ls-files '*.sh')
+    x "${prettier}" -c $(git ls-files '*.yml')
+    x shellcheck $(git ls-files '*.sh')
     # SC2154 doesn't seem to work on dockerfile.
-    shellcheck -e SC2148,SC2154 $(git ls-files '*Dockerfile')
+    x shellcheck -e SC2148,SC2154 $(git ls-files '*Dockerfile')
 fi

@@ -38,16 +38,35 @@ distro_upper="$(tr '[:lower:]' '[:upper:]' <<<"${distro}")"
 default_distro=ubuntu
 # https://wiki.ubuntu.com/Releases
 # https://hub.docker.com/_/ubuntu
+# https://endoflife.date/ubuntu
+# | version        | EoL        |
+# | -------------- | ---------- |
+# | 20.04 (focal)  | 2025-04-02 |
+# | 18.04 (bionic) | 2023-04-02 |
+# | 16.04 (xenial) | 2021-04-02 |
 ubuntu_latest=20.04
-ubuntu_versions=(18.04 20.04)
+ubuntu_versions=(18.04 20.04 rolling)
 # https://wiki.debian.org/DebianReleases
 # https://hub.docker.com/_/debian
-debian_latest=11-slim
-debian_versions=(10-slim 11-slim)
+# https://endoflife.date/debian
+# | version       | EoL        |
+# | ------------- | ---------- |
+# | 11 (bullseye) | 2026-08-15 |
+# | 10 (buster)   | 2024-06-01 |
+# | 9 (stretch)   | 2022-06-30 |
+debian_latest=11
+debian_versions=(10 11 sid)
 # https://alpinelinux.org/releases
 # https://hub.docker.com/_/alpine
+# https://endoflife.date/alpine
+# | version | EoL        |
+# | ------- | ---------- |
+# | 3.15    | 2023-11-01 |
+# | 3.14    | 2023-05-01 |
+# | 3.13    | 2022-11-01 |
+# | 3.12    | 2022-05-01 |
 alpine_latest=3.15
-alpine_versions=(3.13 3.14 3.15)
+alpine_versions=(3.13 3.14 3.15 edge)
 
 build() {
     local dockerfile="${package}/${base}.Dockerfile"
@@ -97,10 +116,11 @@ for mode in slim ""; do
             ;;
         debian)
             base=apt
-            distro_latest="${debian_latest}"
+            distro_latest="${debian_latest}-slim"
             for distro_version in "${debian_versions[@]}"; do
                 log_dir="tmp/log/${package}/${distro}-${distro_version}"
                 mkdir -p "${log_dir}"
+                distro_version="${distro_version}-slim"
                 build 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
                 echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
             done

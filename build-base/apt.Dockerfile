@@ -62,14 +62,20 @@ EOF
 FROM slim as base
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
+ARG DISTRO_VERSION
 ARG LLVM_VERSION
 RUN <<EOF
-curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-codename="$(grep </etc/os-release '^VERSION_CODENAME=' | sed 's/^VERSION_CODENAME=//')"
-cat >/etc/apt/sources.list.d/llvm.list <<EOF2
+case "${DISTRO_VERSION}" in
+    rolling | sid*) ;;
+    *)
+        curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+        codename="$(grep </etc/os-release '^VERSION_CODENAME=' | sed 's/^VERSION_CODENAME=//')"
+        cat >/etc/apt/sources.list.d/llvm.list <<EOF2
 deb https://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-${LLVM_VERSION} main
 deb-src https://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-${LLVM_VERSION} main
 EOF2
+        ;;
+esac
 apt-get -o Acquire::Retries=10 -qq update
 apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     clang-"${LLVM_VERSION}" \

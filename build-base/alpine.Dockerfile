@@ -43,6 +43,13 @@ apk --no-cache add \
     xz
 EOF
 
+# alpine                    | apt
+# ------------------------- | -------------
+# clang                     | clang
+# clang-dev + clang-static  | libclang-dev
+# lld                       | lld
+# llvm                      | llvm
+# llvm*-dev + llvm*-static  | llvm-dev
 FROM slim as base
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ARG LLVM_VERSION
@@ -50,8 +57,12 @@ RUN <<EOF
 apk --no-cache update -q
 apk --no-cache add \
     clang \
+    clang-dev \
+    clang-static \
     lld \
-    llvm"${LLVM_VERSION}"
+    llvm"${LLVM_VERSION}" \
+    llvm"${LLVM_VERSION}"-dev \
+    llvm"${LLVM_VERSION}"-static
 gcc --version
 clang --version
 cmake --version

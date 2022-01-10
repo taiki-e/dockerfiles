@@ -20,7 +20,7 @@ case "${dpkg_arch##*-}" in
     *) echo >&2 "unsupported architecture '${dpkg_arch}'" && exit 1 ;;
 esac
 mkdir -p cmake
-curl --proto '=https' --tlsv1.2 -fsSL --retry 10 "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-${cmake_arch}.tar.gz" \
+curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-${cmake_arch}.tar.gz" \
     | tar xzf - --strip-components 1 -C /cmake
 rm -rf \
     /cmake/{doc,man} \
@@ -33,7 +33,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # - Download-related packages (bzip2, curl, gnupg, libarchive-tools, unzip, xz-utils)
 #   are not necessarily needed for build, but they are small enough (< 10MB).
 RUN <<EOF
-apt-get -o Acquire::Retries=10 update -qq
+apt-get -o Acquire::Retries=10 -qq update
 apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     autoconf \
     automake \
@@ -64,19 +64,21 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 ARG LLVM_VERSION
 RUN <<EOF
-curl --proto '=https' --tlsv1.2 -fsSL --retry 10 https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 codename="$(grep </etc/os-release '^VERSION_CODENAME=' | sed 's/^VERSION_CODENAME=//')"
 cat >/etc/apt/sources.list.d/llvm.list <<EOF2
 deb https://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-${LLVM_VERSION} main
 deb-src https://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-${LLVM_VERSION} main
 EOF2
-apt-get -o Acquire::Retries=10 update -qq
+apt-get -o Acquire::Retries=10 -qq update
 apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     clang-"${LLVM_VERSION}" \
     libc++-"${LLVM_VERSION}"-dev \
     libc++abi-"${LLVM_VERSION}"-dev \
+    libclang-"${LLVM_VERSION}"-dev \
     lld-"${LLVM_VERSION}" \
-    llvm-"${LLVM_VERSION}"
+    llvm-"${LLVM_VERSION}" \
+    llvm-"${LLVM_VERSION}"-dev
 for tool in /usr/bin/clang*-"${LLVM_VERSION}" /usr/bin/llvm-*-"${LLVM_VERSION}" /usr/bin/*lld*-"${LLVM_VERSION}" /usr/bin/wasm-ld-"${LLVM_VERSION}"; do
     link="${tool%"-${LLVM_VERSION}"}"
     update-alternatives --install "${link}" "${link##*/}" "${tool}" 10

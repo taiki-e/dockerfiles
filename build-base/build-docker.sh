@@ -1,11 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 IFS=$'\n\t'
+cd "$(dirname "$0")"/..
 
 # USAGE:
 #    ./build-base/build-docker.sh <DISTRO>
-
-cd "$(cd "$(dirname "$0")" && pwd)"/..
 
 x() {
     local cmd="$1"

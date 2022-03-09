@@ -4,7 +4,7 @@ ARG MODE=base
 ARG ALPINE_VERSION=3.15
 
 # https://pkgs.alpinelinux.org/package/edge/main/x86_64/clang
-ARG LLVM_VERSION=12
+ARG LLVM_VERSION=13
 
 FROM alpine:"${ALPINE_VERSION}" as slim
 SHELL ["/bin/sh", "-eux", "-c"]

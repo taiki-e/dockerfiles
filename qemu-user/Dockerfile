@@ -20,7 +20,7 @@ done
 set -x
 apk --no-cache add file
 file /usr/bin/qemu-*
-if file /usr/bin/qemu-* | grep -E 'dynamically linked' >/dev/null; then
+if file /usr/bin/qemu-* | grep -Eq 'dynamically linked'; then
     exit 1
 fi
 EOF

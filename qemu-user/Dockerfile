@@ -3,7 +3,7 @@
 ARG ALPINE_VERSION=3.15
 
 # https://ftp.debian.org/debian/pool/main/q/qemu
-ARG QEMU_DPKG_VERSION=7.0+dfsg-2+b1
+ARG QEMU_DPKG_VERSION=7.0+dfsg-7
 
 FROM ghcr.io/taiki-e/downloader as downloader
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]

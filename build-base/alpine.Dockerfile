@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.3-labs
 
 ARG MODE=base
-ARG ALPINE_VERSION=3.15
+ARG ALPINE_VERSION=3.16
 
 # https://pkgs.alpinelinux.org/package/edge/main/x86_64/clang
 ARG LLVM_VERSION=13

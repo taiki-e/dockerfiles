@@ -40,11 +40,12 @@ default_distro=ubuntu
 # https://endoflife.date/ubuntu
 # | version        | EoL        |
 # | -------------- | ---------- |
+# | 22.04 (jammy)  | 2027-04-02 |
 # | 20.04 (focal)  | 2025-04-02 |
 # | 18.04 (bionic) | 2023-04-02 |
 # | 16.04 (xenial) | 2021-04-02 |
-ubuntu_latest=20.04
-ubuntu_versions=(18.04 20.04 rolling)
+ubuntu_latest=22.04
+ubuntu_versions=(18.04 20.04 22.04 rolling)
 # https://wiki.debian.org/DebianReleases
 # https://hub.docker.com/_/debian
 # https://endoflife.date/debian
@@ -60,12 +61,13 @@ debian_versions=(10 11 sid)
 # https://endoflife.date/alpine
 # | version | EoL        |
 # | ------- | ---------- |
+# | 3.16    | 2024-05-23 |
 # | 3.15    | 2023-11-01 |
 # | 3.14    | 2023-05-01 |
 # | 3.13    | 2022-11-01 |
 # | 3.12    | 2022-05-01 |
-alpine_latest=3.15
-alpine_versions=(3.13 3.14 3.15 edge)
+alpine_latest=3.16
+alpine_versions=(3.13 3.14 3.15 3.16 edge)
 
 build() {
     local dockerfile="${package}/${base}.Dockerfile"

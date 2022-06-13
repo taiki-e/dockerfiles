@@ -27,7 +27,7 @@ export BUILDKIT_STEP_LOG_MAX_SIZE=10485760
 owner="${OWNER:-taiki-e}"
 repository="ghcr.io/${owner}/${package}"
 platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
-time="$(date --utc '+%Y-%m-%d-%H-%M-%S')"
+time="$(date -u '+%Y-%m-%d-%H-%M-%S')"
 
 build() {
     local dockerfile="${package}/Dockerfile"

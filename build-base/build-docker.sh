@@ -31,7 +31,7 @@ owner="${OWNER:-taiki-e}"
 package="$(basename "$(dirname "$0")")"
 repository="ghcr.io/${owner}/${package}"
 platform=linux/amd64,linux/arm64/v8
-time="$(date --utc '+%Y-%m-%d-%H-%M-%S')"
+time="$(date -u '+%Y-%m-%d-%H-%M-%S')"
 
 distro_upper="$(tr '[:lower:]' '[:upper:]' <<<"${distro}")"
 default_distro=ubuntu

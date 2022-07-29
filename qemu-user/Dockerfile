@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.3-labs
 
-ARG ALPINE_VERSION=3.15
+ARG ALPINE_VERSION=3.16
 
 # https://ftp.debian.org/debian/pool/main/q/qemu
 ARG QEMU_DPKG_VERSION=7.0+dfsg-7

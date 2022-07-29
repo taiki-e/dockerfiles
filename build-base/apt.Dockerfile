@@ -7,7 +7,7 @@ ARG DISTRO_VERSION=22.04
 # https://github.com/Kitware/CMake/releases
 ARG CMAKE_VERSION=3.23.3
 # https://apt.llvm.org
-ARG LLVM_VERSION=13
+ARG LLVM_VERSION=14
 
 FROM ghcr.io/taiki-e/downloader as cmake
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
@@ -98,7 +98,15 @@ gcc --version
 clang --version
 EOF
 
+FROM "${MODE:-base}" as test
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
+COPY --from=cmake /cmake /cmake
+RUN <<EOF
+/cmake/bin/cmake --version
+EOF
+
 FROM "${MODE:-base}" as final
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
-COPY --from=cmake /cmake/. /usr/local/
+COPY --from=test /cmake/. /usr/local/

@@ -92,13 +92,13 @@ build() {
     fi
 
     if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
-        x docker buildx build --push "${build_args[@]}" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
+        x docker buildx build --push "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
         x docker pull "${full_tag}"
         x docker history "${full_tag}"
     elif [[ "${platform}" == *","* ]]; then
-        x docker buildx build "${build_args[@]}" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
+        x docker buildx build "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
     else
-        x docker buildx build --load "${build_args[@]}" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
+        x docker buildx build --load "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
         x docker history "${full_tag}"
     fi
 }
@@ -111,7 +111,10 @@ for mode in slim ""; do
             for distro_version in "${ubuntu_versions[@]}"; do
                 log_dir="tmp/log/${package}/${distro}-${distro_version}"
                 mkdir -p "${log_dir}"
-                build 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+                case "${distro_version}" in
+                    18.04) build --build-arg "LLVM_VERSION=13" 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" ;;
+                    *) build 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" ;;
+                esac
                 echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
             done
             ;;

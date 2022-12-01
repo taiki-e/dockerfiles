@@ -58,13 +58,5 @@ jobs:
           persist-credentials: false
       - uses: taiki-e/install-action@shellcheck
       - uses: taiki-e/install-action@shfmt
-      - run: npm install prettier
-      - run: shfmt -d $(git ls-files '*.sh')
-        if: always()
-      - run: npx prettier -c $(git ls-files '*.yml')
-        if: always()
-      - run: shellcheck $(git ls-files '*.sh')
-        if: always()
-      # SC2154 doesn't seem to work on dockerfile.
-      - run: shellcheck -e SC2148,SC2154 $(git ls-files '*Dockerfile')
+      - run: tools/tidy.sh
         if: always()

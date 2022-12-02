@@ -1,10 +1,7 @@
 # syntax=docker/dockerfile:1.3-labs
 
 ARG MODE=base
-ARG ALPINE_VERSION=3.16
-
-# https://pkgs.alpinelinux.org/package/edge/main/x86_64/clang
-ARG LLVM_VERSION=14
+ARG ALPINE_VERSION=3.17
 
 FROM alpine:"${ALPINE_VERSION}" as slim
 SHELL ["/bin/sh", "-eux", "-c"]
@@ -58,17 +55,18 @@ EOF
 # | llvm*-dev + llvm*-static  | llvm-dev     |
 FROM slim as base
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-ARG LLVM_VERSION
 RUN <<EOF
 apk --no-cache update -q
 apk --no-cache add \
     clang \
     clang-dev \
     clang-static \
-    lld \
-    llvm"${LLVM_VERSION}" \
-    llvm"${LLVM_VERSION}"-dev \
-    llvm"${LLVM_VERSION}"-static
+    lld
+llvm_version=$(clang --version | grep 'clang version' | sed 's/.*clang version //' | sed 's/\..*//')
+apk --no-cache add \
+    llvm"${llvm_version}" \
+    llvm"${llvm_version}"-dev \
+    llvm"${llvm_version}"-static
 gcc --version
 clang --version
 cmake --version

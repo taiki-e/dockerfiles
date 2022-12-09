@@ -1,0 +1,15 @@
+automake
+binutils
+BUILDKIT
+buildkitd
+buildx
+dfsg
+distro
+dpkg
+esac
+fsys
+libc
+libclang
+pkgconf
+tarfile
+workdir

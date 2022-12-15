@@ -41,35 +41,35 @@ default_distro=ubuntu
 # https://wiki.ubuntu.com/Releases
 # https://hub.docker.com/_/ubuntu
 # https://endoflife.date/ubuntu
-# | version        | EoL        |
-# | -------------- | ---------- |
-# | 22.04 (jammy)  | 2027-04-02 |
-# | 20.04 (focal)  | 2025-04-02 |
-# | 18.04 (bionic) | 2023-04-02 |
-# | 16.04 (xenial) | 2021-04-02 |
+# | version        | EoL        | glibc |
+# | -------------- | ---------- | ----- |
+# | 22.04 (jammy)  | 2027-04-02 | 2.35  |
+# | 20.04 (focal)  | 2025-04-02 | 2.31  |
+# | 18.04 (bionic) | 2023-04-02 | 2.27  |
+# | 16.04 (xenial) | 2021-04-02 | 2.23  |
 ubuntu_latest=22.04
 ubuntu_versions=(18.04 20.04 22.04 rolling)
 # https://wiki.debian.org/DebianReleases
 # https://hub.docker.com/_/debian
 # https://endoflife.date/debian
-# | version       | EoL        |
-# | ------------- | ---------- |
-# | 11 (bullseye) | 2026-08-15 |
-# | 10 (buster)   | 2024-06-01 |
-# | 9 (stretch)   | 2022-06-30 |
+# | version       | EoL        | glibc |
+# | ------------- | ---------- | ----- |
+# | 11 (bullseye) | 2026-08-15 | 2.31  |
+# | 10 (buster)   | 2024-06-01 | 2.28  |
+# | 9 (stretch)   | 2022-06-30 | 2.24  |
 debian_latest=11
 debian_versions=(10 11 sid)
 # https://alpinelinux.org/releases
 # https://hub.docker.com/_/alpine
 # https://endoflife.date/alpine
-# | version | EoL        |
-# | ------- | ---------- |
-# | 3.17    | 2024-11-22 |
-# | 3.16    | 2024-05-23 |
-# | 3.15    | 2023-11-01 |
-# | 3.14    | 2023-05-01 |
-# | 3.13    | 2022-11-01 |
-# | 3.12    | 2022-05-01 |
+# | version | EoL        | musl   |
+# | ------- | ---------- | ------ |
+# | 3.17    | 2024-11-22 | 1.2.3  |
+# | 3.16    | 2024-05-23 | 1.2.3  |
+# | 3.15    | 2023-11-01 | 1.2.2  |
+# | 3.14    | 2023-05-01 | 1.2.2  |
+# | 3.13    | 2022-11-01 | 1.2.2  |
+# | 3.12    | 2022-05-01 | 1.1.24 |
 alpine_latest=3.17
 alpine_versions=(3.13 3.14 3.15 3.16 3.17 edge)
 

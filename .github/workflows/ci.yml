@@ -36,6 +36,7 @@ jobs:
           - package: downloader
           - package: qemu-user
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v3
         with:

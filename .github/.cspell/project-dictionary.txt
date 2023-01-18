@@ -5,7 +5,6 @@ buildkitd
 buildx
 dfsg
 distro
-dpkg
 esac
 fsys
 libc

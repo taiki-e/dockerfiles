@@ -42,13 +42,13 @@ build() {
     )
 
     if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
-        x docker buildx build --push "${build_args[@]}" || (echo "info: build log saved at ${log_dir}/build-docker-${time}.log" && exit 1)
+        x docker buildx build --provenance=false --push "${build_args[@]}" || (echo "info: build log saved at ${log_dir}/build-docker-${time}.log" && exit 1)
         x docker pull "${tag}"
         x docker history "${tag}"
     elif [[ "${platform}" == *","* ]]; then
-        x docker buildx build "${build_args[@]}" || (echo "info: build log saved at ${log_dir}/build-docker-${time}.log" && exit 1)
+        x docker buildx build --provenance=false "${build_args[@]}" || (echo "info: build log saved at ${log_dir}/build-docker-${time}.log" && exit 1)
     else
-        x docker buildx build --load "${build_args[@]}" || (echo "info: build log saved at ${log_dir}/build-docker-${time}.log" && exit 1)
+        x docker buildx build --provenance=false --load "${build_args[@]}" || (echo "info: build log saved at ${log_dir}/build-docker-${time}.log" && exit 1)
         x docker history "${tag}"
     fi
 }

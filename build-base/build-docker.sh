@@ -96,13 +96,13 @@ build() {
     fi
 
     if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
-        x docker buildx build --push "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
+        x docker buildx build --provenance=false --push "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
         x docker pull "${full_tag}"
         x docker history "${full_tag}"
     elif [[ "${platform}" == *","* ]]; then
-        x docker buildx build "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
+        x docker buildx build --provenance=false "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
     else
-        x docker buildx build --load "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
+        x docker buildx build --provenance=false --load "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
         x docker history "${full_tag}"
     fi
 }

@@ -62,7 +62,7 @@ apk --no-cache add \
     clang-dev \
     clang-static \
     lld
-llvm_version=$(clang --version | grep 'clang version' | sed 's/.*clang version //' | sed 's/\..*//')
+llvm_version=$(clang --version | grep 'clang version' | sed 's/.*clang version //; s/\..*//')
 apk --no-cache add \
     llvm"${llvm_version}" \
     llvm"${llvm_version}"-dev \

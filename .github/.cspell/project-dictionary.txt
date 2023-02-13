@@ -10,5 +10,6 @@ fsys
 libc
 libclang
 pkgconf
+rockylinux
 tarfile
 workdir

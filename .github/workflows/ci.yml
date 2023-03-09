@@ -2,7 +2,6 @@ name: CI
 
 permissions:
   contents: read
-  packages: write
 
 on:
   pull_request:
@@ -37,6 +36,9 @@ jobs:
           - package: qemu-user
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v3
         with:

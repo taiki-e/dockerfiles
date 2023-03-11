@@ -56,6 +56,6 @@ jobs:
             network=host
       - run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-          echo "PUSH_TO_GHCR=1" >> "${GITHUB_ENV}"
+          echo "PUSH_TO_GHCR=1" >>"${GITHUB_ENV}"
         if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
       - run: ${{ matrix.package }}/build-docker.sh ${{ matrix.distro }}

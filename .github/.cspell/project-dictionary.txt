@@ -1,5 +1,4 @@
 automake
-binutils
 BUILDKIT
 buildkitd
 buildx

@@ -49,6 +49,7 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     libtool \
     make \
     ninja-build \
+    patch \
     pkg-config \
     unzip \
     xz-utils

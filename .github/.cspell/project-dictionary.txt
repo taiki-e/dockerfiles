@@ -4,7 +4,6 @@ buildkitd
 buildx
 dfsg
 distro
-esac
 fsys
 libc
 libclang

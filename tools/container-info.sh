@@ -33,17 +33,19 @@ ubuntu_versions=(14.04 16.04 18.04 20.04 22.04 rolling)
 # https://endoflife.date/debian
 # | version       | EoL        | glibc |
 # | ------------- | ---------- | ----- |
-# | 11 (bullseye) | 2026-08-15 | 2.31  |
-# | 10 (buster)   | 2024-06-01 | 2.28  |
-# | 9 (stretch)   | 2022-06-30 | 2.24  |
+# | 12 (bookworm) | 2028-06-10 | 2.36  |
+# | 11 (bullseye) | 2026-06-30 | 2.31  |
+# | 10 (buster)   | 2024-06-30 | 2.28  |
+# | 9 (stretch)   | 2022-07-01 | 2.24  |
 # | 8 (jessie)    | 2020-06-30 | 2.19  |
 # | 7 (wheezy)    | 2018-05-31 | 2.13  |
-debian_versions=(7 8 9 10 11 sid)
+debian_versions=(7 8 9 10 11 12 sid)
 # https://alpinelinux.org/releases
 # https://hub.docker.com/_/alpine
 # https://endoflife.date/alpine
 # | version | EoL        | musl   |
 # | ------- | ---------- | ------ |
+# | 3.18    | 2025-05-09 | 1.2.4  |
 # | 3.17    | 2024-11-22 | 1.2.3  |
 # | 3.16    | 2024-05-23 | 1.2.3  |
 # | 3.15    | 2023-11-01 | 1.2.2  |
@@ -55,12 +57,13 @@ debian_versions=(7 8 9 10 11 sid)
 # | 3.9     | 2021-01-01 | 1.1.20 |
 # | 3.8     | 2020-05-01 | 1.1.19 |
 # | 3.7     | 2019-11-01 | 1.1.18 |
-alpine_versions=(3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 3.15 3.16 3.17 edge)
+alpine_versions=(3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 3.15 3.16 3.17 3.18 edge)
 # https://docs.fedoraproject.org/en-US/releases
 # https://hub.docker.com/_/fedora
 # https://endoflife.date/fedora
 # | version | EoL        | glibc |
 # | ------- | ---------- | ----- |
+# | 38      | 2024-05-18 | 2.37  |
 # | 37      | 2023-12-15 | 2.36  |
 # | 36      | 2023-05-16 | 2.35  |
 # | 35      | 2022-12-13 | 2.34  |
@@ -71,7 +74,7 @@ alpine_versions=(3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 3.15 3.16 3.17 edge)
 # | 30      | 2020-05-26 | 2.29  |
 # | 29      | 2019-11-26 | 2.28  |
 # | 28      | 2019-05-28 | 2.27  |
-fedora_versions=(28 29 30 31 32 33 34 35 36 37 rawhide)
+fedora_versions=(28 29 30 31 32 33 34 35 36 37 38 rawhide)
 # https://hub.docker.com/_/centos
 # https://endoflife.date/centos
 # | version | EoL        | glibc |

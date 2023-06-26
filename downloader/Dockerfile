@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-ARG ALPINE_VERSION=3.17
+ARG ALPINE_VERSION=3.18
 
 FROM alpine:"${ALPINE_VERSION}"
 SHELL ["/bin/sh", "-eux", "-c"]

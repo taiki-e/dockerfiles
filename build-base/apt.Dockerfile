@@ -5,7 +5,7 @@ ARG DISTRO=ubuntu
 ARG DISTRO_VERSION=22.04
 
 # https://github.com/Kitware/CMake/releases
-ARG CMAKE_VERSION=3.26.4
+ARG CMAKE_VERSION=3.27.1
 # https://apt.llvm.org
 ARG LLVM_VERSION=15
 
@@ -88,7 +88,7 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     llvm-"${LLVM_VERSION}"-dev
 for tool in /usr/bin/clang*-"${LLVM_VERSION}" /usr/bin/llvm-*-"${LLVM_VERSION}" /usr/bin/*lld*-"${LLVM_VERSION}" /usr/bin/wasm-ld-"${LLVM_VERSION}"; do
     link="${tool%"-${LLVM_VERSION}"}"
-    update-alternatives --install "${link}" "${link##*/}" "${tool}" 10
+    update-alternatives --install "${link}" "${link##*/}" "${tool}" 100
 done
 rm -rf \
     /var/lib/apt/lists/* \

@@ -32,12 +32,12 @@ export DOCKER_BUILDKIT=1
 export BUILDKIT_STEP_LOG_MAX_SIZE=10485760
 
 owner="${OWNER:-taiki-e}"
-package="$(basename "$(dirname "$0")")"
+package=$(basename "$(dirname "$0")")
 repository="ghcr.io/${owner}/${package}"
 platform=linux/amd64,linux/arm64/v8
-time="$(date -u '+%Y-%m-%d-%H-%M-%S')"
+time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
-distro_upper="$(tr '[:lower:]' '[:upper:]' <<<"${distro}")"
+distro_upper=$(tr '[:lower:]' '[:upper:]' <<<"${distro}")
 default_distro=ubuntu
 # https://wiki.ubuntu.com/Releases
 # https://hub.docker.com/_/ubuntu

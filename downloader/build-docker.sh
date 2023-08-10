@@ -18,5 +18,5 @@ EOF
     exit 1
 fi
 
-package="$(basename "$(dirname "$0")")"
+package=$(basename "$(dirname "$0")")
 ./tools/build-docker-single.sh "${package}" "$@"

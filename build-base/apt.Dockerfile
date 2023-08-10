@@ -13,7 +13,7 @@ FROM ghcr.io/taiki-e/downloader as cmake
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ARG CMAKE_VERSION
 RUN <<EOF
-dpkg_arch="$(dpkg --print-architecture)"
+dpkg_arch=$(dpkg --print-architecture)
 case "${dpkg_arch##*-}" in
     amd64) cmake_arch=x86_64 ;;
     arm64) cmake_arch=aarch64 ;;
@@ -70,7 +70,7 @@ case "${DISTRO_VERSION}" in
     rolling | sid*) ;;
     *)
         curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-        codename="$(grep '^VERSION_CODENAME=' /etc/os-release | sed 's/^VERSION_CODENAME=//')"
+        codename=$(grep '^VERSION_CODENAME=' /etc/os-release | sed 's/^VERSION_CODENAME=//')
         cat >/etc/apt/sources.list.d/llvm.list <<EOF2
 deb https://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-${LLVM_VERSION} main
 deb-src https://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-${LLVM_VERSION} main

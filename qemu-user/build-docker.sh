@@ -37,6 +37,7 @@ platform=linux/amd64,linux/arm64/v8
 time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
 # https://ftp.debian.org/debian/pool/main/q/qemu
+# https://tracker.debian.org/pkg/qemu
 latest="8.0"
 versions=(
     "8.1"
@@ -44,7 +45,7 @@ versions=(
     "7.2"
 )
 dpkg_versions=(
-    "8.1.0~rc2+dfsg-1"
+    "8.1.0~rc3+dfsg-2"
     "8.0.3+dfsg-5"
     "7.2+dfsg-7~bpo11+1"
 )

@@ -10,6 +10,15 @@ trap 's=$?; echo >&2 "$0: error on line "${LINENO}": ${BASH_COMMAND}"; exit ${s}
 # USAGE:
 #    ./qemu-user/build-docker.sh
 
+x() {
+    local cmd="$1"
+    shift
+    (
+        set -x
+        "${cmd}" "$@"
+    )
+}
+
 if [[ $# -gt 0 ]]; then
     cat <<EOF
 USAGE:
@@ -18,5 +27,64 @@ EOF
     exit 1
 fi
 
+export DOCKER_BUILDKIT=1
+export BUILDKIT_STEP_LOG_MAX_SIZE=10485760
+
+owner="${OWNER:-taiki-e}"
 package=$(basename "$(dirname "$0")")
-./tools/build-docker-single.sh "${package}" "$@"
+repository="ghcr.io/${owner}/${package}"
+platform=linux/amd64,linux/arm64/v8
+time=$(date -u '+%Y-%m-%d-%H-%M-%S')
+
+# https://ftp.debian.org/debian/pool/main/q/qemu
+latest="8.0"
+versions=(
+    "8.1"
+    "${latest}"
+    "7.2"
+)
+dpkg_versions=(
+    "8.1.0~rc2+dfsg-1"
+    "8.0.3+dfsg-5"
+    "7.2+dfsg-7~bpo11+1"
+)
+
+build() {
+    local dockerfile="${package}/Dockerfile"
+    local full_tag="${repository}:${version}"
+    local build_args=(
+        --file "${dockerfile}" "${package}/"
+        --platform "${platform}"
+        --tag "${full_tag}"
+        --build-arg "QEMU_DPKG_VERSION=${dpkg_version}"
+    )
+    if [[ "${version}" == "${latest}" ]]; then
+        build_args+=(
+            --tag "${repository}:latest"
+        )
+    fi
+
+    if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
+        x docker buildx build --provenance=false --push "${build_args[@]}" || (echo "info: build log saved at ${log_file}" && exit 1)
+        x docker pull "${full_tag}"
+        x docker history "${full_tag}"
+    elif [[ "${platform}" == *","* ]]; then
+        x docker buildx build --provenance=false "${build_args[@]}" || (echo "info: build log saved at ${log_file}" && exit 1)
+    else
+        x docker buildx build --provenance=false --load "${build_args[@]}" || (echo "info: build log saved at ${log_file}" && exit 1)
+        x docker history "${full_tag}"
+    fi
+    x docker system df
+}
+
+for i in "${!versions[@]}"; do
+    version="${versions[${i}]}"
+    dpkg_version="${dpkg_versions[${i}]}"
+    log_dir="tmp/log/${package}/${version}"
+    log_file="${log_dir}/build-docker-${time}.log"
+    mkdir -p "${log_dir}"
+    build 2>&1 | tee "${log_file}"
+    echo "info: build log saved at ${log_file}"
+done
+
+x docker images "${repository}"

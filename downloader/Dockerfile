@@ -14,8 +14,10 @@ apk --no-cache add \
     ca-certificates \
     curl \
     dpkg \
+    file \
     git \
     libarchive-tools \
+    lynx \
     tar \
     unzip \
     wget \

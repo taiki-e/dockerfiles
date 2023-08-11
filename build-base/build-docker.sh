@@ -81,15 +81,16 @@ build() {
     fi
 
     if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
-        x docker buildx build --provenance=false --push "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
+        x docker buildx build --provenance=false --push "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_file}" && exit 1)
         x docker pull "${full_tag}"
         x docker history "${full_tag}"
     elif [[ "${platform}" == *","* ]]; then
-        x docker buildx build --provenance=false "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
+        x docker buildx build --provenance=false "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_file}" && exit 1)
     else
-        x docker buildx build --provenance=false --load "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" && exit 1)
+        x docker buildx build --provenance=false --load "${build_args[@]}" "$@" || (echo "info: build log saved at ${log_file}" && exit 1)
         x docker history "${full_tag}"
     fi
+    x docker system df
 }
 
 for mode in slim ""; do
@@ -99,12 +100,13 @@ for mode in slim ""; do
             distro_latest="${ubuntu_latest}"
             for distro_version in "${ubuntu_versions[@]}"; do
                 log_dir="tmp/log/${package}/${distro}-${distro_version}"
+                log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
                 mkdir -p "${log_dir}"
                 case "${distro_version}" in
-                    18.04) build --build-arg "LLVM_VERSION=13" 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" ;;
-                    *) build 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log" ;;
+                    18.04) build --build-arg "LLVM_VERSION=13" 2>&1 | tee "${log_file}" ;;
+                    *) build 2>&1 | tee "${log_file}" ;;
                 esac
-                echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+                echo "info: build log saved at ${log_file}"
             done
             ;;
         debian)
@@ -112,10 +114,11 @@ for mode in slim ""; do
             distro_latest="${debian_latest}-slim"
             for distro_version in "${debian_versions[@]}"; do
                 log_dir="tmp/log/${package}/${distro}-${distro_version}"
+                log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
                 mkdir -p "${log_dir}"
                 distro_version="${distro_version}-slim"
-                build 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
-                echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+                build 2>&1 | tee "${log_file}"
+                echo "info: build log saved at ${log_file}"
             done
             ;;
         alpine)
@@ -123,9 +126,10 @@ for mode in slim ""; do
             distro_latest="${alpine_latest}"
             for distro_version in "${alpine_versions[@]}"; do
                 log_dir="tmp/log/${package}/${distro}-${distro_version}"
+                log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
                 mkdir -p "${log_dir}"
-                build 2>&1 | tee "${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
-                echo "info: build log saved at ${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+                build 2>&1 | tee "${log_file}"
+                echo "info: build log saved at ${log_file}"
             done
             ;;
         *) echo >&2 "error: unrecognized distro '${distro}'" && exit 1 ;;

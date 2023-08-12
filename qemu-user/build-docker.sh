@@ -46,8 +46,8 @@ versions=(
 )
 dpkg_versions=(
     "8.1.0~rc3+dfsg-2"
-    "8.0.3+dfsg-5"
-    "7.2+dfsg-7~bpo11+1"
+    "8.0.4+dfsg-1"
+    "7.2+dfsg-7+deb12u1"
 )
 
 build() {

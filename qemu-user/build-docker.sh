@@ -45,7 +45,7 @@ versions=(
     "7.2"
 )
 dpkg_versions=(
-    "8.1.0~rc3+dfsg-2"
+    "8.1.0~rc4+ds-2"
     "8.0.4+dfsg-1"
     "7.2+dfsg-7+deb12u1"
 )

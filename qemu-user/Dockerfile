@@ -9,11 +9,6 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ARG QEMU_DPKG_VERSION
 RUN <<EOF
 dpkg_arch=$(dpkg --print-architecture)
-if [[ "${QEMU_DPKG_VERSION}" == "8.1.0~rc4+ds-2" ]]; then
-    case "${dpkg_arch##*-}" in
-        arm64) QEMU_DPKG_VERSION='8.1.0~rc4+ds-1' ;;
-    esac
-fi
 mkdir -p /tmp/qemu
 mkdir -p /qemu
 curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused "https://ftp.debian.org/debian/pool/main/q/qemu/qemu-user-static_${QEMU_DPKG_VERSION}_${dpkg_arch##*-}.deb" \

@@ -38,16 +38,16 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
 # https://ftp.debian.org/debian/pool/main/q/qemu
 # https://tracker.debian.org/pkg/qemu
-latest="8.0"
+latest=8.1
 versions=(
-    "8.1"
-    "${latest}"
-    "7.2"
+    8.1
+    8.0
+    7.2
 )
 dpkg_versions=(
-    "8.1.0~rc4+ds-4"
-    "8.0.4+dfsg-2"
-    "7.2+dfsg-7+deb12u1"
+    8.1.0+ds-1~exp1
+    8.0.4+dfsg-3
+    7.2+dfsg-7+deb12u1
 )
 
 build() {

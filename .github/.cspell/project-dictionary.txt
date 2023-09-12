@@ -1,6 +1,5 @@
 automake
 BUILDKIT
-buildkitd
 buildx
 dfsg
 distro

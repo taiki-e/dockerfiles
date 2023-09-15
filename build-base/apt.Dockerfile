@@ -5,7 +5,7 @@ ARG DISTRO=ubuntu
 ARG DISTRO_VERSION=22.04
 
 # https://github.com/Kitware/CMake/releases
-ARG CMAKE_VERSION=3.27.4
+ARG CMAKE_VERSION=3.27.5
 # https://apt.llvm.org
 ARG LLVM_VERSION=15
 

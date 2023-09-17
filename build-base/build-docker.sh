@@ -34,7 +34,7 @@ export BUILDKIT_STEP_LOG_MAX_SIZE=10485760
 owner="${OWNER:-taiki-e}"
 package=$(basename "$(dirname "$0")")
 repository="ghcr.io/${owner}/${package}"
-platform=linux/amd64,linux/arm64/v8
+platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
 time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
 distro_upper=$(tr '[:lower:]' '[:upper:]' <<<"${distro}")

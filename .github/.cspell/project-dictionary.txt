@@ -5,7 +5,11 @@ dfsg
 distro
 fsys
 libclang
+lxde
+novnc
 pkgconf
 rockylinux
 tarfile
+tigervnc
+websockify
 workdir

@@ -12,6 +12,7 @@ ARG DISTRO_VERSION
 RUN <<EOF
 apt-get -o Acquire::Retries=10 -qq update
 packages=(
+    bash-completion
     bzip2
     ca-certificates
     curl
@@ -45,4 +46,6 @@ rm -rf \
     /var/cache/* \
     /var/log/* \
     /usr/share/{doc,man}
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23
+mkdir -p /usr/share/man/man1
 EOF

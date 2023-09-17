@@ -68,7 +68,7 @@ ARG DISTRO_VERSION
 ARG LLVM_VERSION
 RUN <<EOF
 case "${DISTRO_VERSION}" in
-    rolling | sid*) ;;
+    rolling | testing* | sid*) ;;
     *)
         curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
         codename=$(grep '^VERSION_CODENAME=' /etc/os-release | sed 's/^VERSION_CODENAME=//')
@@ -96,6 +96,8 @@ rm -rf \
     /var/cache/* \
     /var/log/* \
     /usr/share/{doc,man}
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23
+mkdir -p /usr/share/man/man1
 gcc --version
 clang --version
 EOF

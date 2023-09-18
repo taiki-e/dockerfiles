@@ -53,4 +53,8 @@ rm -rf \
     /usr/share/{doc,man}
 # workaround for openjdk installation issue: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23
 mkdir -p /usr/share/man/man1
+# enable bash completion
+start=$(grep -nr "^#if ! shopt -oq posix; then" /etc/bash.bashrc | cut -d : -f 1)
+end=$((start + 6))
+sed -i "${start},${end} s/^#//" /etc/bash.bashrc
 EOF

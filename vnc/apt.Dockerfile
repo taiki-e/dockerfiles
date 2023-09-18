@@ -3,12 +3,14 @@
 
 ARG DISTRO=ubuntu
 ARG DISTRO_VERSION=22.04
+ARG DESKTOP=lxde
 
 FROM "${DISTRO}":"${DISTRO_VERSION}"
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 ARG DISTRO
 ARG DISTRO_VERSION
+ARG DESKTOP
 RUN <<EOF
 apt-get -o Acquire::Retries=10 -qq update
 packages=(
@@ -17,10 +19,11 @@ packages=(
     ca-certificates
     curl
     file
-    g++
+    gcc
     git
     gnupg
     libarchive-tools
+    libc6-dev
     nano
     patch
     sudo
@@ -29,11 +32,13 @@ packages=(
     xz-utils
 )
 packages+=(
-    lxde
     novnc
     tigervnc-common
     tigervnc-standalone-server
     websockify
+)
+packages+=(
+    "${DESKTOP}"
 )
 case "${DISTRO}-${DISTRO_VERSION}" in
     ubuntu-1[0-9].* | ubuntu-2[0-1].*) ;;
@@ -46,6 +51,6 @@ rm -rf \
     /var/cache/* \
     /var/log/* \
     /usr/share/{doc,man}
-# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23
+# workaround for openjdk installation issue: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23
 mkdir -p /usr/share/man/man1
 EOF

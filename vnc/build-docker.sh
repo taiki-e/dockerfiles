@@ -46,7 +46,7 @@ ubuntu_versions=(20.04 22.04)
 
 build() {
     local dockerfile="${package}/${base}.Dockerfile"
-    local full_tag="${repository}:${distro}-${distro_version/-slim/}"
+    local full_tag="${repository}:${distro}-${distro_version/-slim/}${DESKTOP:+"-${DESKTOP}"}"
     local build_args=(
         --file "${dockerfile}" "${package}/"
         --platform "${platform}"
@@ -55,10 +55,15 @@ build() {
         --build-arg "DISTRO_VERSION=${distro_version}"
         --build-arg "${distro_upper}_VERSION=${distro_version}"
     )
+    if [[ -n "${DESKTOP:-}" ]]; then
+        build_args+=(
+            --build-arg "DESKTOP=${DESKTOP}"
+        )
+    fi
     if [[ "${distro_version}" == "${distro_latest}" ]]; then
         build_args+=(
-            --tag "${repository}:${distro}"
-            --tag "${repository}:${distro}-latest"
+            --tag "${repository}:${distro}${DESKTOP:+"-${DESKTOP}"}"
+            --tag "${repository}:${distro}-latest${DESKTOP:+"-${DESKTOP}"}"
         )
         # if [[ "${default_distro}" == "${distro}" ]]; then
         #     build_args+=(--tag "${repository}:latest")
@@ -85,7 +90,7 @@ case "${distro}" in
         distro_latest="${ubuntu_latest}"
         for distro_version in "${ubuntu_versions[@]}"; do
             log_dir="tmp/log/${package}/${distro}-${distro_version}"
-            log_file="${log_dir}/build-docker-${time}.log"
+            log_file="${log_dir}/build-docker${DESKTOP:+"-${DESKTOP}"}-${time}.log"
             mkdir -p "${log_dir}"
             build "$@" 2>&1 | tee "${log_file}"
             echo "info: build log saved at ${log_file}"

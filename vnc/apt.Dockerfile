@@ -17,7 +17,6 @@ packages=(
     bash-completion
     bzip2
     ca-certificates
-    cmake
     curl
     file
     gcc

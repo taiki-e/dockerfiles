@@ -17,6 +17,7 @@ packages=(
     bash-completion
     bzip2
     ca-certificates
+    cmake
     curl
     file
     gcc
@@ -30,6 +31,7 @@ packages=(
     unzip
     wget
     xz-utils
+    zsh
 )
 packages+=(
     novnc

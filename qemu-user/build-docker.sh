@@ -45,7 +45,7 @@ versions=(
     7.2
 )
 dpkg_versions=(
-    8.1.0+ds-5
+    8.1.0+ds-6
     8.0.4+dfsg-3+b1
     7.2+dfsg-7+deb12u1
 )

@@ -51,7 +51,7 @@ ubuntu_versions=(18.04 20.04 22.04 rolling)
 # https://endoflife.date/debian
 # See also tools/container-info.sh
 debian_latest=12
-debian_versions=(10 11 12 testing sid)
+debian_versions=(10 11 12 testing)
 # https://alpinelinux.org/releases
 # https://hub.docker.com/_/alpine
 # https://endoflife.date/alpine

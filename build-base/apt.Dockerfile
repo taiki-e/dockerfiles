@@ -68,7 +68,7 @@ ARG DISTRO_VERSION
 ARG LLVM_VERSION
 RUN <<EOF
 case "${DISTRO_VERSION}" in
-    rolling | testing* | sid*) ;;
+    rolling | devel | testing* | sid*) ;;
     *)
         curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
         codename=$(grep '^VERSION_CODENAME=' /etc/os-release | sed 's/^VERSION_CODENAME=//')

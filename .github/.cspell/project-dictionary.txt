@@ -1,6 +1,8 @@
+almalinux
 automake
 BUILDKIT
 buildx
+devel
 dfsg
 distro
 fsys

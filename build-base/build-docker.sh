@@ -39,22 +39,12 @@ platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
 time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
 distro_upper=$(tr '[:lower:]' '[:upper:]' <<<"${distro}")
-# default_distro=ubuntu
-# https://wiki.ubuntu.com/Releases
-# https://hub.docker.com/_/ubuntu
-# https://endoflife.date/ubuntu
 # See also tools/container-info.sh
 ubuntu_latest=22.04
 ubuntu_versions=(18.04 20.04 22.04 rolling)
-# https://wiki.debian.org/DebianReleases
-# https://hub.docker.com/_/debian
-# https://endoflife.date/debian
 # See also tools/container-info.sh
 debian_latest=12
 debian_versions=(10 11 12 testing)
-# https://alpinelinux.org/releases
-# https://hub.docker.com/_/alpine
-# https://endoflife.date/alpine
 # See also tools/container-info.sh
 alpine_latest=3.18
 alpine_versions=(3.13 3.14 3.15 3.16 3.17 3.18 edge)
@@ -76,9 +66,6 @@ build() {
             --tag "${repository}:${distro}${mode:+"-${mode}"}"
             --tag "${repository}:${distro}-latest${mode:+"-${mode}"}"
         )
-        # if [[ "${default_distro}" == "${distro}" ]]; then
-        #     build_args+=(--tag "${repository}:${mode:-latest}")
-        # fi
     fi
     build_args+=("$@")
 

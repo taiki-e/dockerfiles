@@ -39,7 +39,6 @@ platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
 time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
 distro_upper=$(tr '[:lower:]' '[:upper:]' <<<"${distro}")
-# default_distro=ubuntu
 # See also tools/container-info.sh
 ubuntu_latest=22.04
 ubuntu_versions=(20.04 22.04)
@@ -65,9 +64,6 @@ build() {
             --tag "${repository}:${distro}${DESKTOP:+"-${DESKTOP}"}"
             --tag "${repository}:${distro}-latest${DESKTOP:+"-${DESKTOP}"}"
         )
-        # if [[ "${default_distro}" == "${distro}" ]]; then
-        #     build_args+=(--tag "${repository}:latest")
-        # fi
     fi
     build_args+=("$@")
 

@@ -1,5 +1,4 @@
 almalinux
-automake
 BUILDKIT
 buildx
 devel

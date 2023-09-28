@@ -41,13 +41,11 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 latest=8.1
 versions=(
     8.1
-    8.0
     7.2
 )
 dpkg_versions=(
     8.1.0+ds-6
-    8.0.4+dfsg-3+b1
-    7.2+dfsg-7+deb12u1
+    7.2+dfsg-7+deb12u2
 )
 
 build() {

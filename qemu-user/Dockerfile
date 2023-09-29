@@ -6,7 +6,7 @@ ARG ALPINE_VERSION=3.18
 ARG QEMU_DPKG_VERSION
 
 FROM ghcr.io/taiki-e/downloader as downloader
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG QEMU_DPKG_VERSION
 RUN <<EOF
 dpkg_arch=$(dpkg --print-architecture)

@@ -11,7 +11,7 @@ ARG CMAKE_VERSION=3.27.6
 ARG LLVM_VERSION=15
 
 FROM ghcr.io/taiki-e/downloader as cmake
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG CMAKE_VERSION
 RUN <<EOF
 dpkg_arch=$(dpkg --print-architecture)
@@ -29,7 +29,7 @@ rm -rf \
 EOF
 
 FROM "${DISTRO}":"${DISTRO_VERSION}" as slim
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 # - Download-related packages (bzip2, curl, gnupg, libarchive-tools, unzip, xz-utils)
 #   are not necessarily needed for build, but they are small enough (< 10MB).
@@ -62,7 +62,7 @@ rm -rf \
 EOF
 
 FROM slim as base
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 ARG DISTRO_VERSION
 ARG LLVM_VERSION
@@ -103,7 +103,7 @@ clang --version
 EOF
 
 FROM "${MODE:-base}" as test
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 COPY --from=cmake /cmake /cmake
 RUN <<EOF
@@ -111,6 +111,6 @@ RUN <<EOF
 EOF
 
 FROM "${MODE:-base}" as final
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 COPY --from=test /cmake/. /usr/local/

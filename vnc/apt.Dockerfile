@@ -6,7 +6,7 @@ ARG DISTRO_VERSION=22.04
 ARG DESKTOP=lxde
 
 FROM "${DISTRO}":"${DISTRO_VERSION}"
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 ARG DISTRO
 ARG DISTRO_VERSION

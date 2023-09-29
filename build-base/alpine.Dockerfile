@@ -55,7 +55,7 @@ EOF
 # | llvm                      | llvm         |
 # | llvm*-dev + llvm*-static  | llvm-dev     |
 FROM slim as base
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 RUN <<EOF
 apk --no-cache update -q
 apk --no-cache add \
@@ -74,4 +74,4 @@ cmake --version
 EOF
 
 FROM "${MODE:-base}" as final
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]

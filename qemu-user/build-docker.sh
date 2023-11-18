@@ -39,11 +39,6 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 # https://ftp.debian.org/debian/pool/main/q/qemu
 # https://tracker.debian.org/pkg/qemu
 latest=8.1
-versions=(
-    8.2
-    8.1
-    7.2
-)
 dpkg_versions=(
     8.2.0~rc0+ds-1
     8.1.2+ds-1
@@ -78,9 +73,15 @@ build() {
     x docker system df
 }
 
-for i in "${!versions[@]}"; do
-    version="${versions[${i}]}"
-    dpkg_version="${dpkg_versions[${i}]}"
+for dpkg_version in "${dpkg_versions[@]}"; do
+    if [[ "${dpkg_version}" =~ ^[1-9]\.[0-9][\.\+].+ ]]; then
+        version=$(cut -c '-3' <<<"${dpkg_version}")
+    elif [[ "${dpkg_version}" =~ ^[1-9][0-9]\.[0-9][\.\+].+ ]]; then
+        version=$(cut -c '-4' <<<"${dpkg_version}")
+    else
+        echo "error: ${dpkg_version}"
+        exit 1
+    fi
     log_dir="tmp/log/${package}/${version}"
     log_file="${log_dir}/build-docker-${time}.log"
     mkdir -p "${log_dir}"

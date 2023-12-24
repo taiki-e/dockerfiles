@@ -8,7 +8,7 @@ ARG DISTRO_VERSION=22.04
 # https://github.com/Kitware/CMake/releases
 ARG CMAKE_VERSION=3.28.1
 # https://apt.llvm.org
-ARG LLVM_VERSION=15
+ARG LLVM_VERSION=17
 
 FROM ghcr.io/taiki-e/downloader as cmake
 SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]

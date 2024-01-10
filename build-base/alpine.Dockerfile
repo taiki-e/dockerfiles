@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 
 ARG MODE=base
-ARG ALPINE_VERSION=3.18
+ARG ALPINE_VERSION=3.19
 
 FROM alpine:"${ALPINE_VERSION}" as slim
 SHELL ["/bin/sh", "-eux", "-c"]

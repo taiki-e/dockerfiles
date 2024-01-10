@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 
-ARG ALPINE_VERSION=3.18
+ARG ALPINE_VERSION=3.19
 
 ARG QEMU_DPKG_VERSION
 

@@ -1,7 +1,6 @@
 almalinux
 BUILDKIT
 buildx
-devel
 dfsg
 distro
 fsys

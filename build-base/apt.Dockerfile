@@ -6,9 +6,9 @@ ARG DISTRO=ubuntu
 ARG DISTRO_VERSION=22.04
 
 # https://github.com/Kitware/CMake/releases
-ARG CMAKE_VERSION=3.29.0
+ARG CMAKE_VERSION=3.29.1
 # https://apt.llvm.org
-# TODO: update to 17
+# TODO: update to 18
 ARG LLVM_VERSION=15
 
 FROM ghcr.io/taiki-e/downloader as cmake

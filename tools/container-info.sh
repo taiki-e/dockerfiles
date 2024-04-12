@@ -139,19 +139,19 @@ for distro_version in ${ubuntu_versions[@]+"${ubuntu_versions[@]}"}; do
 done
 for distro_version in ${debian_versions[@]+"${debian_versions[@]}"}; do
     case "${distro_version}" in
-        [0-8]) container_info debian:"${distro_version}" --platform linux/x86_64 ;;
+        [0-8]) container_info debian:"${distro_version}" --platform linux/amd64 ;;
         *) container_info debian:"${distro_version}" ;;
     esac
 done
 for distro_version in ${fedora_versions[@]+"${fedora_versions[@]}"}; do
     case "${distro_version}" in
-        2[0-5]) container_info fedora:"${distro_version}" --platform linux/x86_64 ;;
+        2[0-5]) container_info fedora:"${distro_version}" --platform linux/amd64 ;;
         *) container_info fedora:"${distro_version}" ;;
     esac
 done
 for distro_version in ${centos_versions[@]+"${centos_versions[@]}"}; do
     case "${distro_version}" in
-        [0-6]) container_info centos:"${distro_version}" --platform linux/x86_64 ;;
+        [0-6]) container_info centos:"${distro_version}" --platform linux/amd64 ;;
         *) container_info centos:"${distro_version}" ;;
     esac
 done
@@ -163,7 +163,7 @@ for distro_version in ${alma_versions[@]+"${alma_versions[@]}"}; do
 done
 for distro_version in ${alpine_versions[@]+"${alpine_versions[@]}"}; do
     case "${distro_version}" in
-        3.[0-5]) container_info alpine:"${distro_version}" --platform linux/x86_64 ;;
+        3.[0-5]) container_info alpine:"${distro_version}" --platform linux/amd64 ;;
         *) container_info alpine:"${distro_version}" ;;
     esac
 done

@@ -1,9 +1,11 @@
 almalinux
 BUILDKIT
 buildx
+dearmor
 dfsg
 distro
 fsys
+keyrings
 libclang
 lxde
 novnc

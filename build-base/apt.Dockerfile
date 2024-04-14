@@ -60,6 +60,9 @@ rm -rf \
     /var/cache/* \
     /var/log/* \
     /usr/share/{doc,man}
+# Workaround for OpenJDK installation issue: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23
+mkdir -p /usr/share/man/man1
+gcc --version
 EOF
 
 FROM slim as base
@@ -97,9 +100,8 @@ rm -rf \
     /var/cache/* \
     /var/log/* \
     /usr/share/{doc,man}
-# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23
+# Workaround for OpenJDK installation issue: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23
 mkdir -p /usr/share/man/man1
-gcc --version
 clang --version
 EOF
 

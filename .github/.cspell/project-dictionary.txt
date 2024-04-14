@@ -10,9 +10,7 @@ libclang
 lxde
 novnc
 pkgconf
-posix
 rockylinux
-shopt
 tarfile
 tigervnc
 websockify

@@ -112,6 +112,17 @@ rocky_versions=()
 # | 8       | 2029-03-01 | 2.28  |
 alma_versions=(8 9)
 alma_versions=()
+# https://hub.docker.com/r/opensuse/leap
+# https://hub.docker.com/r/opensuse/tumbleweed
+# https://endoflife.date/opensuse
+# | version | EoL        | glibc |
+# | ------- | ---------- | ----- |
+# | 15.5    | 2024-12-31 | 2.31  |
+opensuse_versions=(15.5 tumbleweed)
+opensuse_versions=()
+# https://hub.docker.com/_/archlinux
+arch_versions=(latest)
+arch_versions=()
 
 container_info() {
     local container="$1"
@@ -166,4 +177,13 @@ for distro_version in ${alpine_versions[@]+"${alpine_versions[@]}"}; do
         3.[0-5]) container_info alpine:"${distro_version}" --platform linux/amd64 ;;
         *) container_info alpine:"${distro_version}" ;;
     esac
+done
+for distro_version in ${opensuse_versions[@]+"${opensuse_versions[@]}"}; do
+    case "${distro_version}" in
+        tumbleweed) container_info opensuse/tumbleweed ;;
+        *) container_info opensuse/leap:"${distro_version}" ;;
+    esac
+done
+for distro_version in ${arch_versions[@]+"${arch_versions[@]}"}; do
+    container_info archlinux:"${distro_version}" --platform linux/amd64
 done

@@ -74,7 +74,7 @@ RUN <<EOF
 case "${DISTRO_VERSION}" in
     rolling | devel | testing* | sid*) ;;
     *)
-        codename=$(grep '^VERSION_CODENAME=' /etc/os-release | sed 's/^VERSION_CODENAME=//')
+        codename=$(grep '^VERSION_CODENAME=' /etc/os-release | cut -d= -f2)
         mkdir -pm755 /etc/apt/keyrings
         curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused https://apt.llvm.org/llvm-snapshot.gpg.key \
             | gpg --dearmor >/etc/apt/keyrings/llvm-snapshot.gpg

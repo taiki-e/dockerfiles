@@ -8,15 +8,6 @@ cd "$(dirname "$0")"/..
 # shellcheck disable=SC2154
 trap 's=$?; echo >&2 "$0: error on line "${LINENO}": ${BASH_COMMAND}"; exit ${s}' ERR
 
-x() {
-    local cmd="$1"
-    shift
-    (
-        set -x
-        "${cmd}" "$@"
-    )
-}
-
 # https://wiki.ubuntu.com/Releases
 # https://hub.docker.com/_/ubuntu
 # https://endoflife.date/ubuntu
@@ -140,9 +131,7 @@ container_info() {
         *) docker run --rm --init "$@" "${container}" sh -c 'cat /etc/os-release | grep -E "^(ID|ID_LIKE|VERSION_CODENAME)="' ;;
     esac
     # uname
-    case "${container}" in
-        *) docker run --rm --init "$@" "${container}" sh -c 'uname -a' ;;
-    esac
+    docker run --rm --init "$@" "${container}" sh -c 'uname -a'
 }
 
 for distro_version in ${ubuntu_versions[@]+"${ubuntu_versions[@]}"}; do

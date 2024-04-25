@@ -41,7 +41,7 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 latest=8.2
 dpkg_versions=(
     9.0.0~rc2+ds-1
-    8.2.1+ds-1~bpo12+1
+    8.2.3+ds-1
     7.2+dfsg-7+deb12u5
 )
 

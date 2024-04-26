@@ -41,7 +41,7 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 distro_upper=$(tr '[:lower:]' '[:upper:]' <<<"${distro}")
 # See also tools/container-info.sh
 ubuntu_latest=22.04
-ubuntu_versions=(18.04 20.04 22.04 rolling)
+ubuntu_versions=(18.04 20.04 22.04 24.04 rolling)
 # See also tools/container-info.sh
 debian_latest=12
 debian_versions=(10 11 12 testing)
@@ -91,10 +91,7 @@ for mode in slim ""; do
                 log_dir="tmp/log/${package}/${distro}-${distro_version}"
                 log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
                 mkdir -p "${log_dir}"
-                case "${distro_version}" in
-                    18.04) build --build-arg "LLVM_VERSION=13" "$@" 2>&1 | tee "${log_file}" ;;
-                    *) build "$@" 2>&1 | tee "${log_file}" ;;
-                esac
+                build "$@" 2>&1 | tee "${log_file}"
                 echo "info: build log saved at ${log_file}"
             done
             ;;

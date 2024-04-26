@@ -13,12 +13,13 @@ trap 's=$?; echo >&2 "$0: error on line "${LINENO}": ${BASH_COMMAND}"; exit ${s}
 # https://endoflife.date/ubuntu
 # | version        | EoL        | glibc |
 # | -------------- | ---------- | ----- |
+# | 24.04 (noble)  | 2029-04-02 | 2.39  |
 # | 22.04 (jammy)  | 2027-04-02 | 2.35  |
 # | 20.04 (focal)  | 2025-04-02 | 2.31  |
 # | 18.04 (bionic) | 2023-04-02 | 2.27  |
 # | 16.04 (xenial) | 2021-04-02 | 2.23  |
 # | 14.04 (trusty) | 2019-04-02 | 2.19  |
-ubuntu_versions=(14.04 16.04 18.04 20.04 22.04 rolling devel)
+ubuntu_versions=(14.04 16.04 18.04 20.04 22.04 24.04 rolling devel)
 ubuntu_versions=()
 # https://wiki.debian.org/DebianReleases
 # https://hub.docker.com/_/debian

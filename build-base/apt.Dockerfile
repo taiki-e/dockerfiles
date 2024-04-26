@@ -72,7 +72,12 @@ ARG DISTRO_VERSION
 ARG LLVM_VERSION
 RUN <<EOF
 case "${DISTRO_VERSION}" in
-    rolling | devel | testing* | sid*) ;;
+    18.04) LLVM_VERSION=13 ;;
+    24.04) LLVM_VERSION=18 ;;
+esac
+case "${DISTRO_VERSION}" in
+    # LLVM version of ubuntu 24.04 is 18
+    rolling | devel | testing* | sid* | 24.04) ;;
     *)
         codename=$(grep '^VERSION_CODENAME=' /etc/os-release | cut -d= -f2)
         mkdir -pm755 /etc/apt/keyrings

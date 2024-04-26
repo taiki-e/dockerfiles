@@ -41,7 +41,7 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 distro_upper=$(tr '[:lower:]' '[:upper:]' <<<"${distro}")
 # See also tools/container-info.sh
 ubuntu_latest=22.04
-ubuntu_versions=(20.04 22.04)
+ubuntu_versions=(20.04 22.04 24.04)
 
 build() {
     local dockerfile="${package}/${base}.Dockerfile"

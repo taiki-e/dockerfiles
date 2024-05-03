@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 
-ARG MODE=base
-ARG DISTRO=ubuntu
-ARG DISTRO_VERSION=22.04
+ARG MODE
+ARG DISTRO
+ARG DISTRO_VERSION
 
 # https://github.com/Kitware/CMake/releases
 ARG CMAKE_VERSION=3.29.2

@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 
-ARG MODE=base
-ARG ALPINE_VERSION=3.19
+ARG MODE
+ARG ALPINE_VERSION
 
 FROM alpine:"${ALPINE_VERSION}" as slim
 SHELL ["/bin/sh", "-eux", "-c"]

@@ -10,7 +10,6 @@ keyrings
 libclang
 lxde
 novnc
-pkgconf
 rockylinux
 tarfile
 tigervnc

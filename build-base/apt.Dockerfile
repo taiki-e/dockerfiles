@@ -11,7 +11,7 @@ ARG CMAKE_VERSION=3.29.6
 # TODO: update to 18
 ARG LLVM_VERSION=15
 
-FROM ghcr.io/taiki-e/downloader as cmake
+FROM ghcr.io/taiki-e/downloader AS cmake
 SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG CMAKE_VERSION
 RUN <<EOF
@@ -29,7 +29,7 @@ rm -rf \
     /cmake/bin/cmake-gui
 EOF
 
-FROM "${DISTRO}":"${DISTRO_VERSION}" as slim
+FROM "${DISTRO}":"${DISTRO_VERSION}" AS slim
 SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 # - Download-related packages (bzip2, curl, gnupg, libarchive-tools, unzip, xz-utils)
@@ -65,7 +65,7 @@ mkdir -p /usr/share/man/man1
 gcc --version
 EOF
 
-FROM slim as base
+FROM slim AS base
 SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 ARG DISTRO_VERSION
@@ -110,7 +110,7 @@ mkdir -p /usr/share/man/man1
 clang --version
 EOF
 
-FROM "${MODE:-base}" as test
+FROM "${MODE:-base}" AS test
 SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 COPY --from=cmake /cmake /cmake
@@ -118,7 +118,7 @@ RUN <<EOF
 /cmake/bin/cmake --version
 EOF
 
-FROM "${MODE:-base}" as final
+FROM "${MODE:-base}" AS final
 SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 COPY --from=test /cmake/. /usr/local/

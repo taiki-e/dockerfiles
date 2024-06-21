@@ -4,7 +4,7 @@
 ARG MODE
 ARG ALPINE_VERSION
 
-FROM alpine:"${ALPINE_VERSION}" as slim
+FROM alpine:"${ALPINE_VERSION}" AS slim
 SHELL ["/bin/sh", "-eux", "-c"]
 ARG ALPINE_VERSION
 # - As of alpine 3.15, the ninja package is an alias for samurai.
@@ -54,7 +54,7 @@ EOF
 # | lld                       | lld          |
 # | llvm                      | llvm         |
 # | llvm*-dev + llvm*-static  | llvm-dev     |
-FROM slim as base
+FROM slim AS base
 SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 RUN <<EOF
 apk --no-cache update -q
@@ -73,5 +73,5 @@ clang --version
 cmake --version
 EOF
 
-FROM "${MODE:-base}" as final
+FROM "${MODE:-base}" AS final
 SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]

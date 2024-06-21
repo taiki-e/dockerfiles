@@ -5,7 +5,7 @@ ARG ALPINE_VERSION=3.19
 
 ARG QEMU_DPKG_VERSION
 
-FROM ghcr.io/taiki-e/downloader as downloader
+FROM ghcr.io/taiki-e/downloader AS downloader
 SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG QEMU_DPKG_VERSION
 RUN <<EOF
@@ -29,6 +29,6 @@ if file /qemu/qemu-* | grep -Eq 'dynamically linked'; then
 fi
 EOF
 
-FROM alpine:"${ALPINE_VERSION}" as final
+FROM alpine:"${ALPINE_VERSION}" AS final
 SHELL ["/bin/sh", "-eux", "-c"]
 COPY --from=downloader /qemu/. /usr/bin

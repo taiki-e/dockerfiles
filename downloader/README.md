@@ -10,7 +10,7 @@ docker run --rm --init --user "$(id -u)":"$(id -g)" --volume "$(pwd)":/checkout 
 As a stage of [multi-stage build][multi-stage-build]. (The original purpose of this image.)
 
 ```dockerfile
-FROM ghcr.io/taiki-e/downloader as downloader
+FROM ghcr.io/taiki-e/downloader AS downloader
 ARG URL=...
 RUN wget "$URL"
 

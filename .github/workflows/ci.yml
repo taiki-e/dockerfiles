@@ -41,7 +41,7 @@ jobs:
           - package: vnc
             distro: ubuntu
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120 # TODO
     permissions:
       contents: read
       packages: write

@@ -46,8 +46,8 @@ ubuntu_versions=(18.04 20.04 22.04 24.04 rolling)
 debian_latest=12
 debian_versions=(10 11 12 testing)
 # See also tools/container-info.sh
-alpine_latest=3.19
-alpine_versions=(3.13 3.14 3.15 3.16 3.17 3.18 3.19 edge)
+alpine_latest=3.20
+alpine_versions=(3.13 3.14 3.15 3.16 3.17 3.18 3.19 3.20 edge)
 
 build() {
     local dockerfile="${package}/${base}.Dockerfile"

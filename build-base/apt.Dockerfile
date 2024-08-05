@@ -40,10 +40,13 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     autoconf \
     automake \
     binutils \
+    bison \
     bzip2 \
     ca-certificates \
     curl \
+    ed \
     file \
+    flex \
     g++ \
     git \
     gnupg \

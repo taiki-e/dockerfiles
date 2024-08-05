@@ -28,12 +28,15 @@ apk --no-cache add \
     automake \
     bash \
     binutils \
+    bison \
     bzip2 \
     ca-certificates \
     cmake \
     curl \
     dpkg \
+    ed \
     file \
+    flex \
     g++ \
     git \
     libarchive-tools \

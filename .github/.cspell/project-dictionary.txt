@@ -9,7 +9,6 @@ libclang
 lxde
 novnc
 rockylinux
-tarfile
 tigervnc
 websockify
 workdir

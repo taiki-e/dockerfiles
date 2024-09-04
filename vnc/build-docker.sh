@@ -27,6 +27,9 @@ EOF
     exit 1
 fi
 distro="$1"
+distro_version="${distro#*:}"
+distro="${distro%:*}"
+distro_upper=$(tr '[:lower:]' '[:upper:]' <<<"${distro}")
 shift
 
 export DOCKER_BUILDKIT=1
@@ -38,10 +41,8 @@ repository="ghcr.io/${owner}/${package}"
 platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
 time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
-distro_upper=$(tr '[:lower:]' '[:upper:]' <<<"${distro}")
 # See also tools/container-info.sh
 ubuntu_latest=24.04
-ubuntu_versions=(20.04 22.04 24.04)
 
 build() {
     local dockerfile="${package}/${base}.Dockerfile"
@@ -84,13 +85,11 @@ case "${distro}" in
     ubuntu)
         base=apt
         distro_latest="${ubuntu_latest}"
-        for distro_version in "${ubuntu_versions[@]}"; do
-            log_dir="tmp/log/${package}/${distro}-${distro_version}"
-            log_file="${log_dir}/build-docker${DESKTOP:+"-${DESKTOP}"}-${time}.log"
-            mkdir -p "${log_dir}"
-            build "$@" 2>&1 | tee "${log_file}"
-            echo "info: build log saved at ${log_file}"
-        done
+        log_dir="tmp/log/${package}/${distro}-${distro_version}"
+        log_file="${log_dir}/build-docker${DESKTOP:+"-${DESKTOP}"}-${time}.log"
+        mkdir -p "${log_dir}"
+        build "$@" 2>&1 | tee "${log_file}"
+        echo "info: build log saved at ${log_file}"
         ;;
     *) echo >&2 "error: unrecognized distro '${distro}'" && exit 1 ;;
 esac

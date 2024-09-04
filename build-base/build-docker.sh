@@ -27,6 +27,9 @@ EOF
     exit 1
 fi
 distro="$1"
+distro_version="${distro#*:}"
+distro="${distro%:*}"
+distro_upper=$(tr '[:lower:]' '[:upper:]' <<<"${distro}")
 shift
 
 export DOCKER_BUILDKIT=1
@@ -38,16 +41,12 @@ repository="ghcr.io/${owner}/${package}"
 platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
 time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
-distro_upper=$(tr '[:lower:]' '[:upper:]' <<<"${distro}")
 # See also tools/container-info.sh
 ubuntu_latest=24.04
-ubuntu_versions=(18.04 20.04 22.04 24.04 rolling)
 # See also tools/container-info.sh
 debian_latest=12
-debian_versions=(10 11 12 testing)
 # See also tools/container-info.sh
 alpine_latest=3.20
-alpine_versions=(3.13 3.14 3.15 3.16 3.17 3.18 3.19 3.20 edge)
 
 build() {
     local dockerfile="${package}/${base}.Dockerfile"
@@ -87,36 +86,30 @@ for mode in slim ""; do
         ubuntu)
             base=apt
             distro_latest="${ubuntu_latest}"
-            for distro_version in "${ubuntu_versions[@]}"; do
-                log_dir="tmp/log/${package}/${distro}-${distro_version}"
-                log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
-                mkdir -p "${log_dir}"
-                build "$@" 2>&1 | tee "${log_file}"
-                echo "info: build log saved at ${log_file}"
-            done
+            log_dir="tmp/log/${package}/${distro}-${distro_version}"
+            log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+            mkdir -p "${log_dir}"
+            build "$@" 2>&1 | tee "${log_file}"
+            echo "info: build log saved at ${log_file}"
             ;;
         debian)
             base=apt
             distro_latest="${debian_latest}-slim"
-            for distro_version in "${debian_versions[@]}"; do
-                log_dir="tmp/log/${package}/${distro}-${distro_version}"
-                log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
-                mkdir -p "${log_dir}"
-                distro_version="${distro_version}-slim"
-                build "$@" 2>&1 | tee "${log_file}"
-                echo "info: build log saved at ${log_file}"
-            done
+            log_dir="tmp/log/${package}/${distro}-${distro_version}"
+            log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+            mkdir -p "${log_dir}"
+            distro_version="${distro_version%-slim}-slim"
+            build "$@" 2>&1 | tee "${log_file}"
+            echo "info: build log saved at ${log_file}"
             ;;
         alpine)
             base=alpine
             distro_latest="${alpine_latest}"
-            for distro_version in "${alpine_versions[@]}"; do
-                log_dir="tmp/log/${package}/${distro}-${distro_version}"
-                log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
-                mkdir -p "${log_dir}"
-                build "$@" 2>&1 | tee "${log_file}"
-                echo "info: build log saved at ${log_file}"
-            done
+            log_dir="tmp/log/${package}/${distro}-${distro_version}"
+            log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+            mkdir -p "${log_dir}"
+            build "$@" 2>&1 | tee "${log_file}"
+            echo "info: build log saved at ${log_file}"
             ;;
         *) echo >&2 "error: unrecognized distro '${distro}'" && exit 1 ;;
     esac

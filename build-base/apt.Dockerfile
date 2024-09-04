@@ -58,7 +58,8 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     pkg-config \
     texinfo \
     unzip \
-    xz-utils
+    xz-utils \
+    zstd
 rm -rf \
     /var/lib/apt/lists/* \
     /var/cache/* \

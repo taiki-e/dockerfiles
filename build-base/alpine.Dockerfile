@@ -48,7 +48,8 @@ apk --no-cache add \
     tar \
     texinfo \
     unzip \
-    xz
+    xz \
+    zstd
 EOF
 
 # | alpine                    | apt          |

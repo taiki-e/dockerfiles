@@ -13,3 +13,4 @@ texinfo
 tigervnc
 websockify
 workdir
+zstd

@@ -9,6 +9,7 @@ libclang
 lxde
 novnc
 rockylinux
+texinfo
 tigervnc
 websockify
 workdir

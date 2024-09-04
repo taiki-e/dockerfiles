@@ -46,6 +46,7 @@ apk --no-cache add \
     pkgconf \
     samurai \
     tar \
+    texinfo \
     unzip \
     xz
 EOF

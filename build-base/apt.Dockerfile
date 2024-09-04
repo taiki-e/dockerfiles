@@ -56,6 +56,7 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     ninja-build \
     patch \
     pkg-config \
+    texinfo \
     unzip \
     xz-utils
 rm -rf \

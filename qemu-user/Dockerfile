@@ -10,11 +10,12 @@ SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
 ARG QEMU_DPKG_VERSION
 RUN <<EOF
 dpkg_arch=$(dpkg --print-architecture)
-mkdir -p /tmp/qemu
-mkdir -p /qemu
-curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused "https://ftp.debian.org/debian/pool/main/q/qemu/qemu-user-static_${QEMU_DPKG_VERSION}_${dpkg_arch##*-}.deb" \
-    | dpkg-deb --fsys-tarfile - \
-    | tar xf - -C /tmp/qemu
+mkdir -p -- /tmp/qemu /qemu
+case "${QEMU_DPKG_VERSION}" in
+    [0-8].* | 9.0.*) static='-static' ;;
+esac
+curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused "https://ftp.debian.org/debian/pool/main/q/qemu/qemu-user${static:-}_${QEMU_DPKG_VERSION}_${dpkg_arch##*-}.deb" \
+    | dpkg-deb -xv - /tmp/qemu
 (
     cd /tmp/qemu/usr/bin
     set +x

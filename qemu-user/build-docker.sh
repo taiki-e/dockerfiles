@@ -38,10 +38,9 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
 # https://ftp.debian.org/debian/pool/main/q/qemu
 # https://tracker.debian.org/pkg/qemu
-latest=9.0
+latest=9.1
 dpkg_versions=(
-    9.1.0~rc0+ds-3
-    9.0.2+ds-7
+    9.1.0+ds-3
     7.2+dfsg-7+deb12u7
 )
 

@@ -4,7 +4,7 @@
 ARG ALPINE_VERSION=3.20
 
 FROM alpine:"${ALPINE_VERSION}"
-SHELL ["/bin/sh", "-eux", "-c"]
+SHELL ["/bin/sh", "-CeEuxo", "pipefail", "-c"]
 RUN <<EOF
 apk --no-cache update -q
 apk --no-cache upgrade

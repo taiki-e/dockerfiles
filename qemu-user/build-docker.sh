@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0 OR MIT
-set -eEuo pipefail
+set -CeEuo pipefail
 IFS=$'\n\t'
-cd "$(dirname "$0")"/..
-
-# shellcheck disable=SC2154
-trap 's=$?; echo >&2 "$0: error on line "${LINENO}": ${BASH_COMMAND}"; exit ${s}' ERR
+trap -- 's=$?; printf >&2 "%s\n" "${0##*/}:${LINENO}: \`${BASH_COMMAND}\` exit with ${s}"; exit ${s}' ERR
+cd -- "$(dirname -- "$0")"/..
 
 # USAGE:
 #    ./qemu-user/build-docker.sh
 
 x() {
-    local cmd="$1"
-    shift
     (
         set -x
-        "${cmd}" "$@"
+        "$@"
     )
+}
+bail() {
+    printf >&2 'error: %s\n' "$*"
+    exit 1
 }
 
 if [[ $# -gt 0 ]]; then
@@ -31,7 +31,7 @@ export DOCKER_BUILDKIT=1
 export BUILDKIT_STEP_LOG_MAX_SIZE=10485760
 
 owner="${OWNER:-taiki-e}"
-package=$(basename "$(dirname "$0")")
+package=$(basename -- "$(cd -- "$(dirname -- "$0")" && pwd)")
 repository="ghcr.io/${owner}/${package}"
 platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
 time=$(date -u '+%Y-%m-%d-%H-%M-%S')
@@ -60,13 +60,13 @@ build() {
     fi
 
     if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
-        x docker buildx build --provenance=false --push "${build_args[@]}" || (echo "info: build log saved at ${log_file}" && exit 1)
+        x docker buildx build --provenance=false --push "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
         x docker pull "${full_tag}"
         x docker history "${full_tag}"
     elif [[ "${platform}" == *","* ]]; then
-        x docker buildx build --provenance=false "${build_args[@]}" || (echo "info: build log saved at ${log_file}" && exit 1)
+        x docker buildx build --provenance=false "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
     else
-        x docker buildx build --provenance=false --load "${build_args[@]}" || (echo "info: build log saved at ${log_file}" && exit 1)
+        x docker buildx build --provenance=false --load "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
         x docker history "${full_tag}"
     fi
     x docker system df
@@ -74,18 +74,17 @@ build() {
 
 for dpkg_version in "${dpkg_versions[@]}"; do
     if [[ "${dpkg_version}" =~ ^[1-9]\.[0-9][\.\+].+ ]]; then
-        version=$(cut -c '-3' <<<"${dpkg_version}")
+        version="${dpkg_version:0:3}"
     elif [[ "${dpkg_version}" =~ ^[1-9][0-9]\.[0-9][\.\+].+ ]]; then
-        version=$(cut -c '-4' <<<"${dpkg_version}")
+        version="${dpkg_version:0:4}"
     else
-        echo "error: ${dpkg_version}"
-        exit 1
+        bail "${dpkg_version}"
     fi
     log_dir="tmp/log/${package}/${version}"
     log_file="${log_dir}/build-docker-${time}.log"
-    mkdir -p "${log_dir}"
-    build 2>&1 | tee "${log_file}"
-    echo "info: build log saved at ${log_file}"
+    mkdir -p -- "${log_dir}"
+    build 2>&1 | tee -- "${log_file}"
+    printf '%s\n' "info: build log saved at ${log_file}"
 done
 
 x docker images "${repository}"

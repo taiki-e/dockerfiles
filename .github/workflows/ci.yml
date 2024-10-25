@@ -15,7 +15,7 @@ on:
 
 defaults:
   run:
-    shell: bash
+    shell: bash --noprofile --norc -CeEuxo pipefail {0}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
@@ -58,16 +58,16 @@ jobs:
           - package: vnc
             distro: ubuntu:24.04
     runs-on: ubuntu-latest
-    timeout-minutes: 120 # TODO
+    timeout-minutes: 60
     permissions:
       contents: read
-      packages: write
+      packages: write # for push to ghcr
     steps:
       - uses: taiki-e/checkout-action@v1
-      - uses: taiki-e/github-actions/free-device-space@main
       - uses: taiki-e/github-actions/setup-docker@main
       - run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-          echo "PUSH_TO_GHCR=1" >>"${GITHUB_ENV}"
+          docker login ghcr.io -u "${{ github.actor }}" --password-stdin <<<"${{ secrets.GITHUB_TOKEN }}"
+          printf 'PUSH_TO_GHCR=1\n' >>"${GITHUB_ENV}"
         if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
-      - run: ${{ matrix.package }}/build-docker.sh ${{ matrix.distro }}
+      - run: |
+          "${{ matrix.package }}"/build-docker.sh ${{ matrix.distro }}

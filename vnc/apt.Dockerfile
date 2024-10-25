@@ -6,7 +6,7 @@ ARG DISTRO_VERSION
 ARG DESKTOP=lxde
 
 FROM "${DISTRO}":"${DISTRO_VERSION}"
-SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-CeEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 ARG DISTRO
 ARG DISTRO_VERSION
@@ -46,11 +46,11 @@ case "${DISTRO}-${DISTRO_VERSION}" in
 esac
 apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     "${packages[@]}"
-rm -rf \
+rm -rf -- \
     /var/lib/apt/lists/* \
     /var/cache/* \
     /var/log/* \
     /usr/share/{doc,man}
 # Workaround for OpenJDK installation issue: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23
-mkdir -p /usr/share/man/man1
+mkdir -p -- /usr/share/man/man1
 EOF

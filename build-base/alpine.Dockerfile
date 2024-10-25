@@ -5,7 +5,7 @@ ARG MODE
 ARG ALPINE_VERSION
 
 FROM alpine:"${ALPINE_VERSION}" AS slim
-SHELL ["/bin/sh", "-eux", "-c"]
+SHELL ["/bin/sh", "-CeEuxo", "pipefail", "-c"]
 ARG ALPINE_VERSION
 # - As of alpine 3.15, the ninja package is an alias for samurai.
 # - Download-related packages (bzip2, curl, dpkg, libarchive-tools, tar, unzip, xz)
@@ -20,7 +20,7 @@ https://dl-cdn.alpinelinux.org/alpine/edge/community
 EOF2
         ;;
 esac
-cat /etc/apk/repositories
+cat -- /etc/apk/repositories
 apk --no-cache update -q
 apk --no-cache upgrade
 apk --no-cache add \
@@ -60,7 +60,7 @@ EOF
 # | llvm                      | llvm         |
 # | llvm*-dev + llvm*-static  | llvm-dev     |
 FROM slim AS base
-SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-CeEuxo", "pipefail", "-c"]
 RUN <<EOF
 apk --no-cache update -q
 apk --no-cache add \
@@ -68,7 +68,7 @@ apk --no-cache add \
     clang-dev \
     clang-static \
     lld
-llvm_version=$(clang --version | grep 'clang version' | sed 's/.*clang version //; s/\..*//')
+llvm_version=$(clang --version | grep 'clang version' | sed -En '1 s/.*clang version ([0-9]+)\..*/\1/p;')
 apk --no-cache add \
     llvm"${llvm_version}" \
     llvm"${llvm_version}"-dev \
@@ -79,4 +79,4 @@ cmake --version
 EOF
 
 FROM "${MODE:-base}" AS final
-SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-CeEuxo", "pipefail", "-c"]

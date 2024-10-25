@@ -6,7 +6,7 @@ ARG ALPINE_VERSION=3.20
 ARG QEMU_DPKG_VERSION
 
 FROM ghcr.io/taiki-e/downloader AS downloader
-SHELL ["/bin/bash", "-eEuxo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-CeEuxo", "pipefail", "-c"]
 ARG QEMU_DPKG_VERSION
 RUN <<EOF
 dpkg_arch=$(dpkg --print-architecture)
@@ -17,19 +17,19 @@ esac
 curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused "https://ftp.debian.org/debian/pool/main/q/qemu/qemu-user${static:-}_${QEMU_DPKG_VERSION}_${dpkg_arch##*-}.deb" \
     | dpkg-deb -xv - /tmp/qemu
 (
-    cd /tmp/qemu/usr/bin
+    cd -- /tmp/qemu/usr/bin
     set +x
     for tool in qemu-*; do
         # ignore symbolic links
-        [[ -L "${tool}" ]] || mv "${tool}" /qemu/"${tool%-static}"
+        [[ -L "${tool}" ]] || mv -- "${tool}" /qemu/"${tool%-static}"
     done
 )
 file /qemu/qemu-*
-if file /qemu/qemu-* | grep -Eq 'dynamically linked'; then
+if file /qemu/qemu-* | grep -Fq 'dynamically linked'; then
     exit 1
 fi
 EOF
 
 FROM alpine:"${ALPINE_VERSION}" AS final
-SHELL ["/bin/sh", "-eux", "-c"]
+SHELL ["/bin/sh", "-CeEuxo", "pipefail", "-c"]
 COPY --from=downloader /qemu/. /usr/bin

@@ -6,7 +6,7 @@ ARG DISTRO
 ARG DISTRO_VERSION
 
 # https://github.com/Kitware/CMake/releases
-ARG CMAKE_VERSION=3.30.5
+ARG CMAKE_VERSION=3.31.1
 # https://apt.llvm.org
 # TODO: update to 18
 ARG LLVM_VERSION=15

@@ -8,8 +8,7 @@ ARG DISTRO_VERSION
 # https://github.com/Kitware/CMake/releases
 ARG CMAKE_VERSION=3.31.1
 # https://apt.llvm.org
-# TODO: update to 18
-ARG LLVM_VERSION=15
+ARG LLVM_VERSION=19
 
 FROM ghcr.io/taiki-e/downloader AS cmake
 SHELL ["/bin/bash", "-CeEuxo", "pipefail", "-c"]
@@ -78,11 +77,9 @@ ARG LLVM_VERSION
 RUN <<EOF
 case "${DISTRO_VERSION}" in
     18.04) LLVM_VERSION=13 ;;
-    24.04) LLVM_VERSION=18 ;;
 esac
 case "${DISTRO_VERSION}" in
-    # LLVM version of ubuntu 24.04 is 18
-    rolling | devel | testing* | sid* | 24.04) ;;
+    rolling | devel | testing* | sid*) ;;
     *)
         codename=$(grep -E '^VERSION_CODENAME=' /etc/os-release | cut -d= -f2)
         # shellcheck disable=SC2174

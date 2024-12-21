@@ -6,7 +6,7 @@ ARG DISTRO
 ARG DISTRO_VERSION
 
 # https://github.com/Kitware/CMake/releases
-ARG CMAKE_VERSION=3.31.1
+ARG CMAKE_VERSION=3.31.3
 # https://apt.llvm.org
 ARG LLVM_VERSION=19
 

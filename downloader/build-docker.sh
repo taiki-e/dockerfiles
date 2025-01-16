@@ -9,11 +9,11 @@ cd -- "$(dirname -- "$0")"/..
 #    ./downloader/build-docker.sh
 
 if [[ $# -gt 0 ]]; then
-    cat <<EOF
+  cat <<EOF
 USAGE:
     $0
 EOF
-    exit 1
+  exit 1
 fi
 
 package=$(basename -- "$(cd -- "$(dirname -- "$0")" && pwd)")

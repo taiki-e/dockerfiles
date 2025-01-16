@@ -9,22 +9,22 @@ cd -- "$(dirname -- "$0")"/..
 #    ./qemu-user/build-docker.sh
 
 x() {
-    (
-        set -x
-        "$@"
-    )
+  (
+    set -x
+    "$@"
+  )
 }
 bail() {
-    printf >&2 'error: %s\n' "$*"
-    exit 1
+  printf >&2 'error: %s\n' "$*"
+  exit 1
 }
 
 if [[ $# -gt 0 ]]; then
-    cat <<EOF
+  cat <<EOF
 USAGE:
     $0
 EOF
-    exit 1
+  exit 1
 fi
 
 export DOCKER_BUILDKIT=1
@@ -40,51 +40,51 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 # https://tracker.debian.org/pkg/qemu
 latest=9.2
 dpkg_versions=(
-    9.2.0+ds-4
-    7.2+dfsg-7+deb12u12
+  9.2.0+ds-4
+  7.2+dfsg-7+deb12u12
 )
 
 build() {
-    local dockerfile="${package}/Dockerfile"
-    local full_tag="${repository}:${version}"
-    local build_args=(
-        --file "${dockerfile}" "${package}/"
-        --platform "${platform}"
-        --tag "${full_tag}"
-        --build-arg "QEMU_DPKG_VERSION=${dpkg_version}"
+  local dockerfile="${package}/Dockerfile"
+  local full_tag="${repository}:${version}"
+  local build_args=(
+    --file "${dockerfile}" "${package}/"
+    --platform "${platform}"
+    --tag "${full_tag}"
+    --build-arg "QEMU_DPKG_VERSION=${dpkg_version}"
+  )
+  if [[ "${version}" == "${latest}" ]]; then
+    build_args+=(
+      --tag "${repository}:latest"
     )
-    if [[ "${version}" == "${latest}" ]]; then
-        build_args+=(
-            --tag "${repository}:latest"
-        )
-    fi
+  fi
 
-    if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
-        x docker buildx build --provenance=false --push "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
-        x docker pull "${full_tag}"
-        x docker history "${full_tag}"
-    elif [[ "${platform}" == *","* ]]; then
-        x docker buildx build --provenance=false "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
-    else
-        x docker buildx build --provenance=false --load "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
-        x docker history "${full_tag}"
-    fi
-    x docker system df
+  if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
+    x docker buildx build --provenance=false --push "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
+    x docker pull "${full_tag}"
+    x docker history "${full_tag}"
+  elif [[ "${platform}" == *","* ]]; then
+    x docker buildx build --provenance=false "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
+  else
+    x docker buildx build --provenance=false --load "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
+    x docker history "${full_tag}"
+  fi
+  x docker system df
 }
 
 for dpkg_version in "${dpkg_versions[@]}"; do
-    if [[ "${dpkg_version}" =~ ^[1-9]\.[0-9][\.\+].+ ]]; then
-        version="${dpkg_version:0:3}"
-    elif [[ "${dpkg_version}" =~ ^[1-9][0-9]\.[0-9][\.\+].+ ]]; then
-        version="${dpkg_version:0:4}"
-    else
-        bail "${dpkg_version}"
-    fi
-    log_dir="tmp/log/${package}/${version}"
-    log_file="${log_dir}/build-docker-${time}.log"
-    mkdir -p -- "${log_dir}"
-    build 2>&1 | tee -- "${log_file}"
-    printf '%s\n' "info: build log saved at ${log_file}"
+  if [[ "${dpkg_version}" =~ ^[1-9]\.[0-9][\.\+].+ ]]; then
+    version="${dpkg_version:0:3}"
+  elif [[ "${dpkg_version}" =~ ^[1-9][0-9]\.[0-9][\.\+].+ ]]; then
+    version="${dpkg_version:0:4}"
+  else
+    bail "${dpkg_version}"
+  fi
+  log_dir="tmp/log/${package}/${version}"
+  log_file="${log_dir}/build-docker-${time}.log"
+  mkdir -p -- "${log_dir}"
+  build 2>&1 | tee -- "${log_file}"
+  printf '%s\n' "info: build log saved at ${log_file}"
 done
 
 x docker images "${repository}"

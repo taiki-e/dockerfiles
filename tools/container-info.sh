@@ -146,80 +146,80 @@ arch_versions=(latest)
 arch_versions=()
 
 container_info() {
-    local container="$1"
-    shift
-    printf '%s\n' "===== ${container} ====="
+  local container="$1"
+  shift
+  printf '%s\n' "===== ${container} ====="
 
-    # libc version
-    case "${container}" in
-        alpine*) docker run --rm --init "$@" "${container}" sh -c 'printf "musl: "; { ldd --version 2>&1 || true; } | grep -F Version | sed "s/Version //"' ;;
-        debian*:slink* | debian*:potato*) docker run --rm --init "$@" "${container}" sh -c 'apt-cache show libc6 | grep -F Version' ;;
-        *) docker run --rm --init "$@" "${container}" sh -c 'printf "glibc: "; { ldd --version 2>&1 || true; } | grep -E "GLIBC|GNU libc" | sed "s/.* //g"' ;;
-    esac
-    # /etc/os-release
-    case "${container}" in
-        centos:[0-6]) ;;
-        debian*:slink* | debian*:potato* | debian*:woody* | debian*:sarge* | debian*:etch* | debian*:lenny* | debian*:squeeze*) ;; # [0-6]
-        *) docker run --rm --init "$@" "${container}" sh -c 'cat -- /etc/os-release | grep -E "^(ID|ID_LIKE|VERSION_CODENAME)="' ;;
-    esac
-    case "${container}" in
-        debian* | ubuntu*) docker run --rm --init "$@" "${container}" sh -c 'cat -- /etc/debian_version' ;;
-        centos* | fedora* | rockylinux* | almalinux*) docker run --rm --init "$@" "${container}" sh -c 'cat -- /etc/redhat-release' ;;
-    esac
-    # uname
-    docker run --rm --init "$@" "${container}" sh -c 'uname -a'
+  # libc version
+  case "${container}" in
+    alpine*) docker run --rm --init "$@" "${container}" sh -c 'printf "musl: "; { ldd --version 2>&1 || true; } | grep -F Version | sed "s/Version //"' ;;
+    debian*:slink* | debian*:potato*) docker run --rm --init "$@" "${container}" sh -c 'apt-cache show libc6 | grep -F Version' ;;
+    *) docker run --rm --init "$@" "${container}" sh -c 'printf "glibc: "; { ldd --version 2>&1 || true; } | grep -E "GLIBC|GNU libc" | sed "s/.* //g"' ;;
+  esac
+  # /etc/os-release
+  case "${container}" in
+    centos:[0-6]) ;;
+    debian*:slink* | debian*:potato* | debian*:woody* | debian*:sarge* | debian*:etch* | debian*:lenny* | debian*:squeeze*) ;; # [0-6]
+    *) docker run --rm --init "$@" "${container}" sh -c 'cat -- /etc/os-release | grep -E "^(ID|ID_LIKE|VERSION_CODENAME)="' ;;
+  esac
+  case "${container}" in
+    debian* | ubuntu*) docker run --rm --init "$@" "${container}" sh -c 'cat -- /etc/debian_version' ;;
+    centos* | fedora* | rockylinux* | almalinux*) docker run --rm --init "$@" "${container}" sh -c 'cat -- /etc/redhat-release' ;;
+  esac
+  # uname
+  docker run --rm --init "$@" "${container}" sh -c 'uname -a'
 }
 
 for distro_version in ${ubuntu_versions[@]+"${ubuntu_versions[@]}"}; do
-    case "${distro_version}" in
-        1[0-2].*) container_info ubuntu:"${distro_version}" --platform linux/amd64 ;;
-        *) container_info ubuntu:"${distro_version}" ;;
-    esac
+  case "${distro_version}" in
+    1[0-2].*) container_info ubuntu:"${distro_version}" --platform linux/amd64 ;;
+    *) container_info ubuntu:"${distro_version}" ;;
+  esac
 done
 for distro_version in ${debian_versions[@]+"${debian_versions[@]}"}; do
-    case "${distro_version}" in
-        2.1) container_info debian/eol:slink-slim --platform linux/amd64 ;;
-        2.2) container_info debian/eol:potato-slim --platform linux/amd64 ;;
-        3.0) container_info debian/eol:woody-slim --platform linux/amd64 ;;
-        3.1) container_info debian/eol:sarge-slim --platform linux/amd64 ;;
-        4) container_info debian/eol:etch-slim --platform linux/amd64 ;;
-        5) container_info debian/eol:lenny-slim --platform linux/amd64 ;;
-        6) container_info debian/eol:squeeze-slim --platform linux/amd64 ;;
-        7) container_info debian/eol:wheezy-slim --platform linux/amd64 ;;
-        8) container_info debian/eol:jessie-slim --platform linux/amd64 ;;
-        *) container_info debian:"${distro_version}" ;;
-    esac
+  case "${distro_version}" in
+    2.1) container_info debian/eol:slink-slim --platform linux/amd64 ;;
+    2.2) container_info debian/eol:potato-slim --platform linux/amd64 ;;
+    3.0) container_info debian/eol:woody-slim --platform linux/amd64 ;;
+    3.1) container_info debian/eol:sarge-slim --platform linux/amd64 ;;
+    4) container_info debian/eol:etch-slim --platform linux/amd64 ;;
+    5) container_info debian/eol:lenny-slim --platform linux/amd64 ;;
+    6) container_info debian/eol:squeeze-slim --platform linux/amd64 ;;
+    7) container_info debian/eol:wheezy-slim --platform linux/amd64 ;;
+    8) container_info debian/eol:jessie-slim --platform linux/amd64 ;;
+    *) container_info debian:"${distro_version}" ;;
+  esac
 done
 for distro_version in ${fedora_versions[@]+"${fedora_versions[@]}"}; do
-    case "${distro_version}" in
-        2[0-5]) container_info fedora:"${distro_version}" --platform linux/amd64 ;;
-        *) container_info fedora:"${distro_version}" ;;
-    esac
+  case "${distro_version}" in
+    2[0-5]) container_info fedora:"${distro_version}" --platform linux/amd64 ;;
+    *) container_info fedora:"${distro_version}" ;;
+  esac
 done
 for distro_version in ${centos_versions[@]+"${centos_versions[@]}"}; do
-    case "${distro_version}" in
-        [0-6]) container_info centos:"${distro_version}" --platform linux/amd64 ;;
-        *) container_info centos:"${distro_version}" ;;
-    esac
+  case "${distro_version}" in
+    [0-6]) container_info centos:"${distro_version}" --platform linux/amd64 ;;
+    *) container_info centos:"${distro_version}" ;;
+  esac
 done
 for distro_version in ${rocky_versions[@]+"${rocky_versions[@]}"}; do
-    container_info rockylinux:"${distro_version}"
+  container_info rockylinux:"${distro_version}"
 done
 for distro_version in ${alma_versions[@]+"${alma_versions[@]}"}; do
-    container_info almalinux:"${distro_version}"
+  container_info almalinux:"${distro_version}"
 done
 for distro_version in ${alpine_versions[@]+"${alpine_versions[@]}"}; do
-    case "${distro_version}" in
-        3.[0-5]) container_info alpine:"${distro_version}" --platform linux/amd64 ;;
-        *) container_info alpine:"${distro_version}" ;;
-    esac
+  case "${distro_version}" in
+    3.[0-5]) container_info alpine:"${distro_version}" --platform linux/amd64 ;;
+    *) container_info alpine:"${distro_version}" ;;
+  esac
 done
 for distro_version in ${opensuse_versions[@]+"${opensuse_versions[@]}"}; do
-    case "${distro_version}" in
-        tumbleweed) container_info opensuse/tumbleweed ;;
-        *) container_info opensuse/leap:"${distro_version}" ;;
-    esac
+  case "${distro_version}" in
+    tumbleweed) container_info opensuse/tumbleweed ;;
+    *) container_info opensuse/leap:"${distro_version}" ;;
+  esac
 done
 for distro_version in ${arch_versions[@]+"${arch_versions[@]}"}; do
-    container_info archlinux:"${distro_version}" --platform linux/amd64
+  container_info archlinux:"${distro_version}" --platform linux/amd64
 done

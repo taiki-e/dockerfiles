@@ -6,18 +6,18 @@ trap -- 's=$?; printf >&2 "%s\n" "${0##*/}:${LINENO}: \`${BASH_COMMAND}\` exit w
 cd -- "$(dirname -- "$0")"/..
 
 x() {
-    (
-        set -x
-        "$@"
-    )
+  (
+    set -x
+    "$@"
+  )
 }
 
 if [[ $# -gt 1 ]]; then
-    cat <<EOF
+  cat <<EOF
 USAGE:
     $0 <PACKAGE>
 EOF
-    exit 1
+  exit 1
 fi
 package="$1"
 
@@ -30,25 +30,25 @@ platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
 time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
 build() {
-    local dockerfile="${package}/Dockerfile"
-    local tag="${repository}:latest"
-    local build_args=(
-        --file "${dockerfile}" "${package}/"
-        --platform "${platform}"
-        --tag "${tag}"
-    )
+  local dockerfile="${package}/Dockerfile"
+  local tag="${repository}:latest"
+  local build_args=(
+    --file "${dockerfile}" "${package}/"
+    --platform "${platform}"
+    --tag "${tag}"
+  )
 
-    if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
-        x docker buildx build --provenance=false --push "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
-        x docker pull "${tag}"
-        x docker history "${tag}"
-    elif [[ "${platform}" == *","* ]]; then
-        x docker buildx build --provenance=false "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
-    else
-        x docker buildx build --provenance=false --load "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
-        x docker history "${tag}"
-    fi
-    x docker system df
+  if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
+    x docker buildx build --provenance=false --push "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
+    x docker pull "${tag}"
+    x docker history "${tag}"
+  elif [[ "${platform}" == *","* ]]; then
+    x docker buildx build --provenance=false "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
+  else
+    x docker buildx build --provenance=false --load "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
+    x docker history "${tag}"
+  fi
+  x docker system df
 }
 
 log_dir="tmp/log/${package}"

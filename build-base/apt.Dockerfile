@@ -78,7 +78,7 @@ ARG LLVM_VERSION
 RUN <<EOF
 case "${DISTRO_VERSION}" in
     18.04) LLVM_VERSION=13 ;;
-    24.04) LLVM_VERSION=18 ;;
+    24.04 | testing*) LLVM_VERSION=18 ;;
 esac
 case "${DISTRO_VERSION}" in
     # LLVM version of ubuntu 24.04 is 18

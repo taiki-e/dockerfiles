@@ -40,7 +40,7 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 # https://tracker.debian.org/pkg/qemu
 latest=9.2
 dpkg_versions=(
-  9.2.0+ds-5
+  9.2.1+ds-1
   7.2+dfsg-7+deb12u12
 )
 

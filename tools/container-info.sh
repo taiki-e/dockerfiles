@@ -49,6 +49,7 @@ ubuntu_versions=()
 # https://endoflife.date/alpine
 # | version | EoL        | musl   |
 # | ------- | ---------- | ------ |
+# | 3.21    | 2026-11-01 | 1.2.5  |
 # | 3.20    | 2026-04-01 | 1.2.5  |
 # | 3.19    | 2025-11-01 | 1.2.4  |
 # | 3.18    | 2025-05-09 | 1.2.4  |
@@ -70,7 +71,7 @@ ubuntu_versions=()
 # | 3.2     | ?          | 1.1.11 |
 # | 3.1     | ?          | 1.1.5  |
 # alpine:3.0 docker image is not available
-alpine_versions=(3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 3.15 3.16 3.17 3.18 3.19 3.20 edge)
+alpine_versions=(3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 3.15 3.16 3.17 3.18 3.19 3.20 3.21 edge)
 alpine_versions=()
 # https://docs.fedoraproject.org/en-US/releases
 # https://hub.docker.com/_/fedora

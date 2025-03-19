@@ -46,7 +46,7 @@ ubuntu_latest=24.04
 # See also tools/container-info.sh
 debian_latest=12
 # See also tools/container-info.sh
-alpine_latest=3.20
+alpine_latest=3.21
 
 build() {
   local dockerfile="${package}/${base}.Dockerfile"

@@ -5,7 +5,6 @@ buildx
 dfsg
 distro
 libclang
-lxde
 novnc
 rockylinux
 texinfo

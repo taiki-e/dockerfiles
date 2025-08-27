@@ -42,7 +42,7 @@ latest=10.0
 dpkg_versions=(
   10.1.0~rc3+ds-2
   10.0.3+ds-4
-  7.2+dfsg-7+deb12u14
+  7.2+dfsg-7+deb12u16
 )
 
 build() {

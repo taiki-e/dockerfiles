@@ -6,9 +6,10 @@ ARG DISTRO
 ARG DISTRO_VERSION
 
 # https://github.com/Kitware/CMake/releases
-ARG CMAKE_VERSION=4.1.1
+# TODO: update to 4
+ARG CMAKE_VERSION=3.31.8
 # https://apt.llvm.org
-# TODO: update to 19
+# TODO: update to 21
 ARG LLVM_VERSION=15
 
 FROM ghcr.io/taiki-e/downloader AS cmake

@@ -39,10 +39,10 @@ jobs:
         distro:
           - ubuntu:18.04
           - ubuntu:20.04
-          # - ubuntu:22.04
+          - ubuntu:22.04
           - ubuntu:24.04
           - ubuntu:rolling
-          # - debian:11
+          - debian:11
           - debian:12
           - debian:testing
           - alpine:3.22
@@ -54,8 +54,8 @@ jobs:
             distro: ubuntu:18.04
           - package: vnc
             distro: ubuntu:20.04
-          # - package: vnc
-          #   distro: ubuntu:22.04
+          - package: vnc
+            distro: ubuntu:22.04
           - package: vnc
             distro: ubuntu:24.04
     runs-on: ubuntu-latest

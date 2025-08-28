@@ -82,37 +82,27 @@ build() {
 }
 
 for mode in slim ""; do
+  log_dir="tmp/log/${package}/${distro}-${distro_version}"
+  log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
+  mkdir -p -- "${log_dir}"
   case "${distro}" in
     ubuntu)
       base=apt
       distro_latest="${ubuntu_latest}"
-      log_dir="tmp/log/${package}/${distro}-${distro_version}"
-      log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
-      mkdir -p -- "${log_dir}"
-      build "$@" 2>&1 | tee -- "${log_file}"
-      printf '%s\n' "info: build log saved at ${log_file}"
       ;;
     debian)
       base=apt
       distro_latest="${debian_latest}-slim"
-      log_dir="tmp/log/${package}/${distro}-${distro_version}"
-      log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
-      mkdir -p -- "${log_dir}"
       distro_version="${distro_version%-slim}-slim"
-      build "$@" 2>&1 | tee -- "${log_file}"
-      printf '%s\n' "info: build log saved at ${log_file}"
       ;;
     alpine)
       base=alpine
       distro_latest="${alpine_latest}"
-      log_dir="tmp/log/${package}/${distro}-${distro_version}"
-      log_file="${log_dir}/build-docker${mode:+"-${mode}"}-${time}.log"
-      mkdir -p -- "${log_dir}"
-      build "$@" 2>&1 | tee -- "${log_file}"
-      printf '%s\n' "info: build log saved at ${log_file}"
       ;;
     *) bail "unrecognized distro '${distro}'" ;;
   esac
+  build "$@" 2>&1 | tee -- "${log_file}"
+  printf '%s\n' "info: build log saved at ${log_file}"
 done
 
 x docker images "${repository}"

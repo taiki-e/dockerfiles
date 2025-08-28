@@ -81,17 +81,17 @@ build() {
   x docker system df
 }
 
+log_dir="tmp/log/${package}/${distro}-${distro_version}"
+log_file="${log_dir}/build-docker${DESKTOP:+"-${DESKTOP}"}-${time}.log"
+mkdir -p -- "${log_dir}"
 case "${distro}" in
   ubuntu)
     base=apt
     distro_latest="${ubuntu_latest}"
-    log_dir="tmp/log/${package}/${distro}-${distro_version}"
-    log_file="${log_dir}/build-docker${DESKTOP:+"-${DESKTOP}"}-${time}.log"
-    mkdir -p -- "${log_dir}"
-    build "$@" 2>&1 | tee -- "${log_file}"
-    printf '%s\n' "info: build log saved at ${log_file}"
     ;;
   *) bail "unrecognized distro '${distro}'" ;;
 esac
+build "$@" 2>&1 | tee -- "${log_file}"
+printf '%s\n' "info: build log saved at ${log_file}"
 
 x docker images "${repository}"

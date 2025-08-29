@@ -4,7 +4,9 @@ BUILDKIT
 buildx
 dfsg
 distro
+groff
 libclang
+lintian
 novnc
 rockylinux
 texinfo

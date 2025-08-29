@@ -25,9 +25,13 @@ esac
 mkdir -p -- cmake
 curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-${cmake_arch}.tar.gz" \
     | tar xzf - --strip-components 1 -C /cmake
+du -h -d1 /cmake
+find /cmake/doc -depth -type f ! -name Copyright.txt -exec rm -- {} + || true
+find /cmake/doc -empty -exec rmdir -- {} + || true
 rm -rf -- \
-    /cmake/{doc,man} \
+    /cmake/man \
     /cmake/bin/cmake-gui
+du -h -d1 /cmake
 EOF
 
 FROM "${DISTRO}":"${DISTRO_VERSION}" AS slim
@@ -36,6 +40,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # - Download-related packages (bzip2, curl, gnupg, libarchive-tools, unzip, xz-utils)
 #   are not necessarily needed for build, but they are small enough (< 10MB).
 RUN <<EOF
+du -h -d1 /usr/share/
 apt-get -o Acquire::Retries=10 -qq update
 apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     autoconf \
@@ -61,13 +66,18 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     unzip \
     xz-utils \
     zstd
+du -h -d1 /usr/share/
+# https://wiki.ubuntu.com/ReducingDiskFootprint#Documentation
+find /usr/share/doc -depth -type f ! -name copyright -exec rm -- {} + || true
+find /usr/share/doc -empty -exec rmdir -- {} + || true
 rm -rf -- \
     /var/lib/apt/lists/* \
     /var/cache/* \
     /var/log/* \
-    /usr/share/{doc,man}
+    /usr/share/{groff,info,linda,lintian,man}
 # Workaround for OpenJDK installation issue: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23
 mkdir -p -- /usr/share/man/man1
+du -h -d1 /usr/share/
 gcc --version
 EOF
 
@@ -77,6 +87,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG DISTRO_VERSION
 ARG LLVM_VERSION
 RUN <<EOF
+du -h -d1 /usr/share/
 case "${DISTRO_VERSION}" in
     18.04) LLVM_VERSION=13 ;;
     24.04 | testing*) LLVM_VERSION=18 ;;
@@ -107,13 +118,18 @@ for tool in /usr/bin/clang*-"${LLVM_VERSION}" /usr/bin/llvm-*-"${LLVM_VERSION}" 
     link="${tool%"-${LLVM_VERSION}"}"
     update-alternatives --install "${link}" "${link##*/}" "${tool}" 100
 done
+du -h -d1 /usr/share/
+# https://wiki.ubuntu.com/ReducingDiskFootprint#Documentation
+find /usr/share/doc -depth -type f ! -name copyright -exec rm -- {} + || true
+find /usr/share/doc -empty -exec rmdir -- {} + || true
 rm -rf -- \
     /var/lib/apt/lists/* \
     /var/cache/* \
     /var/log/* \
-    /usr/share/{doc,man}
+    /usr/share/{groff,info,linda,lintian,man}
 # Workaround for OpenJDK installation issue: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23
 mkdir -p -- /usr/share/man/man1
+du -h -d1 /usr/share/
 clang --version
 EOF
 

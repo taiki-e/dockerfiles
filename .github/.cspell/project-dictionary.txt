@@ -11,4 +11,5 @@ novnc
 rockylinux
 texinfo
 tigervnc
+trixie
 websockify

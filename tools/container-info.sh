@@ -12,6 +12,7 @@ cd -- "$(dirname -- "$0")"/..
 # https://endoflife.date/debian
 # | version       | EoL        | glibc  |
 # | ------------- | ---------- | ------ |
+# | 13 (trixie)   | 2030-06-30 | 2.41   |
 # | 12 (bookworm) | 2028-06-10 | 2.36   |
 # | 11 (bullseye) | 2026-06-30 | 2.31   |
 # | 10 (buster)   | 2024-06-30 | 2.28   |
@@ -27,7 +28,7 @@ cd -- "$(dirname -- "$0")"/..
 # | 2.1 (slink)   | 2000-10-30 | 2.0.7  |
 # debian:6 docker image uses legacy image format (use debian/eol images instead).
 # debian/eol:hamm-slim docker image (debian 2.0) is not available.
-debian_versions=(2.1 2.2 3.1 4 5 6 7 8 9 10 11 12 testing sid)
+debian_versions=(2.1 2.2 3.1 4 5 6 7 8 9 10 11 12 13 testing sid)
 debian_versions=()
 # https://wiki.ubuntu.com/Releases
 # https://hub.docker.com/_/ubuntu
@@ -79,6 +80,8 @@ alpine_versions=()
 # https://endoflife.date/fedora
 # | version | EoL        | glibc |
 # | ------- | ---------- | ----- |
+# | 42      | 2026-05-13 | 2.41  |
+# | 41      | 2025-11-19 | 2.40  |
 # | 40      | 2025-05-13 | 2.39  |
 # | 39      | 2024-12-07 | 2.38  |
 # | 38      | 2024-05-18 | 2.37  |
@@ -101,8 +104,26 @@ alpine_versions=()
 # | 21      | ?          | 2.20  |
 # | 20      | ?          | 2.18  |
 # fedora:19 docker image is not available
-fedora_versions=(20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 rawhide)
+fedora_versions=(20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 rawhide)
 fedora_versions=()
+# https://hub.docker.com/_/rockylinux
+# https://endoflife.date/rocky-linux
+# | version | EoL        | glibc |
+# | ------- | ---------- | ----- |
+# | 10      | 2035-05-31 | 2.39  |
+# | 9       | 2032-05-31 | 2.34  |
+# | 8       | 2029-05-31 | 2.28  |
+rocky_versions=(8 9 10)
+rocky_versions=()
+# https://hub.docker.com/_/almalinux
+# https://endoflife.date/almalinux
+# | version | EoL        | glibc |
+# | ------- | ---------- | ----- |
+# | 10      | 2035-05-31 | 2.39  |
+# | 9       | 2032-05-31 | 2.34  |
+# | 8       | 2029-03-01 | 2.28  |
+alma_versions=(8 9 10)
+alma_versions=()
 # https://hub.docker.com/_/centos
 # https://endoflife.date/centos
 # | version | EoL        | glibc |
@@ -113,22 +134,6 @@ fedora_versions=()
 # | 5       | 2017-03-31 | 2.5   |
 centos_versions=(5 6 7 8)
 centos_versions=()
-# https://hub.docker.com/_/rockylinux
-# https://endoflife.date/rocky-linux
-# | version | EoL        | glibc |
-# | ------- | ---------- | ----- |
-# | 9       | 2032-05-31 | 2.34  |
-# | 8       | 2029-05-31 | 2.28  |
-rocky_versions=(8 9)
-rocky_versions=()
-# https://hub.docker.com/_/almalinux
-# https://endoflife.date/almalinux
-# | version | EoL        | glibc |
-# | ------- | ---------- | ----- |
-# | 9       | 2032-05-31 | 2.34  |
-# | 8       | 2029-03-01 | 2.28  |
-alma_versions=(8 9)
-alma_versions=()
 # https://hub.docker.com/r/opensuse/leap
 # https://hub.docker.com/r/opensuse/tumbleweed
 # https://endoflife.date/opensuse
@@ -205,7 +210,7 @@ for distro_version in ${centos_versions[@]+"${centos_versions[@]}"}; do
   esac
 done
 for distro_version in ${rocky_versions[@]+"${rocky_versions[@]}"}; do
-  container_info rockylinux:"${distro_version}"
+  container_info rockylinux/rockylinux:"${distro_version}"
 done
 for distro_version in ${alma_versions[@]+"${alma_versions[@]}"}; do
   container_info almalinux:"${distro_version}"

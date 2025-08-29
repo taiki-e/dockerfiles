@@ -84,17 +84,20 @@ EOF
 FROM slim AS base
 SHELL ["/bin/bash", "-CeEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
+ARG DISTRO
 ARG DISTRO_VERSION
 ARG LLVM_VERSION
 RUN <<EOF
 du -h -d1 /usr/share/
-case "${DISTRO_VERSION}" in
-    18.04) LLVM_VERSION=13 ;;
-    24.04 | testing*) LLVM_VERSION=18 ;;
+case "${DISTRO}:${DISTRO_VERSION%-slim}" in
+    ubuntu:18.04) LLVM_VERSION=13 ;;
+    ubuntu:24.04) LLVM_VERSION=18 ;;
+    debian:13 | debian:testing | debian:sid) LLVM_VERSION=19 ;;
+    ubuntu:rolling | ubuntu:devel) LLVM_VERSION=20 ;;
 esac
-case "${DISTRO_VERSION}" in
-    # LLVM version of ubuntu 24.04 is 18
-    rolling | devel | testing* | sid* | 24.04) ;;
+case "${DISTRO}:${DISTRO_VERSION%-slim}" in
+    # LLVM version of ubuntu 24.04 is 18, debian 13 is 19
+    ubuntu:24.04 | ubuntu:rolling | ubuntu:devel | debian:13 | debian:testing | debian:sid) ;;
     *)
         codename=$(grep -E '^VERSION_CODENAME=' /etc/os-release | cut -d= -f2)
         # shellcheck disable=SC2174

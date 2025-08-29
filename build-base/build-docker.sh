@@ -43,9 +43,7 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
 # See also tools/container-info.sh
 ubuntu_latest=24.04
-# See also tools/container-info.sh
 debian_latest=13
-# See also tools/container-info.sh
 alpine_latest=3.22
 
 build() {

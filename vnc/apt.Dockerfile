@@ -42,8 +42,8 @@ packages+=(
     "${DESKTOP}"
 )
 case "${DISTRO}:${DISTRO_VERSION%-slim}" in
-    ubuntu:1[0-9].* | ubuntu:2[0-1].*) ;;
-    ubuntu:*) packages+=(tigervnc-tools) ;;
+    ubuntu:1[0-9].* | ubuntu:2[0-1].* | debian:1[0-1]) ;;
+    *) packages+=(tigervnc-tools) ;;
 esac
 apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     "${packages[@]}"

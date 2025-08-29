@@ -43,6 +43,7 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
 # See also tools/container-info.sh
 ubuntu_latest=24.04
+debian_latest=13
 
 build() {
   local dockerfile="${package}/${base}.Dockerfile"
@@ -88,6 +89,11 @@ case "${distro}" in
   ubuntu)
     base=apt
     distro_latest="${ubuntu_latest}"
+    ;;
+  debian)
+    base=apt
+    distro_latest="${debian_latest}-slim"
+    distro_version="${distro_version%-slim}-slim"
     ;;
   *) bail "unrecognized distro '${distro}'" ;;
 esac

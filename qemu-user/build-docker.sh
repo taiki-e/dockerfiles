@@ -40,9 +40,8 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 # https://tracker.debian.org/pkg/qemu
 latest=10.1
 dpkg_versions=(
-  10.1.0+ds-1
-  10.0.3+ds-4
-  7.2+dfsg-7+deb12u16
+  10.1.0+ds-2
+  10.0.3+ds-0+deb13u1
 )
 
 build() {
@@ -74,12 +73,10 @@ build() {
 }
 
 for dpkg_version in "${dpkg_versions[@]}"; do
-  if [[ "${dpkg_version}" =~ ^[1-9]\.[0-9][\.\+].+ ]]; then
-    version="${dpkg_version:0:3}"
-  elif [[ "${dpkg_version}" =~ ^[1-9][0-9]\.[0-9][\.\+].+ ]]; then
+  if [[ "${dpkg_version}" =~ ^[1-9][0-9]\.[0-9][\.\+].+ ]]; then
     version="${dpkg_version:0:4}"
   else
-    bail "${dpkg_version}"
+    bail "unhandled ${dpkg_version}"
   fi
   log_dir="tmp/log/${package}/${version}"
   log_file="${log_dir}/build-docker-${time}.log"

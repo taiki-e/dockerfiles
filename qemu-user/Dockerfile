@@ -32,4 +32,5 @@ EOF
 
 FROM alpine:"${ALPINE_VERSION}" AS final
 SHELL ["/bin/sh", "-CeEuxo", "pipefail", "-c"]
+COPY --from=downloader /tmp/qemu/usr/share/doc/qemu-user/copyright /usr/share/doc/qemu-user/copyright
 COPY --from=downloader /qemu/. /usr/bin

@@ -7,6 +7,7 @@ groff
 libclang
 lintian
 novnc
+opencontainers
 rockylinux
 texinfo
 tigervnc

@@ -49,6 +49,7 @@ build() {
   local dockerfile="${package}/${base}.Dockerfile"
   local full_tag="${repository}:${distro}-${distro_version/-slim/}${DESKTOP:+"-${DESKTOP}"}"
   local build_args=(
+    --label "org.opencontainers.image.source=https://github.com/taiki-e/dockerfiles"
     --file "${dockerfile}" "${package}/"
     --platform "${platform}"
     --tag "${full_tag}"

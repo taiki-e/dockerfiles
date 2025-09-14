@@ -39,7 +39,8 @@ SHELL ["/bin/bash", "-CeEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 # - Download-related packages (bzip2, curl, gnupg, libarchive-tools, unzip, xz-utils)
 #   are not necessarily needed for build, but they are small enough (< 10MB).
-RUN <<EOF
+RUN --mount=type=cache,target=/var/cache,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked <<EOF
 du -h -d1 /usr/share/
 apt-get -o Acquire::Retries=10 -qq update
 apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
@@ -71,8 +72,6 @@ du -h -d1 /usr/share/
 find /usr/share/doc -depth -type f ! -name copyright -exec rm -- {} + || true
 find /usr/share/doc -empty -exec rmdir -- {} + || true
 rm -rf -- \
-    /var/lib/apt/lists/* \
-    /var/cache/* \
     /var/log/* \
     /usr/share/{groff,info,linda,lintian,man}
 # Workaround for OpenJDK installation issue: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23
@@ -87,7 +86,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG DISTRO
 ARG DISTRO_VERSION
 ARG LLVM_VERSION
-RUN <<EOF
+RUN --mount=type=cache,target=/var/cache,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked <<EOF
 du -h -d1 /usr/share/
 case "${DISTRO}:${DISTRO_VERSION%-slim}" in
     ubuntu:18.04) LLVM_VERSION=13 ;;
@@ -126,8 +126,6 @@ du -h -d1 /usr/share/
 find /usr/share/doc -depth -type f ! -name copyright -exec rm -- {} + || true
 find /usr/share/doc -empty -exec rmdir -- {} + || true
 rm -rf -- \
-    /var/lib/apt/lists/* \
-    /var/cache/* \
     /var/log/* \
     /usr/share/{groff,info,linda,lintian,man}
 # Workaround for OpenJDK installation issue: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23

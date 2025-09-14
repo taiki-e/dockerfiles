@@ -10,7 +10,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG DISTRO
 ARG DISTRO_VERSION
 ARG ARCH
-RUN <<EOF
+RUN --mount=type=cache,target=/var/cache,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked <<EOF
 du -h -d1 /usr/share/
 packages=()
 case "${ARCH}" in
@@ -46,8 +47,6 @@ du -h -d1 /usr/share/
 find /usr/share/doc -depth -type f ! -name copyright -exec rm -- {} + || true
 find /usr/share/doc -empty -exec rmdir -- {} + || true
 rm -rf -- \
-    /var/lib/apt/lists/* \
-    /var/cache/* \
     /var/log/* \
     /usr/share/{groff,info,linda,lintian,man}
 # Workaround for OpenJDK installation issue: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23

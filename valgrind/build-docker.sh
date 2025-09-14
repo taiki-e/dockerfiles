@@ -6,7 +6,7 @@ trap -- 's=$?; printf >&2 "%s\n" "${0##*/}:${LINENO}: \`${BASH_COMMAND}\` exit w
 cd -- "$(dirname -- "$0")"/..
 
 # USAGE:
-#    ./vnc/build-docker.sh <DISTRO> [DOCKER_BUILD_OPTIONS]
+#    ./valgrind/build-docker.sh <DISTRO> [DOCKER_BUILD_OPTIONS]
 
 x() {
   (
@@ -38,18 +38,17 @@ export BUILDKIT_STEP_LOG_MAX_SIZE=10485760
 owner="${OWNER:-taiki-e}"
 package=$(basename -- "$(cd -- "$(dirname -- "$0")" && pwd)")
 repository="ghcr.io/${owner}/${package}"
-platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
 time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
 # See also tools/container-info.sh
 ubuntu_latest=24.04
 debian_latest=13
 
-desktop="${DESKTOP:-}"
+dpkg_arch=(amd64 arm64 armhf i386 ppc64el riscv64 s390x)
 
 build() {
   local dockerfile="${package}/${base}.Dockerfile"
-  local full_tag="${repository}:${distro}-${distro_version/-slim/}${desktop:+"-${desktop}"}"
+  local full_tag="${repository}:${distro}-${distro_version/-slim/}-${arch}"
   local build_args=(
     --label "org.opencontainers.image.source=https://github.com/taiki-e/dockerfiles"
     --file "${dockerfile}" "${package}/"
@@ -58,16 +57,12 @@ build() {
     --build-arg "DISTRO=${distro}"
     --build-arg "DISTRO_VERSION=${distro_version}"
     --build-arg "${distro_upper}_VERSION=${distro_version}"
+    --build-arg "ARCH=${arch}"
   )
-  if [[ -n "${desktop:-}" ]]; then
-    build_args+=(
-      --build-arg "DESKTOP=${desktop}"
-    )
-  fi
   if [[ "${distro_version}" == "${distro_latest}" ]]; then
     build_args+=(
-      --tag "${repository}:${distro}${desktop:+"-${desktop}"}"
-      --tag "${repository}:${distro}-latest${desktop:+"-${desktop}"}"
+      --tag "${repository}:${distro}-${arch}"
+      --tag "${repository}:${distro}-latest-${arch}"
     )
   fi
   build_args+=("$@")
@@ -85,22 +80,32 @@ build() {
   x docker system df
 }
 
-log_dir="tmp/log/${package}/${distro}-${distro_version}"
-log_file="${log_dir}/build-docker${desktop:+"-${desktop}"}-${time}.log"
-mkdir -p -- "${log_dir}"
-case "${distro}" in
-  ubuntu)
-    base=apt
-    distro_latest="${ubuntu_latest}"
-    ;;
-  debian)
-    base=apt
-    distro_latest="${debian_latest}-slim"
-    distro_version="${distro_version%-slim}-slim"
-    ;;
-  *) bail "unrecognized distro '${distro}'" ;;
-esac
-build "$@" 2>&1 | tee -- "${log_file}"
-printf '%s\n' "info: build log saved at ${log_file}"
+for arch in "${dpkg_arch[@]}"; do
+  log_dir="tmp/log/${package}/${distro}-${distro_version}"
+  log_file="${log_dir}/build-docker-${arch}-${time}.log"
+  mkdir -p -- "${log_dir}"
+  case "${arch}" in
+    amd64 | i386) platform=linux/amd64 ;;
+    arm64 | armhf) platform=linux/arm64/v8 ;;
+    ppc64el) platform=linux/ppc64le ;;
+    riscv64) platform=linux/riscv64 ;;
+    s390x) platform=linux/s390x ;;
+    *) bail "unrecognized dpkg arch '${arch}'" ;;
+  esac
+  case "${distro}" in
+    ubuntu)
+      base=apt
+      distro_latest="${ubuntu_latest}"
+      ;;
+    debian)
+      base=apt
+      distro_latest="${debian_latest}-slim"
+      distro_version="${distro_version%-slim}-slim"
+      ;;
+    *) bail "unrecognized distro '${distro}'" ;;
+  esac
+  build "$@" 2>&1 | tee -- "${log_file}"
+  printf '%s\n' "info: build log saved at ${log_file}"
+done
 
 x docker images "${repository}"

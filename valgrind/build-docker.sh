@@ -44,11 +44,21 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 ubuntu_latest=24.04
 debian_latest=13
 
-dpkg_arch=(amd64 arm64 armhf i386 ppc64el riscv64 s390x)
+host_dpkg_arch=(amd64 arm64 armhf i386)
+cross_dpkg_arch=(ppc64el riscv64 s390x)
 
 build() {
+  local platform
+  case "${arch}" in
+    amd64 | i386) platform=linux/amd64 ;;
+    arm64 | armhf) platform=linux/arm64/v8 ;;
+    ppc64el) platform=linux/ppc64le ;;
+    riscv64) platform=linux/riscv64 ;;
+    s390x) platform=linux/s390x ;;
+    *) bail "unrecognized dpkg arch '${arch}'" ;;
+  esac
   local dockerfile="${package}/${base}.Dockerfile"
-  local full_tag="${repository}:${distro}-${distro_version/-slim/}-${arch}"
+  local full_tag="${repository}:${distro}-${distro_version/-slim/}-${arch}${env:+"-${env}"}"
   local build_args=(
     --label "org.opencontainers.image.source=https://github.com/taiki-e/dockerfiles"
     --file "${dockerfile}" "${package}/"
@@ -58,11 +68,12 @@ build() {
     --build-arg "DISTRO_VERSION=${distro_version}"
     --build-arg "${distro_upper}_VERSION=${distro_version}"
     --build-arg "ARCH=${arch}"
+    --build-arg "ENV=${env}"
   )
   if [[ "${distro_version}" == "${distro_latest}" ]]; then
     build_args+=(
-      --tag "${repository}:${distro}-${arch}"
-      --tag "${repository}:${distro}-latest-${arch}"
+      --tag "${repository}:${distro}-${arch}${env:+"-${env}"}"
+      --tag "${repository}:${distro}-latest-${arch}${env:+"-${env}"}"
     )
   fi
   build_args+=("$@")
@@ -80,18 +91,32 @@ build() {
   x docker system df
 }
 
-for arch in "${dpkg_arch[@]}"; do
+env=''
+for arch in "${host_dpkg_arch[@]}"; do
   log_dir="tmp/log/${package}/${distro}-${distro_version}"
   log_file="${log_dir}/build-docker-${arch}-${time}.log"
   mkdir -p -- "${log_dir}"
-  case "${arch}" in
-    amd64 | i386) platform=linux/amd64 ;;
-    arm64 | armhf) platform=linux/arm64/v8 ;;
-    ppc64el) platform=linux/ppc64le ;;
-    riscv64) platform=linux/riscv64 ;;
-    s390x) platform=linux/s390x ;;
-    *) bail "unrecognized dpkg arch '${arch}'" ;;
+  case "${distro}" in
+    ubuntu)
+      base=apt
+      distro_latest="${ubuntu_latest}"
+      ;;
+    debian)
+      base=apt
+      distro_latest="${debian_latest}-slim"
+      distro_version="${distro_version%-slim}-slim"
+      ;;
+    *) bail "unrecognized distro '${distro}'" ;;
   esac
+  build "$@" 2>&1 | tee -- "${log_file}"
+  printf '%s\n' "info: build log saved at ${log_file}"
+done
+
+env=cross
+for arch in "${cross_dpkg_arch[@]}"; do
+  log_dir="tmp/log/${package}/${distro}-${distro_version}"
+  log_file="${log_dir}/build-docker-${arch}-${time}.log"
+  mkdir -p -- "${log_dir}"
   case "${distro}" in
     ubuntu)
       base=apt

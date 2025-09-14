@@ -10,12 +10,18 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG DISTRO
 ARG DISTRO_VERSION
 ARG ARCH
+ARG ENV
 RUN --mount=type=cache,target=/var/cache,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked <<EOF
 du -h -d1 /usr/share/
 packages=()
-case "${ARCH}" in
-    amd64 | arm64 | i386 | armhf) packages+=(ca-certificates g++ git) ;;
+case "${ENV}" in
+    cross)
+        case "${ARCH}" in
+            riscv64) packages+=(ca-certificates curl) ;;
+        esac
+        ;;
+    *) packages+=(ca-certificates curl g++ git) ;;
 esac
 case "${ARCH}" in
     i386)
@@ -24,9 +30,9 @@ case "${ARCH}" in
         ;;
     armhf)
         dpkg --add-architecture "${ARCH}"
-        packages+=(g++-arm-linux-gnueabihf valgrind:"${ARCH}")
+        packages+=(g++-arm-linux-gnueabihf libstdc++6:"${ARCH}" valgrind:"${ARCH}")
         ;;
-    riscv64) packages+=(ca-certificates curl libc6-dbg) ;;
+    riscv64) packages+=(libc6-dbg) ;;
     *) packages+=(valgrind) ;;
 esac
 apt-get -o Acquire::Retries=10 -qq update
@@ -38,9 +44,17 @@ case "${ARCH}" in
         curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-all-errors -o valgrind-riscv64.deb https://launchpad.net/~jchittum/+archive/ubuntu/valgrind-riscv-2120873/+build/31091443/+files/valgrind_3.25.1-0ubuntu2~ppa1_riscv64.deb
         dpkg -i valgrind-riscv64.deb
         rm -- valgrind-riscv64.deb
-        apt-get -qq -o Dpkg::Use-Pty=0 purge -y ca-certificates curl
-        apt-get -qq -o Dpkg::Use-Pty=0 autoremove -y --purge
+        case "${ENV}" in
+            cross)
+                apt-get -qq -o Dpkg::Use-Pty=0 purge -y ca-certificates curl
+                apt-get -qq -o Dpkg::Use-Pty=0 autoremove -y --purge
+                ;;
+        esac
         ;;
+esac
+case "${ARCH}" in
+    i386 | armhf) ;;
+    *) valgrind --version ;;
 esac
 du -h -d1 /usr/share/
 # https://wiki.ubuntu.com/ReducingDiskFootprint#Documentation

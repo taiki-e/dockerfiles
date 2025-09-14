@@ -12,7 +12,8 @@ ARG DISTRO_VERSION
 ARG ARCH
 ARG ENV
 RUN --mount=type=cache,target=/var/cache,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked <<EOF
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    --mount=type=bind,source=./default.supp,target=/tmp/default.supp <<EOF
 du -h -d1 /usr/share/
 packages=()
 case "${ENV}" in
@@ -56,6 +57,7 @@ case "${ARCH}" in
     i386 | armhf) ;;
     *) valgrind --version ;;
 esac
+cat -- /tmp/default.supp >>/usr/libexec/valgrind/default.supp
 du -h -d1 /usr/share/
 # https://wiki.ubuntu.com/ReducingDiskFootprint#Documentation
 find /usr/share/doc -depth -type f ! -name copyright -exec rm -- {} + || true

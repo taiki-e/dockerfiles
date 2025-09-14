@@ -48,5 +48,5 @@
       "dictionaries": ["bash", "cpp-refined", "rust"]
     }
   ],
-  "ignorePaths": []
+  "ignorePaths": ["valgrind/default.supp"]
 }

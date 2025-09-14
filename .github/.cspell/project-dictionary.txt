@@ -5,6 +5,7 @@ buildx
 distro
 groff
 libclang
+libexec
 lintian
 novnc
 opencontainers

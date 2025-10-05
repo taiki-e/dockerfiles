@@ -57,6 +57,11 @@ build() {
       --tag "${repository}:${distro}-latest-${arch}${env:+"-${env}"}"
     )
   fi
+  if [[ "${distro}" == "ubuntu" ]] && [[ "${distro_version}" == "${ubuntu_rolling}" ]]; then
+    build_args+=(
+      --tag "${repository}:${distro}-rolling-${arch}${env:+"-${env}"}"
+    )
+  fi
   build_args+=("$@")
 
   if [[ -n "${PUSH_TO_GHCR:-}" ]]; then

@@ -50,6 +50,11 @@ build() {
       --tag "${repository}:${distro}-latest${desktop:+"-${desktop}"}"
     )
   fi
+  if [[ "${distro}" == "ubuntu" ]] && [[ "${distro_version}" == "${ubuntu_rolling}" ]]; then
+    build_args+=(
+      --tag "${repository}:${distro}-rolling${desktop:+"-${desktop}"}"
+    )
+  fi
   build_args+=("$@")
 
   if [[ -n "${PUSH_TO_GHCR:-}" ]]; then

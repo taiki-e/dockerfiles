@@ -45,6 +45,11 @@ build() {
       --tag "${repository}:${distro}-latest${mode:+"-${mode}"}"
     )
   fi
+  if [[ "${distro}" == "ubuntu" ]] && [[ "${distro_version}" == "${ubuntu_rolling}" ]]; then
+    build_args+=(
+      --tag "${repository}:${distro}-rolling${mode:+"-${mode}"}"
+    )
+  fi
   build_args+=("$@")
 
   if [[ -n "${PUSH_TO_GHCR:-}" ]]; then

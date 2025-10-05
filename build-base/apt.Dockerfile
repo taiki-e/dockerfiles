@@ -93,11 +93,11 @@ case "${DISTRO}:${DISTRO_VERSION%-slim}" in
     ubuntu:18.04) LLVM_VERSION=13 ;;
     ubuntu:24.04) LLVM_VERSION=18 ;;
     debian:13 | debian:testing | debian:sid) LLVM_VERSION=19 ;;
-    ubuntu:rolling | ubuntu:devel) LLVM_VERSION=20 ;;
+    ubuntu:25.* | ubuntu:devel) LLVM_VERSION=20 ;;
 esac
 case "${DISTRO}:${DISTRO_VERSION%-slim}" in
     # LLVM version of ubuntu 24.04 is 18, debian 13 is 19
-    ubuntu:24.04 | ubuntu:rolling | ubuntu:devel | debian:13 | debian:testing | debian:sid) ;;
+    ubuntu:24.04 | ubuntu:25.* | ubuntu:devel | debian:13 | debian:testing | debian:sid) ;;
     *)
         codename=$(grep -E '^VERSION_CODENAME=' /etc/os-release | cut -d= -f2)
         # shellcheck disable=SC2174

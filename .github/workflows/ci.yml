@@ -34,23 +34,47 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package:
-          - build-base
-        distro:
-          - ubuntu:18.04
-          - ubuntu:20.04
-          - ubuntu:22.04
-          - ubuntu:24.04
-          - ubuntu:rolling
-          - debian:11
-          - debian:12
-          - debian:13
-          - debian:testing
-          - alpine:3.22
-          - alpine:edge
         include:
+          # --------------------------------------------------------------------
+          # build-base
+          - package: build-base
+            distro: ubuntu:18.04
+          - package: build-base
+            distro: ubuntu:20.04
+          - package: build-base
+            distro: ubuntu:22.04
+          - package: build-base
+            distro: ubuntu:24.04 # latest
+          - package: build-base
+            distro: ubuntu:25.04 # rolling
+          - package: build-base
+            distro: debian:11
+          - package: build-base
+            distro: debian:12
+          - package: build-base
+            distro: debian:13 # latest
+          - package: build-base
+            distro: debian:testing
+          - package: build-base
+            distro: alpine:3.22 # latest
+          - package: build-base
+            distro: alpine:edge
+          # --------------------------------------------------------------------
+          # downloader
           - package: downloader
+          # --------------------------------------------------------------------
+          # qemu-user
           - package: qemu-user
+          # --------------------------------------------------------------------
+          # valgrind
+          - package: valgrind
+            distro: ubuntu:24.04 # latest
+          - package: valgrind
+            distro: ubuntu:25.04 # rolling
+          - package: valgrind
+            distro: ubuntu:devel
+          # --------------------------------------------------------------------
+          # vnc
           - package: vnc
             distro: ubuntu:18.04
           - package: vnc
@@ -58,19 +82,13 @@ jobs:
           - package: vnc
             distro: ubuntu:22.04
           - package: vnc
-            distro: ubuntu:24.04
+            distro: ubuntu:24.04 # latest
           - package: vnc
             distro: debian:11
           - package: vnc
             distro: debian:12
           - package: vnc
-            distro: debian:13
-          - package: valgrind
-            distro: ubuntu:24.04
-          - package: valgrind
-            distro: ubuntu:rolling
-          - package: valgrind
-            distro: ubuntu:devel
+            distro: debian:13 # latest
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:

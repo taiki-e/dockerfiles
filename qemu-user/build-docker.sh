@@ -8,17 +8,6 @@ cd -- "$(dirname -- "$0")"/..
 # USAGE:
 #    ./qemu-user/build-docker.sh
 
-x() {
-  (
-    set -x
-    "$@"
-  )
-}
-bail() {
-  printf >&2 'error: %s\n' "$*"
-  exit 1
-}
-
 if [[ $# -gt 0 ]]; then
   cat <<EOF
 USAGE:
@@ -26,15 +15,11 @@ USAGE:
 EOF
   exit 1
 fi
-
-export DOCKER_BUILDKIT=1
-export BUILDKIT_STEP_LOG_MAX_SIZE=10485760
-
-owner="${OWNER:-taiki-e}"
 package=$(basename -- "$(cd -- "$(dirname -- "$0")" && pwd)")
-repository="ghcr.io/${owner}/${package}"
 platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
-time=$(date -u '+%Y-%m-%d-%H-%M-%S')
+
+# shellcheck source-path=SCRIPTDIR/..
+. ./tools/build-docker-shared.sh
 
 # https://ftp.debian.org/debian/pool/main/q/qemu
 # https://tracker.debian.org/pkg/qemu

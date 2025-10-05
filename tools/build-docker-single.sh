@@ -5,13 +5,6 @@ IFS=$'\n\t'
 trap -- 's=$?; printf >&2 "%s\n" "${0##*/}:${LINENO}: \`${BASH_COMMAND}\` exit with ${s}"; exit ${s}' ERR
 cd -- "$(dirname -- "$0")"/..
 
-x() {
-  (
-    set -x
-    "$@"
-  )
-}
-
 if [[ $# -gt 1 ]]; then
   cat <<EOF
 USAGE:
@@ -20,14 +13,10 @@ EOF
   exit 1
 fi
 package="$1"
-
-export DOCKER_BUILDKIT=1
-export BUILDKIT_STEP_LOG_MAX_SIZE=10485760
-
-owner="${OWNER:-taiki-e}"
-repository="ghcr.io/${owner}/${package}"
 platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
-time=$(date -u '+%Y-%m-%d-%H-%M-%S')
+
+# shellcheck source-path=SCRIPTDIR/..
+. ./tools/build-docker-shared.sh
 
 build() {
   local dockerfile="${package}/Dockerfile"

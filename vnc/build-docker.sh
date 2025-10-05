@@ -8,17 +8,6 @@ cd -- "$(dirname -- "$0")"/..
 # USAGE:
 #    ./vnc/build-docker.sh <DISTRO> [DOCKER_BUILD_OPTIONS]
 
-x() {
-  (
-    set -x
-    "$@"
-  )
-}
-bail() {
-  printf >&2 'error: %s\n' "$*"
-  exit 1
-}
-
 if [[ $# -lt 1 ]]; then
   cat <<EOF
 USAGE:
@@ -31,21 +20,12 @@ distro_version="${distro#*:}"
 distro="${distro%:*}"
 distro_upper=$(tr '[:lower:]' '[:upper:]' <<<"${distro}")
 shift
-
-export DOCKER_BUILDKIT=1
-export BUILDKIT_STEP_LOG_MAX_SIZE=10485760
-
-owner="${OWNER:-taiki-e}"
 package=$(basename -- "$(cd -- "$(dirname -- "$0")" && pwd)")
-repository="ghcr.io/${owner}/${package}"
 platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
-time=$(date -u '+%Y-%m-%d-%H-%M-%S')
-
-# See also tools/container-info.sh
-ubuntu_latest=24.04
-debian_latest=13
-
 desktop="${DESKTOP:-}"
+
+# shellcheck source-path=SCRIPTDIR/..
+. ./tools/build-docker-shared.sh
 
 build() {
   local dockerfile="${package}/${base}.Dockerfile"

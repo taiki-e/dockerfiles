@@ -46,7 +46,7 @@ jobs:
           - package: build-base
             distro: ubuntu:24.04 # latest
           - package: build-base
-            distro: ubuntu:25.04 # rolling
+            distro: ubuntu:25.10 # rolling
           - package: build-base
             distro: debian:11
           - package: build-base
@@ -70,7 +70,9 @@ jobs:
           - package: valgrind
             distro: ubuntu:24.04 # latest
           - package: valgrind
-            distro: ubuntu:25.04 # rolling
+            distro: ubuntu:25.04 # TODO(riscv64): "unhandled instruction 0x0C0777D7" error on Ubuntu 25.10 (likely due to RVA23U64 extensions are now enabled)
+          - package: valgrind
+            distro: ubuntu:25.10 # rolling
           - package: valgrind
             distro: ubuntu:devel
           # --------------------------------------------------------------------

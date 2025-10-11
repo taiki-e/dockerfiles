@@ -36,6 +36,9 @@ jobs:
       matrix:
         include:
           # --------------------------------------------------------------------
+          # binutils/objdump
+          - package: binutils
+          # --------------------------------------------------------------------
           # build-base
           - package: build-base
             distro: ubuntu:18.04

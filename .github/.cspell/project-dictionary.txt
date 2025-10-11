@@ -4,6 +4,7 @@ BUILDKIT
 buildx
 distro
 groff
+LDFLAGS
 libclang
 libexec
 lintian

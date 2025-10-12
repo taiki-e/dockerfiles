@@ -19,7 +19,7 @@ packages=()
 case "${ENV}" in
     cross)
         case "${ARCH}" in
-            riscv64) packages+=(ca-certificates curl) ;;
+            riscv64) packages+=(autoconf automake ca-certificates gcc git libc6-dev make) ;;
         esac
         ;;
     *) packages+=(ca-certificates curl g++ git) ;;
@@ -41,13 +41,22 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     "${packages[@]}"
 case "${ARCH}" in
     riscv64)
-        # https://bugs.launchpad.net/ubuntu/+source/valgrind/+bug/2120873
-        curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-all-errors -o valgrind-riscv64.deb https://launchpad.net/~jchittum/+archive/ubuntu/valgrind-riscv-2120873/+build/31091443/+files/valgrind_3.25.1-0ubuntu2~ppa1_riscv64.deb
-        dpkg -i valgrind-riscv64.deb
-        rm -- valgrind-riscv64.deb
+        # Build Valgrind from source to pick https://sourceware.org/git/?p=valgrind.git;a=commit;h=97831bbbc208f3c574095770aff9b19e5a2c6aae
+        git clone git://sourceware.org/git/valgrind.git
+        (
+            cd -- valgrind
+            git checkout 97831bbbc208f3c574095770aff9b19e5a2c6aae
+            ./autogen.sh
+            ./configure --prefix=/usr/
+            make -j"$(nproc)"
+            make -j"$(nproc)" install
+        )
+        mkdir -p -- /usr/share/doc/valgrind
+        cp -- valgrind/COPYING /usr/share/doc/valgrind
+        rm -rf -- valgrind
         case "${ENV}" in
             cross)
-                apt-get -qq -o Dpkg::Use-Pty=0 purge -y ca-certificates curl
+                apt-get -qq -o Dpkg::Use-Pty=0 purge -y autoconf automake ca-certificates gcc git libc6-dev make
                 apt-get -qq -o Dpkg::Use-Pty=0 autoremove -y --purge
                 ;;
         esac
@@ -60,7 +69,7 @@ esac
 cat -- /tmp/default.supp >>/usr/libexec/valgrind/default.supp
 du -h -d1 /usr/share/
 # https://wiki.ubuntu.com/ReducingDiskFootprint#Documentation
-find /usr/share/doc -depth -type f ! -name copyright -exec rm -- {} + || true
+find /usr/share/doc -depth -type f ! -name copyright ! -name COPYING -exec rm -- {} + || true
 find /usr/share/doc -empty -exec rmdir -- {} + || true
 rm -rf -- \
     /var/log/* \

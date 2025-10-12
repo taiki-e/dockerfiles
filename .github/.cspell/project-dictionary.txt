@@ -1,5 +1,6 @@
 almalinux
 archlinux
+autogen
 BUILDKIT
 buildx
 distro
@@ -11,6 +12,7 @@ lintian
 novnc
 opencontainers
 rockylinux
+sourceware
 texinfo
 tigervnc
 trixie

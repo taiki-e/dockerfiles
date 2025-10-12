@@ -30,11 +30,16 @@ jobs:
       repository-projects: read # for gh pr edit --add-assignee
     secrets: inherit
 
-  docker:
+  build:
     strategy:
       fail-fast: false
       matrix:
         include:
+          # --------------------------------------------------------------------
+          # binutils/objdump
+          - package: binutils
+          - package: binutils
+            os: ubuntu-24.04-arm
           # --------------------------------------------------------------------
           # build-base
           - package: build-base
@@ -91,7 +96,7 @@ jobs:
             distro: debian:12
           - package: vnc
             distro: debian:13 # latest
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     timeout-minutes: 60
     permissions:
       contents: read
@@ -105,3 +110,19 @@ jobs:
         if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
       - run: |
           "${{ matrix.package }}"/build-docker.sh ${{ matrix.distro }}
+
+  manifest:
+    if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: write # for push to ghcr
+    steps:
+      - uses: taiki-e/checkout-action@v1
+      - run: |
+          docker login ghcr.io -u "${{ github.actor }}" --password-stdin <<<"${{ secrets.GITHUB_TOKEN }}"
+          printf 'PUSH_TO_GHCR=1\n' >>"${GITHUB_ENV}"
+        if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
+      - run: binutils/docker-manifest.sh

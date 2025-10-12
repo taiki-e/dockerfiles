@@ -9,6 +9,16 @@ x() {
     "$@"
   )
 }
+retry() {
+  for i in {1..10}; do
+    if "$@"; then
+      return 0
+    else
+      sleep "${i}"
+    fi
+  done
+  "$@"
+}
 bail() {
   printf >&2 'error: %s\n' "$*"
   exit 1

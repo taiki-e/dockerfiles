@@ -26,7 +26,7 @@ platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
 # https://tracker.debian.org/pkg/qemu
 latest=10.1
 dpkg_versions=(
-  10.1.0+ds-5
+  10.1.1+ds-1
   10.0.3+ds-0+deb13u1
 )
 

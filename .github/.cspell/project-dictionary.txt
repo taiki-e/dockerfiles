@@ -2,7 +2,6 @@ almalinux
 archlinux
 BUILDKIT
 buildx
-distro
 groff
 LDFLAGS
 libclang

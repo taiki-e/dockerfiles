@@ -11,23 +11,44 @@
     fun:{closure#*}<std::thread::Inner>
     fun:allocate_for_layout<core::mem::maybe_uninit::MaybeUninit<std::thread::Inner>, alloc::sync::{impl#*}::new_uninit::{closure_env#*}<std::thread::Inner>, fn(*mut u8) -> *mut alloc::sync::ArcInner<core::mem::maybe_uninit::MaybeUninit<std::thread::Inner>>>
     fun:new_uninit<std::thread::Inner>
-    fun:_ZN3std6thread6Thread3new17h*E
-    fun:_ZN3std6thread7current12init_current17h*E
+    fun:_*3std6thread*6Thread3new*
+    fun:_*3std6thread7current12init_current*
     fun:current_or_unnamed
-    fun:_ZN3std4sync4mpmc7context7Context3new17h*E
-    fun:__init
+    fun:_*3std4sync4mpmc7context*7Context3new*
+    fun:__*init*
     fun:call_once<fn() -> core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>, ()>
     fun:unwrap_or_else<core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>, fn() -> core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>>
-    fun:_ZN3std3sys12thread_local6native4lazy20Storage$LT$T$C$D$GT$16get_or_init_slow17h*E
+    fun:_*3std3sys12thread_local6native4lazy*
     fun:get_or_init<core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>, (), fn() -> core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>>
     fun:{closure#*}
     fun:call_once<std::sync::mpmc::context::{impl#*}::with::CONTEXT::{constant#*}::{closure_env#*}, (core::option::Option<&mut core::option::Option<core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>>>)>
     fun:try_with<core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>, std::sync::mpmc::context::{impl#*}::with::{closure_env#*}<std::sync::mpmc::list::{impl#*}::recv::{closure_env#*}<test::event::CompletedTest>, ()>, ()>
     fun:with<std::sync::mpmc::list::{impl#*}::recv::{closure_env#*}<test::event::CompletedTest>, ()>
-    fun:_ZN3std4sync4mpmc4list16Channel$LT$T$GT$4recv17h*E
+    fun:_*3std4sync4mpmc4list*Channel*
     fun:recv<test::event::CompletedTest>
     fun:recv<test::event::CompletedTest>
     fun:run_tests<test::console::run_tests_console::{closure_env#*}>
-    fun:_ZN4test7console17run_tests_console17h*E
+    fun:_*4test7console17run_tests_console*
     ...
+}
+{
+    std_thread_delete_current_info_armhf
+    Memcheck:Overlap
+    fun:memcpy
+    fun:copy<*>
+    fun:slice_remove<*>
+    fun:remove<usize, std::sys::pal::unix::stack_overflow::thread_info::ThreadInfo>
+    fun:_*5alloc11collections5btree6remove*
+    fun:remove_kv_tracking<usize, std::sys::pal::unix::stack_overflow::thread_info::ThreadInfo, alloc::collections::btree::map::entry::{impl#*}::remove_kv::{closure_env#*}<usize, std::sys::pal::unix::stack_overflow::thread_info::ThreadInfo, alloc::alloc::Global>, alloc::alloc::Global>
+    fun:remove_kv<usize, std::sys::pal::unix::stack_overflow::thread_info::ThreadInfo, alloc::alloc::Global>
+    fun:remove_entry<usize, std::sys::pal::unix::stack_overflow::thread_info::ThreadInfo, alloc::alloc::Global>
+    fun:remove_entry<usize, std::sys::pal::unix::stack_overflow::thread_info::ThreadInfo, alloc::alloc::Global, usize>
+    fun:remove<usize, std::sys::pal::unix::stack_overflow::thread_info::ThreadInfo, alloc::alloc::Global, usize>
+    fun:delete_current_info
+    fun:_*3std3sys3pal4unix14stack_overflow3imp12drop_handler*
+    fun:drop
+    fun:drop_in_place<std::sys::pal::unix::stack_overflow::Handler>
+    fun:_*3std3sys6thread4unix*6Thread3new12thread_start*
+    fun:start_thread
+    obj:/usr/lib/arm-linux-gnueabihf/libc.so.6
 }

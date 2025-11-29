@@ -107,6 +107,10 @@ for arch in "${cross_dpkg_arch[@]}"; do
     ubuntu)
       base=apt
       distro_latest="${ubuntu_latest}"
+      if [[ "${arch}" == "riscv64" ]] && [[ "${distro_version}" == "devel" ]]; then
+        # TODO: Failed to fetch http://ports.ubuntu.com/ubuntu-ports/dists/resolute/main/binary-riscv64/Packages.gz
+        continue
+      fi
       ;;
     debian)
       base=apt

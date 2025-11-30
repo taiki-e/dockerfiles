@@ -18,29 +18,29 @@ du -h -d1 /usr/share/
 packages=()
 case "${ENV}" in
     cross)
-        case "${ARCH}" in
-            riscv64) packages+=(ca-certificates curl) ;;
+        case "${ARCH}:${DISTRO}:${DISTRO_VERSION}" in
+            riscv64:ubuntu:2[0-5].*) packages+=(ca-certificates curl) ;;
         esac
         ;;
     *) packages+=(ca-certificates curl g++ git) ;;
 esac
-case "${ARCH}" in
-    i386)
+case "${ARCH}:${DISTRO}:${DISTRO_VERSION}" in
+    i386:*)
         dpkg --add-architecture "${ARCH}"
         packages+=(g++-i686-linux-gnu valgrind:"${ARCH}")
         ;;
-    armhf)
+    armhf:*)
         dpkg --add-architecture "${ARCH}"
         packages+=(g++-arm-linux-gnueabihf libstdc++6:"${ARCH}" valgrind:"${ARCH}")
         ;;
-    riscv64) packages+=(libc6-dbg) ;;
+    riscv64:ubuntu:2[0-5].*) packages+=(libc6-dbg) ;;
     *) packages+=(valgrind) ;;
 esac
 apt-get -o Acquire::Retries=10 -qq update
 apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     "${packages[@]}"
-case "${ARCH}" in
-    riscv64)
+case "${ARCH}:${DISTRO}:${DISTRO_VERSION}" in
+    riscv64:ubuntu:2[0-5].*)
         # https://bugs.launchpad.net/ubuntu/+source/valgrind/+bug/2120873
         curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-all-errors -o valgrind-riscv64.deb https://launchpad.net/~jchittum/+archive/ubuntu/valgrind-riscv-2120873/+build/31091443/+files/valgrind_3.25.1-0ubuntu2~ppa1_riscv64.deb
         dpkg -i valgrind-riscv64.deb

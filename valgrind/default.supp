@@ -8,9 +8,9 @@
     ...
     fun:alloc_impl
     fun:allocate
-    fun:{closure#*}<std::thread::Inner>
-    fun:allocate_for_layout<core::mem::maybe_uninit::MaybeUninit<std::thread::Inner>, alloc::sync::{impl#*}::new_uninit::{closure_env#*}<std::thread::Inner>, fn(*mut u8) -> *mut alloc::sync::ArcInner<core::mem::maybe_uninit::MaybeUninit<std::thread::Inner>>>
-    fun:new_uninit<std::thread::Inner>
+    fun:{closure#*}<std::thread*::Inner*>
+    fun:allocate_for_layout<core::mem::maybe_uninit::MaybeUninit<std::thread*::Inner>, alloc::sync::{impl#*}::new_uninit*::{closure_env#*}<std::thread*::Inner*>, fn(*mut u8) -> *mut alloc::sync::ArcInner<core::mem::maybe_uninit::MaybeUninit<std::thread*::Inner>>>
+    fun:new_uninit*<std::thread*::Inner*>
     fun:_*3std6thread*6Thread3new*
     fun:_*3std6thread7current12init_current*
     fun:current_or_unnamed

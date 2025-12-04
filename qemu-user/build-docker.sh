@@ -27,7 +27,7 @@ platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
 latest=10.1
 dpkg_versions=(
   10.2.0~rc1+ds-1
-  10.1.2+ds-3
+  10.1.2+ds-3+b1
   10.0.6+ds-0+deb13u2
 )
 

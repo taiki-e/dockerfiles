@@ -73,13 +73,19 @@ jobs:
           # --------------------------------------------------------------------
           # valgrind
           - package: valgrind
-            distro: ubuntu:24.04 # latest
+            arch: amd64
           - package: valgrind
-            distro: ubuntu:25.04 # TODO(riscv64): "unhandled instruction 0x0C0777D7" error on Ubuntu 25.10 (likely due to RVA23U64 extensions are now enabled)
+            arch: arm64
           - package: valgrind
-            distro: ubuntu:25.10 # rolling
+            arch: armhf
           - package: valgrind
-            distro: ubuntu:devel
+            arch: i386
+          - package: valgrind
+            arch: ppc64el
+          - package: valgrind
+            arch: riscv64
+          - package: valgrind
+            arch: s390x
           # --------------------------------------------------------------------
           # vnc
           - package: vnc
@@ -109,7 +115,7 @@ jobs:
           printf 'PUSH_TO_GHCR=1\n' >>"${GITHUB_ENV}"
         if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
       - run: |
-          "${{ matrix.package }}"/build-docker.sh ${{ matrix.distro }}
+          "${{ matrix.package }}"/build-docker.sh ${{ matrix.distro }} ${{ matrix.arch }}
 
   manifest:
     if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')

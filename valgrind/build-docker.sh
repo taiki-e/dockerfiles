@@ -6,7 +6,7 @@ trap -- 's=$?; printf >&2 "%s\n" "${0##*/}:${LINENO}: \`${BASH_COMMAND}\` exit w
 cd -- "$(dirname -- "$0")"/..
 
 # USAGE:
-#    ./valgrind/build-docker.sh <DISTRO> [DOCKER_BUILD_OPTIONS]
+#    ./valgrind/build-docker.sh <ARCH> [DOCKER_BUILD_OPTIONS]
 
 if [[ $# -lt 1 ]]; then
   cat <<EOF
@@ -15,18 +15,16 @@ USAGE:
 EOF
   exit 1
 fi
-distro="$1"
-distro_version="${distro#*:}"
-distro="${distro%:*}"
-distro_upper=$(tr '[:lower:]' '[:upper:]' <<<"${distro}")
+arch="$1"
 shift
 package=$(basename -- "$(cd -- "$(dirname -- "$0")" && pwd)")
 
 # shellcheck source-path=SCRIPTDIR/..
 . ./tools/build-docker-shared.sh
 
-host_dpkg_arch=(amd64 arm64 armhf i386)
-cross_dpkg_arch=(ppc64el riscv64 s390x)
+# https://valgrind.org/docs/manual/dist.news.html
+valgrind_version=3.26.0
+valgrind_latest=3.26.0
 
 build() {
   local platform
@@ -38,28 +36,24 @@ build() {
     s390x) platform=linux/s390x ;;
     *) bail "unrecognized dpkg arch '${arch}'" ;;
   esac
-  local dockerfile="${package}/${base}.Dockerfile"
-  local full_tag="${repository}:${distro}-${distro_version/-slim/}-${arch}${env:+"-${env}"}"
+  local dockerfile="${package}/Dockerfile"
+  local full_tag="${repository}:${valgrind_version}-${arch}${env:+"-${env}"}"
+  local valgrind_ref="${valgrind_version}"
+  if [[ "${valgrind_ref}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    valgrind_ref="VALGRIND_${valgrind_ref//\./_}"
+  fi
   local build_args=(
     "${opencontainers_labels[@]}"
     --file "${dockerfile}" "${package}/"
     --platform "${platform}"
     --tag "${full_tag}"
-    --build-arg "DISTRO=${distro}"
-    --build-arg "DISTRO_VERSION=${distro_version}"
-    --build-arg "${distro_upper}_VERSION=${distro_version}"
     --build-arg "ARCH=${arch}"
     --build-arg "ENV=${env}"
+    --build-arg "VALGRIND_REF=${valgrind_ref}"
   )
-  if [[ "${distro_version}" == "${distro_latest}" ]]; then
+  if [[ "${valgrind_version}" == "${valgrind_latest}" ]]; then
     build_args+=(
-      --tag "${repository}:${distro}-${arch}${env:+"-${env}"}"
-      --tag "${repository}:${distro}-latest-${arch}${env:+"-${env}"}"
-    )
-  fi
-  if [[ "${distro}" == "ubuntu" ]] && [[ "${distro_version}" == "${ubuntu_rolling}" ]]; then
-    build_args+=(
-      --tag "${repository}:${distro}-rolling-${arch}${env:+"-${env}"}"
+      --tag "${repository}:${arch}${env:+"-${env}"}"
     )
   fi
   build_args+=("$@")
@@ -77,46 +71,15 @@ build() {
   x docker system df
 }
 
-env=''
-for arch in "${host_dpkg_arch[@]}"; do
-  log_dir="tmp/log/${package}/${distro}-${distro_version}"
-  log_file="${log_dir}/build-docker-${arch}-${time}.log"
-  mkdir -p -- "${log_dir}"
-  case "${distro}" in
-    ubuntu)
-      base=apt
-      distro_latest="${ubuntu_latest}"
-      ;;
-    debian)
-      base=apt
-      distro_latest="${debian_latest}-slim"
-      distro_version="${distro_version%-slim}-slim"
-      ;;
-    *) bail "unrecognized distro '${distro}'" ;;
-  esac
-  build "$@" 2>&1 | tee -- "${log_file}"
-  printf '%s\n' "info: build log saved at ${log_file}"
-done
-
-env=cross
-for arch in "${cross_dpkg_arch[@]}"; do
-  log_dir="tmp/log/${package}/${distro}-${distro_version}"
-  log_file="${log_dir}/build-docker-${arch}-${time}.log"
-  mkdir -p -- "${log_dir}"
-  case "${distro}" in
-    ubuntu)
-      base=apt
-      distro_latest="${ubuntu_latest}"
-      ;;
-    debian)
-      base=apt
-      distro_latest="${debian_latest}-slim"
-      distro_version="${distro_version%-slim}-slim"
-      ;;
-    *) bail "unrecognized distro '${distro}'" ;;
-  esac
-  build "$@" 2>&1 | tee -- "${log_file}"
-  printf '%s\n' "info: build log saved at ${log_file}"
-done
+log_dir="tmp/log/${package}/${valgrind_version}"
+log_file="${log_dir}/build-docker-${arch}-${time}.log"
+mkdir -p -- "${log_dir}"
+case "${arch}" in
+  amd64 | arm64 | armhf | i386) env='' ;;
+  ppc64el | riscv64 | s390x) env=cross ;;
+  *) bail "unrecognized arch '${arch}'" ;;
+esac
+build "$@" 2>&1 | tee -- "${log_file}"
+printf '%s\n' "info: build log saved at ${log_file}"
 
 x docker images "${repository}"

@@ -7,10 +7,15 @@ LDFLAGS
 libclang
 libexec
 lintian
+marm
+mfloat
+mfpu
 novnc
 opencontainers
 rockylinux
+sourceware
 texinfo
 tigervnc
 trixie
+vfpv
 websockify

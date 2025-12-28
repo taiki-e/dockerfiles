@@ -39,6 +39,7 @@ build() {
     --file "${dockerfile}" "${package}/"
     --platform "${platform}"
     --tag "${full_tag}"
+    --build-arg "ALPINE_VERSION=${alpine_latest}"
     --build-arg "QEMU_DPKG_VERSION=${dpkg_version}"
   )
   if [[ "${version}" == "${latest}" ]]; then

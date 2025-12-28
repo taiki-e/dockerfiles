@@ -40,4 +40,4 @@ time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 ubuntu_latest=24.04
 ubuntu_rolling=25.10
 debian_latest=13
-alpine_latest=3.22
+alpine_latest=3.23

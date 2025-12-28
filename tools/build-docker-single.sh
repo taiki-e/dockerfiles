@@ -5,14 +5,8 @@ IFS=$'\n\t'
 trap -- 's=$?; printf >&2 "%s\n" "${0##*/}:${LINENO}: \`${BASH_COMMAND}\` exit with ${s}"; exit ${s}' ERR
 cd -- "$(dirname -- "$0")"/..
 
-if [[ $# -gt 1 ]]; then
-  cat <<EOF
-USAGE:
-    $0 <PACKAGE>
-EOF
-  exit 1
-fi
 package="$1"
+shift
 platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
 
 # shellcheck source-path=SCRIPTDIR/..
@@ -26,6 +20,7 @@ build() {
     --file "${dockerfile}" "${package}/"
     --platform "${platform}"
     --tag "${tag}"
+    "$@"
   )
 
   if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
@@ -44,7 +39,7 @@ build() {
 log_dir="tmp/log/${package}"
 log_file="${log_dir}/build-docker-${time}.log"
 mkdir -p -- "${log_dir}"
-build 2>&1 | tee -- "${log_file}"
+build "$@" 2>&1 | tee -- "${log_file}"
 printf '%s\n' "info: build log saved at ${log_file}"
 
 x docker images "${repository}"

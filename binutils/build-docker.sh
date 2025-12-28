@@ -34,7 +34,7 @@ esac
 
 # NB: Sync with docker-manifest.sh
 # https://ftp.gnu.org/gnu/binutils
-binutils_version=2.45
+binutils_version=2.45.1
 # https://apt.llvm.org
 llvm_version=21
 version="binutils-${binutils_version}-llvm-${llvm_version}"

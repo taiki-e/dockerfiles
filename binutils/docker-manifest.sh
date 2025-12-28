@@ -21,10 +21,10 @@ package=$(basename -- "$(cd -- "$(dirname -- "$0")" && pwd)")
 . ./tools/build-docker-shared.sh
 
 # NB: Sync with build-docker.sh
-binutils_version=2.45
+binutils_version=2.45.1
 llvm_version=21
 version="binutils-${binutils_version}-llvm-${llvm_version}"
-latest=binutils-2.45-llvm-21
+latest=binutils-2.45.1-llvm-21
 
 docker_manifest() {
   local tags=("${repository}:${version}")

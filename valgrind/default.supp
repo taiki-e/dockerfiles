@@ -4,30 +4,16 @@
     Memcheck:Leak
     match-leak-kinds: possible
     fun:malloc
-    fun:alloc
     ...
-    fun:alloc_impl
-    fun:allocate
-    fun:{closure#*}<std::thread*::Inner*>
-    fun:allocate_for_layout<core::mem::maybe_uninit::MaybeUninit<std::thread*::Inner>, alloc::sync::{impl#*}::new_uninit*::{closure_env#*}<std::thread*::Inner*>, fn(*mut u8) -> *mut alloc::sync::ArcInner<core::mem::maybe_uninit::MaybeUninit<std::thread*::Inner>>>
-    fun:new_uninit*<std::thread*::Inner*>
     fun:_*std6thread*6Thread3new*
     fun:_*std6thread7current12init_current*
-    fun:current_or_unnamed
+    ...
     fun:_*std4sync4mpmc7context*7Context3new*
-    fun:__*init*
-    fun:call_once<fn() -> core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>, ()>
-    fun:unwrap_or_else<core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>, fn() -> core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>>
+    ...
     fun:_*std3sys12thread_local6native4lazy*
-    fun:get_or_init<core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>, (), fn() -> core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>>
-    fun:{closure#*}
-    fun:call_once<std::sync::mpmc::context::{impl#*}::with::CONTEXT::{constant#*}::{closure_env#*}, (core::option::Option<&mut core::option::Option<core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>>>)>
-    fun:try_with<core::cell::Cell<core::option::Option<std::sync::mpmc::context::Context>>, std::sync::mpmc::context::{impl#*}::with::{closure_env#*}<std::sync::mpmc::list::{impl#*}::recv::{closure_env#*}<test::event::CompletedTest>, ()>, ()>
-    fun:with<std::sync::mpmc::list::{impl#*}::recv::{closure_env#*}<test::event::CompletedTest>, ()>
+    ...
     fun:_*std4sync4mpmc4list*Channel*
-    fun:recv<test::event::CompletedTest>
-    fun:recv<test::event::CompletedTest>
-    fun:run_tests<test::console::run_tests_console::{closure_env#*}>
+    ...
     fun:_*test7console17run_tests_console*
     ...
 }

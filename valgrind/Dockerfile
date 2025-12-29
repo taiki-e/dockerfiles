@@ -7,7 +7,6 @@ FROM --platform=amd64 ubuntu:"${UBUNTU_VERSION}" as build
 SHELL ["/bin/bash", "-CeEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 ARG ARCH
-ARG ENV
 ARG VALGRIND_REF
 RUN --mount=type=cache,target=/var/cache,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -35,6 +34,7 @@ case "${ARCH}" in
         packages+=(g++-arm-linux-gnueabihf)
         export CC=arm-linux-gnueabihf-gcc
         export CFLAGS="${CFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon-vfpv4 -marm"
+        # export CFLAGS="${CFLAGS} -march=armv8-a -mfloat-abi=hard -mfpu=neon-fp-armv8 -marm"
         configure_args+=(--host=arm-linux-gnueabihf)
         ;;
     i386)
@@ -78,6 +78,11 @@ rm -rf -- /tmp/valgrind
 cat -- /tmp/default.supp >>/valgrind/libexec/valgrind/default.supp
 du -h -d1 /valgrind/
 EOF
+
+FROM ubuntu:"${UBUNTU_VERSION}" as dist
+SHELL ["/bin/bash", "-CeEuxo", "pipefail", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
+COPY --from=build /valgrind /valgrind
 
 FROM ubuntu:"${UBUNTU_VERSION}"
 SHELL ["/bin/bash", "-CeEuxo", "pipefail", "-c"]

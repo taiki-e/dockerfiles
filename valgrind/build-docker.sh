@@ -27,22 +27,34 @@ valgrind_version=3.26.0
 valgrind_latest=3.26.0
 
 build() {
+  local target="$1"
+  shift
+  local build_args=()
   local platform
-  case "${arch}" in
-    amd64 | i386) platform=linux/amd64 ;;
-    arm64 | armhf) platform=linux/arm64/v8 ;;
-    ppc64el) platform=linux/ppc64le ;;
-    riscv64) platform=linux/riscv64 ;;
-    s390x) platform=linux/s390x ;;
-    *) bail "unrecognized dpkg arch '${arch}'" ;;
+  case "${target}" in
+    dist)
+      platform=linux/amd64
+      build_args+=(--target "${target}")
+      ;;
+    *)
+      target="${env}"
+      case "${arch}" in
+        amd64 | i386) platform=linux/amd64 ;;
+        arm64 | armhf) platform=linux/arm64/v8 ;;
+        ppc64el) platform=linux/ppc64le ;;
+        riscv64) platform=linux/riscv64 ;;
+        s390x) platform=linux/s390x ;;
+        *) bail "unrecognized dpkg arch '${arch}'" ;;
+      esac
+      ;;
   esac
   local dockerfile="${package}/Dockerfile"
-  local full_tag="${repository}:${valgrind_version}-${arch}${env:+"-${env}"}"
+  local full_tag="${repository}:${valgrind_version}-${arch}${target:+"-${target}"}"
   local valgrind_ref="${valgrind_version}"
   if [[ "${valgrind_ref}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     valgrind_ref="VALGRIND_${valgrind_ref//\./_}"
   fi
-  local build_args=(
+  build_args+=(
     "${opencontainers_labels[@]}"
     --file "${dockerfile}" "${package}/"
     --platform "${platform}"
@@ -53,7 +65,7 @@ build() {
   )
   if [[ "${valgrind_version}" == "${valgrind_latest}" ]]; then
     build_args+=(
-      --tag "${repository}:${arch}${env:+"-${env}"}"
+      --tag "${repository}:${arch}${target:+"-${target}"}"
     )
   fi
   build_args+=("$@")
@@ -79,7 +91,8 @@ case "${arch}" in
   ppc64el | riscv64 | s390x) env=cross ;;
   *) bail "unrecognized arch '${arch}'" ;;
 esac
-build "$@" 2>&1 | tee -- "${log_file}"
+build dist "$@" 2>&1 | tee -- "${log_file}"
+build - "$@" 2>&1 | tee -- "${log_file}"
 printf '%s\n' "info: build log saved at ${log_file}"
 
 x docker images "${repository}"

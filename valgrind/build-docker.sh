@@ -68,6 +68,18 @@ build() {
       --tag "${repository}:${arch}${target:+"-${target}"}"
     )
   fi
+  case "${arch}" in
+    ppc64el)
+      build_args+=(
+        --tag "${repository}:${valgrind_version}-ppc64le${target:+"-${target}"}"
+      )
+      if [[ "${valgrind_version}" == "${valgrind_latest}" ]]; then
+        build_args+=(
+          --tag "${repository}:ppc64le${target:+"-${target}"}"
+        )
+      fi
+      ;;
+  esac
   build_args+=("$@")
 
   if [[ -n "${PUSH_TO_GHCR:-}" ]]; then

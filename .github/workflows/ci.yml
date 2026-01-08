@@ -71,6 +71,16 @@ jobs:
           # qemu-user
           - package: qemu-user
           # --------------------------------------------------------------------
+          # qemu-system
+          - package: qemu-system
+          - package: qemu-system
+            os: ubuntu-24.04-arm
+          - package: qemu-system
+            qemu: '7.2.22'
+          - package: qemu-system
+            qemu: '7.2.22'
+            os: ubuntu-24.04-arm
+          # --------------------------------------------------------------------
           # valgrind
           - package: valgrind
             arch: amd64
@@ -116,6 +126,8 @@ jobs:
         if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
       - run: |
           "${{ matrix.package }}"/build-docker.sh ${{ matrix.distro }} ${{ matrix.arch }}
+        env:
+          QEMU_VERSION: ${{ matrix.qemu }}
 
   manifest:
     if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
@@ -132,3 +144,5 @@ jobs:
           printf 'PUSH_TO_GHCR=1\n' >>"${GITHUB_ENV}"
         if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
       - run: binutils/docker-manifest.sh
+      - run: qemu-system/docker-manifest.sh
+      - run: QEMU_VERSION=7.2.22 qemu-system/docker-manifest.sh

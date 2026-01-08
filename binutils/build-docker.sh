@@ -31,13 +31,8 @@ esac
 
 # shellcheck source-path=SCRIPTDIR/..
 . ./tools/build-docker-shared.sh
-
-# NB: Sync with docker-manifest.sh
-# https://ftp.gnu.org/gnu/binutils
-binutils_version=2.45.1
-# https://apt.llvm.org
-llvm_version=21
-version="binutils-${binutils_version}-llvm-${llvm_version}"
+# shellcheck source-path=SCRIPTDIR/..
+. ./binutils/shared.sh
 
 build() {
   local dockerfile="${package}/Dockerfile"
@@ -65,7 +60,7 @@ build() {
   x docker system df
 }
 
-for mode in binutils objdump; do
+for mode in "${modes[@]}"; do
   repository="ghcr.io/${owner}/${mode}"
   log_dir="tmp/log/${package}/${version}"
   log_file="${log_dir}/build-docker-${mode}-${time}.log"

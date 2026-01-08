@@ -19,12 +19,8 @@ package=$(basename -- "$(cd -- "$(dirname -- "$0")" && pwd)")
 
 # shellcheck source-path=SCRIPTDIR/..
 . ./tools/build-docker-shared.sh
-
-# NB: Sync with build-docker.sh
-binutils_version=2.45.1
-llvm_version=21
-version="binutils-${binutils_version}-llvm-${llvm_version}"
-latest=binutils-2.45.1-llvm-21
+# shellcheck source-path=SCRIPTDIR/..
+. ./binutils/shared.sh
 
 docker_manifest() {
   local tags=("${repository}:${version}")
@@ -59,7 +55,7 @@ docker_manifest() {
   fi
 }
 
-for mode in binutils objdump; do
+for mode in "${modes[@]}"; do
   repository="ghcr.io/${owner}/${mode}"
   arches=(amd64 arm64v8)
   docker_manifest

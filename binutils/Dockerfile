@@ -10,10 +10,16 @@ ARG BINUTILS_VERSION
 ARG BASE_URL=https://ftp.gnu.org/gnu/binutils
 # ARG BASE_URL=https://sourceware.org/pub/binutils/releases
 RUN mkdir -p -- /tmp/binutils-src
-RUN curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused "${BASE_URL}/binutils-${BINUTILS_VERSION}.tar.xz" \
-        | tar xJf - --strip-components 1 -C /tmp/binutils-src
-RUN --mount=type=bind,source=./build-binutils.sh,target=/tmp/build-binutils.sh \
-    /tmp/build-binutils.sh
+RUN <<EOF
+curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused https://ftp.gnu.org/gnu/gnu-keyring.gpg \
+    | gpg --import -
+curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused -O "${BASE_URL}/binutils-${BINUTILS_VERSION}.tar.xz"
+curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused -O "${BASE_URL}/binutils-${BINUTILS_VERSION}.tar.xz.sig"
+gpg --verify "binutils-${BINUTILS_VERSION}.tar.xz.sig" "binutils-${BINUTILS_VERSION}.tar.xz"
+tar xf "binutils-${BINUTILS_VERSION}.tar.xz" --strip-components 1 -C /tmp/binutils-src
+EOF
+RUN --mount=type=bind,source=./binutils.sh,target=/tmp/binutils.sh \
+    /tmp/binutils.sh
 ARG MODE
 RUN <<EOF
 du -h -d2 /binutils

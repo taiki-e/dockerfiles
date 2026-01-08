@@ -18,6 +18,7 @@ prefix=/binutils
 mkdir -p -- /tmp/binutils-build "${prefix}"
 cd -- /tmp/binutils-build
 set +C
+/tmp/binutils-src/configure --help
 /tmp/binutils-src/configure \
   --prefix="${prefix}" \
   --enable-targets=all \

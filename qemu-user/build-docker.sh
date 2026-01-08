@@ -28,7 +28,7 @@ latest=10.2
 dpkg_versions=(
   10.2.0+ds-1
   10.1.2+ds-3+b1
-  10.0.6+ds-0+deb13u2
+  10.0.7+ds-0+deb13u1+b1
 )
 
 build() {

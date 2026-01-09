@@ -55,7 +55,6 @@ set +C
   --disable-user \
   --disable-vde \
   --disable-vdi \
-  --disable-vnc \
   --disable-vvfat \
   --disable-xen \
   --disable-zstd \

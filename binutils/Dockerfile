@@ -107,7 +107,7 @@ rm -rf -- \
 mkdir -p -- /usr/share/man/man1
 du -h -d1 /usr/share/
 EOF
-COPY --from=binutils /binutils/. /usr/
+COPY --from=binutils /binutils/. /usr/local/
 RUN <<EOF
 objdump --version
 objdump --help

@@ -122,8 +122,8 @@ rm -rf -- \
 mkdir -p -- /usr/share/man/man1
 du -h -d1 /usr/share/
 EOF
-COPY --from=build /valgrind/. /usr/
-ENV VALGRIND_LIB=/usr/libexec/valgrind
+COPY --from=build /valgrind/. /usr/local/
+ENV VALGRIND_LIB=/usr/local/libexec/valgrind
 RUN <<EOF
 case "${ARCH}" in
     i386 | armhf) ;;

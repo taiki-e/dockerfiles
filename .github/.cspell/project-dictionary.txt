@@ -26,6 +26,7 @@ redir
 rockylinux
 slirp
 smartcard
+softmmu
 sourceware
 texinfo
 tigervnc

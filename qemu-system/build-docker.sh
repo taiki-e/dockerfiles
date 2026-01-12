@@ -43,6 +43,7 @@ build() {
     --platform "${platform}"
     --tag "${full_tag}"
     --build-arg "QEMU_VERSION=${version}"
+    --build-arg "QEMU_TARGET=${target}"
   )
 
   if [[ -n "${PUSH_TO_GHCR:-}" ]]; then

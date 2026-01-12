@@ -29,6 +29,7 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     libslirp-dev \
     python3-pip
 EOF
+ARG QEMU_TARGET
 RUN --mount=type=bind,source=./qemu.sh,target=/tmp/qemu.sh \
     /tmp/qemu.sh
 RUN <<EOF
@@ -66,6 +67,11 @@ du -h -d1 /usr/share/
 EOF
 COPY --from=qemu /qemu /qemu
 ENV PATH="/qemu/bin:$PATH"
+ARG QEMU_TARGET
 RUN <<EOF
-qemu-system-x86_64 --version
+if [[ "${QEMU_TARGET}" == *"mips-softmmu"* ]]; then
+    qemu-system-mips --version
+else
+    qemu-system-x86_64 --version
+fi
 EOF

@@ -76,9 +76,11 @@ jobs:
           - package: qemu-system
             os: ubuntu-24.04-arm
           - package: qemu-system
-            qemu: '7.2.22'
+            qemu-version: '7.2.22'
+            qemu-target: mips-softmmu,mipsel-softmmu,mips64-softmmu,mips64el-softmmu
           - package: qemu-system
-            qemu: '7.2.22'
+            qemu-version: '7.2.22'
+            qemu-target: mips-softmmu,mipsel-softmmu,mips64-softmmu,mips64el-softmmu
             os: ubuntu-24.04-arm
           # --------------------------------------------------------------------
           # valgrind
@@ -127,7 +129,8 @@ jobs:
       - run: |
           "${{ matrix.package }}"/build-docker.sh ${{ matrix.distro }} ${{ matrix.arch }}
         env:
-          QEMU_VERSION: ${{ matrix.qemu }}
+          QEMU_VERSION: ${{ matrix.qemu-version }}
+          QEMU_TARGET: ${{ matrix.qemu-target }}
 
   manifest:
     if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')

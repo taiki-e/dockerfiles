@@ -19,7 +19,7 @@ set +C
 /tmp/qemu-src/configure --help
 args=()
 if [[ -n "${QEMU_TARGET:-}" ]]; then
-  args+=("${QEMU_TARGET}")
+  args+=(--target-list="${QEMU_TARGET}")
 fi
 # Refs: https://github.com/cross-platform-actions/resources/blob/v0.12.0/ci.rb
 args+=(

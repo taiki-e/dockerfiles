@@ -124,6 +124,7 @@ du -h -d1 /usr/share/
 EOF
 COPY --from=build /valgrind/. /usr/local/
 ENV VALGRIND_LIB=/usr/local/libexec/valgrind
+ENV VALGRIND_INCLUDE=/usr/local/include
 RUN <<EOF
 case "${ARCH}" in
     i386 | armhf) ;;

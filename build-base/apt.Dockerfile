@@ -103,7 +103,7 @@ case "${DISTRO}:${DISTRO_VERSION%-slim}" in
         # shellcheck disable=SC2174
         mkdir -pm755 -- /etc/apt/keyrings
         curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused https://apt.llvm.org/llvm-snapshot.gpg.key \
-            | gpg --dearmor >/etc/apt/keyrings/llvm-snapshot.gpg
+            | gpg --dearmor -o /etc/apt/keyrings/llvm-snapshot.gpg
         printf '%s\n' "deb [signed-by=/etc/apt/keyrings/llvm-snapshot.gpg] http://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-${LLVM_VERSION} main" \
             >"/etc/apt/sources.list.d/llvm-toolchain-${codename}-${LLVM_VERSION}.list"
         ;;

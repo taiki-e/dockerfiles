@@ -6,8 +6,8 @@
 modes=(binutils objdump)
 
 # https://ftp.gnu.org/gnu/binutils
-binutils_version=2.45.1
+binutils_version=2.46.0
 # https://apt.llvm.org
 llvm_version=21
 version="binutils-${binutils_version}-llvm-${llvm_version}"
-latest=binutils-2.45.1-llvm-21
+latest=binutils-2.46.0-llvm-21

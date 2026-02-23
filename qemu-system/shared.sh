@@ -4,6 +4,6 @@
 # shellcheck disable=SC2034
 
 # https://www.qemu.org/download/
-version="${QEMU_VERSION:-10.2.0}"
+version="${QEMU_VERSION:-10.2.1}"
 latest=10.2
 target="${QEMU_TARGET:-}"

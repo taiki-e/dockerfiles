@@ -118,7 +118,7 @@ jobs:
     timeout-minutes: 60
     permissions:
       contents: read
-      packages: write # for push to ghcr
+      packages: write # for pushing to ghcr
     steps:
       - uses: taiki-e/checkout-action@v1
       - uses: taiki-e/github-actions/setup-docker@main
@@ -139,7 +139,7 @@ jobs:
     timeout-minutes: 60
     permissions:
       contents: read
-      packages: write # for push to ghcr
+      packages: write # for pushing to ghcr
     steps:
       - uses: taiki-e/checkout-action@v1
       - run: |

@@ -29,10 +29,12 @@ export BUILDKIT_STEP_LOG_MAX_SIZE=10485760
 
 owner="${OWNER:-taiki-e}"
 repository="ghcr.io/${owner}/${package:?}"
+revision=$(git rev-parse HEAD)
 # https://specs.opencontainers.org/image-spec/annotations/
 opencontainers_labels=(
   --label "org.opencontainers.image.source=https://github.com/${owner}/dockerfiles"
-  --label "org.opencontainers.image.revision=$(git rev-parse HEAD)"
+  --label "org.opencontainers.image.revision=${revision}"
+  --label "org.opencontainers.image.documentation=https://github.com/${owner}/dockerfiles/blob/${revision}/${package}/README.md"
 )
 time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 

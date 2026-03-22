@@ -101,6 +101,11 @@ jobs:
           # --------------------------------------------------------------------
           # vnc
           - package: vnc
+            distro: ubuntu:14.04
+          # TODO: (x-terminal-emulator:80): GLib-CRITICAL **: g_shell_parse_argv: assertion 'command_line != NULL' failed
+          # - package: vnc
+          #   distro: ubuntu:16.04
+          - package: vnc
             distro: ubuntu:18.04
           - package: vnc
             distro: ubuntu:20.04

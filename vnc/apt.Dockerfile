@@ -23,7 +23,6 @@ packages=(
     gcc
     git
     gnupg
-    libarchive-tools
     libc6-dev
     nano
     patch
@@ -35,13 +34,14 @@ packages=(
 )
 packages+=(
     novnc
-    tigervnc-common
-    tigervnc-standalone-server
     websockify
-)
-packages+=(
     "${DESKTOP}"
 )
+case "${DISTRO}:${DISTRO_VERSION%-slim}" in
+    # tigervnc is not available in old versions.
+    ubuntu:1[0-6].*) packages+=(x11vnc xvfb) ;;
+    *) packages+=(libarchive-tools tigervnc-common tigervnc-standalone-server) ;;
+esac
 case "${DISTRO}:${DISTRO_VERSION%-slim}" in
     ubuntu:1[0-9].* | ubuntu:2[0-1].* | debian:1[0-1]) ;;
     *) packages+=(tigervnc-tools) ;;

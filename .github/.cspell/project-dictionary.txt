@@ -1,5 +1,6 @@
 almalinux
 archlinux
+asmtest
 bochs
 BUILDKIT
 buildx

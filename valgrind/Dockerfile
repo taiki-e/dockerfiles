@@ -26,34 +26,34 @@ configure_args=(--prefix=/valgrind/)
 export CFLAGS="-O2"
 case "${ARCH}" in
     arm64)
-        packages+=(g++-aarch64-linux-gnu)
+        packages+=(gcc-aarch64-linux-gnu libc6-dev-arm64-cross)
         export CC=aarch64-linux-gnu-gcc
         configure_args+=(--host=aarch64-linux-gnu --enable-only64bit)
         ;;
     armhf)
-        packages+=(g++-arm-linux-gnueabihf)
+        packages+=(gcc-arm-linux-gnueabihf libc6-dev-armhf-cross)
         export CC=arm-linux-gnueabihf-gcc
         export CFLAGS="${CFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon-vfpv4 -marm"
         # export CFLAGS="${CFLAGS} -march=armv8-a -mfloat-abi=hard -mfpu=neon-fp-armv8 -marm"
         configure_args+=(--host=arm-linux-gnueabihf)
         ;;
     i386)
-        packages+=(g++-i686-linux-gnu)
+        packages+=(gcc-i686-linux-gnu libc6-dev-i386-cross)
         export CC=i686-linux-gnu-gcc
         configure_args+=(--host=i686-linux-gnu)
         ;;
     ppc64el)
-        packages+=(g++-powerpc64le-linux-gnu)
+        packages+=(gcc-powerpc64le-linux-gnu libc6-dev-ppc64el-cross)
         export CC=powerpc64le-linux-gnu-gcc
         configure_args+=(--host=powerpc64le-linux-gnu --enable-only64bit)
         ;;
     riscv64)
-        packages+=(g++-riscv64-linux-gnu)
+        packages+=(gcc-riscv64-linux-gnu libc6-dev-riscv64-cross)
         export CC=riscv64-linux-gnu-gcc
         configure_args+=(--host=riscv64-linux-gnu --enable-only64bit)
         ;;
     s390x)
-        packages+=(g++-s390x-linux-gnu)
+        packages+=(gcc-s390x-linux-gnu libc6-dev-s390x-cross)
         export CC=s390x-linux-gnu-gcc
         configure_args+=(--host=s390x-linux-gnu --enable-only64bit)
         ;;

@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 
+ARG DISTRO=ubuntu
+ARG DISTRO_VERSION=24.04
 ARG UBUNTU_VERSION=24.04
 
 FROM --platform=amd64 ubuntu:"${UBUNTU_VERSION}" as build
@@ -24,6 +26,7 @@ packages+=(
 mkdir -p -- /valgrind
 configure_args=(--prefix=/valgrind/)
 export CFLAGS="-O2"
+repository=git://sourceware.org/git/valgrind.git
 case "${ARCH}" in
     arm64)
         packages+=(gcc-aarch64-linux-gnu libc6-dev-arm64-cross)
@@ -57,6 +60,20 @@ case "${ARCH}" in
         export CC=s390x-linux-gnu-gcc
         configure_args+=(--host=s390x-linux-gnu --enable-only64bit)
         ;;
+    loong64)
+        # https://bugs.kde.org/show_bug.cgi?id=457504
+        # https://github.com/FreeFlyingSheep/valgrind-loongarch64/releases
+        repository=https://github.com/FreeFlyingSheep/valgrind-loongarch64.git
+        VALGRIND_REF=v3.24-GIT
+        packages+=(gcc-14-loongarch64-linux-gnu libc6-dev-loong64-cross)
+        export CC=loongarch64-linux-gnu-gcc-14
+        configure_args+=(--host=loongarch64-linux-gnu --enable-only64bit)
+        ;;
+    mips64el)
+        packages+=(gcc-mips64el-linux-gnuabi64 libc6-dev-mips64el-cross)
+        export CC=mips64el-linux-gnuabi64-gcc
+        configure_args+=(--host=mips64el-linux-gnuabi64 --enable-only64bit)
+        ;;
     *) configure_args+=(--enable-only64bit)
 esac
 apt-get -o Acquire::Retries=10 -qq update
@@ -64,7 +81,7 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     "${packages[@]}"
 (
     cd -- tmp
-    git clone git://sourceware.org/git/valgrind.git
+    git clone "${repository}" valgrind
     cd -- valgrind
     git checkout "${VALGRIND_REF}"
     ./autogen.sh
@@ -79,12 +96,12 @@ cat -- /tmp/default.supp >>/valgrind/libexec/valgrind/default.supp
 du -h -d1 /valgrind/
 EOF
 
-FROM ubuntu:"${UBUNTU_VERSION}" as dist
+FROM "${DISTRO}":"${DISTRO_VERSION}" as dist
 SHELL ["/bin/bash", "-CeEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 COPY --from=build /valgrind /valgrind
 
-FROM ubuntu:"${UBUNTU_VERSION}"
+FROM "${DISTRO}":"${DISTRO_VERSION}"
 SHELL ["/bin/bash", "-CeEuxo", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 ARG ARCH
@@ -102,15 +119,18 @@ case "${ARCH}" in
         dpkg --add-architecture "${ARCH}"
         packages+=(g++-arm-linux-gnueabihf libstdc++6:"${ARCH}" libc6-dbg:"${ARCH}")
         ;;
+    loong64) ;;
     *) packages+=(libc6-dbg) ;;
 esac
 case "${ENV}" in
     cross) ;;
     *) packages+=(ca-certificates curl g++ git) ;;
 esac
-apt-get -o Acquire::Retries=10 -qq update
-apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
-    "${packages[@]}"
+if [[ ${#packages[@]} -gt 0 ]]; then
+    apt-get -o Acquire::Retries=10 -qq update
+    apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
+        "${packages[@]}"
+fi
 du -h -d1 /usr/share/
 # https://wiki.ubuntu.com/ReducingDiskFootprint#Documentation
 find /usr/share/doc -depth -type f ! -name copyright ! -name COPYING -exec rm -- {} + || true

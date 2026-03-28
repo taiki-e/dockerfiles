@@ -35,6 +35,13 @@ build() {
     dist)
       platform=linux/amd64
       build_args+=(--target "${target}")
+      case "${arch}" in
+        mips64el)
+          build_args+=(
+            --build-arg "UBUNTU_VERSION=22.04"
+          )
+          ;;
+      esac
       ;;
     *)
       target="${env}"
@@ -44,6 +51,45 @@ build() {
         ppc64el) platform=linux/ppc64le ;;
         riscv64) platform=linux/riscv64 ;;
         s390x) platform=linux/s390x ;;
+        loong64)
+          platform=linux/loong64
+          # https://hub.docker.com/r/loongarch64/debian
+          # TODO: use https://hub.docker.com/r/pkgforge/debian?
+          build_args+=(
+            --build-arg "DISTRO=loongarch64/debian"
+            --build-arg "DISTRO_VERSION=sid@sha256:0356df4e494bbb86bb469377a00789a5b42bbf67d5ff649a3f9721b745cbef77"
+          )
+          # TODO:
+          #  > [stage-2 4/4] RUN <<EOF (case "loong64" in...):
+          # 0.110 valgrind: fatal error: unsupported CPU.
+          # 0.110    Supported CPUs are:
+          # 0.110    * x86 (practically any; Pentium-I or above), AMD Athlon or above)
+          # 0.110    * AMD Athlon64/Opteron
+          # 0.110    * ARM (armv7)
+          # 0.110    * LoongArch (3A5000 and above)
+          # 0.110    * MIPS (mips32 and above; mips64 and above)
+          # 0.110    * PowerPC (most; ppc405 and above)
+          # 0.110    * System z (64bit only - s390x; z990 and above)
+          # 0.110
+          # https://github.com/FreeFlyingSheep/valgrind-loongarch64/releases/tag/v3.21-GIT
+          ;;
+        mips64el)
+          platform=linux/mips64le
+          build_args+=(
+            --build-arg "DISTRO=debian"
+            --build-arg "DISTRO_VERSION=12"
+            --build-arg "UBUNTU_VERSION=22.04"
+          )
+          # TODO:
+          # 0.142 valgrind: fatal error: unsupported CPU.
+          # 0.142    Supported CPUs are:
+          # 0.142    * x86 (practically any; Pentium-I or above), AMD Athlon or above)
+          # 0.142    * AMD Athlon64/Opteron
+          # 0.142    * ARM (armv7)
+          # 0.142    * MIPS (mips32 and above; mips64 and above)
+          # 0.142    * PowerPC (most; ppc405 and above)
+          # 0.142    * System z (64bit only - s390x; z990 and above)
+          ;;
         *) bail "unrecognized dpkg arch '${arch}'" ;;
       esac
       ;;
@@ -79,6 +125,16 @@ build() {
         )
       fi
       ;;
+    mips64el)
+      build_args+=(
+        --tag "${repository}:${valgrind_version}-mips64le${target:+"-${target}"}"
+      )
+      if [[ "${valgrind_version}" == "${valgrind_latest}" ]]; then
+        build_args+=(
+          --tag "${repository}:mips64le${target:+"-${target}"}"
+        )
+      fi
+      ;;
   esac
   build_args+=("$@")
 
@@ -100,8 +156,7 @@ log_file="${log_dir}/build-docker-${arch}-${time}.log"
 mkdir -p -- "${log_dir}"
 case "${arch}" in
   amd64 | arm64 | armhf | i386) env='' ;;
-  ppc64el | riscv64 | s390x) env=cross ;;
-  *) bail "unrecognized arch '${arch}'" ;;
+  *) env=cross ;;
 esac
 build dist "$@" 2>&1 | tee -- "${log_file}"
 build - "$@" 2>&1 | tee -- "${log_file}"

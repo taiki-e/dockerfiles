@@ -8,6 +8,7 @@ LDFLAGS
 libclang
 libexec
 lintian
+loong
 marm
 mfloat
 mfpu

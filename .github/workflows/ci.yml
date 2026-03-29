@@ -28,7 +28,8 @@ jobs:
       contents: write # for creating branch for pr
       pull-requests: write # unused (used in `codegen-automerge: true` case)
       security-events: write # for github/codeql-action/*
-    secrets: inherit
+    secrets:
+      PR_TOKEN_APP_PRIVATE_KEY: ${{ secrets.PR_TOKEN_APP_PRIVATE_KEY }}
 
   build:
     strategy:
@@ -116,12 +117,17 @@ jobs:
       - uses: taiki-e/checkout-action@v1
       - uses: taiki-e/github-actions/setup-docker@main
       - run: |
-          docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin <<<"${{ secrets.GITHUB_TOKEN }}"
+          docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin <<<"${GITHUB_TOKEN}"
           printf 'PUSH_TO_GHCR=1\n' >>"${GITHUB_ENV}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
       - run: |
-          "${{ matrix.package }}"/build-docker.sh ${{ matrix.distro }} ${{ matrix.arch }}
+          "${PACKAGE}"/build-docker.sh ${DISTRO:-} ${ARCH:-}
         env:
+          PACKAGE: ${{ matrix.package }}
+          DISTRO: ${{ matrix.distro }}
+          ARCH: ${{ matrix.arch }}
           QEMU_VERSION: ${{ matrix.qemu-version }}
           QEMU_TARGET: ${{ matrix.qemu-target }}
 
@@ -136,7 +142,9 @@ jobs:
     steps:
       - uses: taiki-e/checkout-action@v1
       - run: |
-          docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin <<<"${{ secrets.GITHUB_TOKEN }}"
+          docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin <<<"${GITHUB_TOKEN}"
           printf 'PUSH_TO_GHCR=1\n' >>"${GITHUB_ENV}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
       - run: binutils/docker-manifest.sh

@@ -170,7 +170,8 @@ if [[ ${#rust_files[@]} -gt 0 ]]; then
   has_root_crate=''
   for pkg in $(jq -c '. as $metadata | .workspace_members[] as $id | $metadata.packages[] | select(.id == $id)' <<<"${metadata}"); do
     eval "$(jq -r '@sh "publish=\(.publish) MANIFEST_PATH=\(.manifest_path)"' <<<"${pkg}")"
-    if ! grep -Eq '^ *\[lints(\.|\])' "${MANIFEST_PATH}"; then
+    lints=$(tomlq -c '.lints' "${MANIFEST_PATH}")
+    if [[ "${lints}" == 'null' ]]; then
       error "no [lints] table in ${MANIFEST_PATH}; please add '[lints]' with 'workspace = true'"
     fi
     # Publishing is unrestricted if null, and forbidden if an empty array.
@@ -180,18 +181,14 @@ if [[ ${#rust_files[@]} -gt 0 ]]; then
     has_public_crate=1
     if [[ "${MANIFEST_PATH}" == "${root_manifest}" ]]; then
       has_root_crate=1
-      exclude=$(grep -E '^ *\[|^ *exclude *=' "${MANIFEST_PATH}" | head -2)
-      if [[ "${exclude// /}" != '[package]'$'\n''exclude='* ]]; then
-        error "top-level Cargo.toml of non-virtual workspace should have 'exclude' field"
-      fi
-      exclude=$(cut -d= -f2 <<<"${exclude}")
-      if ! grep -Eq '"/\.\*"' <<<"${exclude}"; then
+      exclude=$(tomlq -r '.package.exclude[]' "${MANIFEST_PATH}")
+      if ! grep -Eq '^/\.\*$' <<<"${exclude}"; then
         error "top-level Cargo.toml of non-virtual workspace should have 'exclude' field with \"/.*\""
       fi
-      if [[ -e tools ]] && ! grep -Eq '"/tools"' <<<"${exclude}"; then
+      if [[ -e tools ]] && ! grep -Eq '^/tools$' <<<"${exclude}"; then
         error "top-level Cargo.toml of non-virtual workspace should have 'exclude' field with \"/tools\" if it exists"
       fi
-      if [[ -e target-specs ]] && ! grep -Eq '"/target-specs"' <<<"${exclude}"; then
+      if [[ -e target-specs ]] && ! grep -Eq '^/target-specs$' <<<"${exclude}"; then
         error "top-level Cargo.toml of non-virtual workspace should have 'exclude' field with \"/target-specs\" if it exists"
       fi
     fi

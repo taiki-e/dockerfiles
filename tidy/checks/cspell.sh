@@ -142,8 +142,11 @@ if [[ -f .cspell.json ]]; then
     has_rust=1
     dependencies=''
     for manifest_path in $(ls_files '*Cargo.toml'); do
-      if [[ "${manifest_path}" != "Cargo.toml" ]] && ! grep -Eq '^ *\[workspace(\.|\])' "${manifest_path}"; then
-        continue
+      if [[ "${manifest_path}" != "Cargo.toml" ]]; then
+        workspace=$(tomlq -c '.workspace' "${manifest_path}")
+        if [[ "${workspace}" == 'null' ]]; then
+          continue
+        fi
       fi
       m=$(cargo metadata --format-version=1 --no-deps --manifest-path "${manifest_path}" || true)
       if [[ -z "${m}" ]]; then

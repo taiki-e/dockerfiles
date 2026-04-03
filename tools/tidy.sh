@@ -27,7 +27,7 @@ fi
 if [[ -n "${TIDY_DEV:-}" ]]; then
   image="ghcr.io/taiki-e/tidy:latest"
 else
-  image="ghcr.io/taiki-e/tidy@sha256:f80e582f70d57c90281c742aa61db4c6a6fde7b3cdf1a6d6048d0e34bea6dac1"
+  image="ghcr.io/taiki-e/tidy@sha256:4552cbce9426e102f9650cd9f8381e836fc8fda081dcbddcc7f31b15d48d1654"
 fi
 user="$(id -u):$(id -g)"
 workdir=$(pwd)

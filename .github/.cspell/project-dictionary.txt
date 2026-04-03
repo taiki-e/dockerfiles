@@ -4,6 +4,7 @@ asmtest
 BUILDKIT
 buildx
 groff
+Idate
 LDFLAGS
 libclang
 libexec
@@ -11,6 +12,8 @@ lintian
 marm
 mfloat
 mfpu
+nodesource
+nodistro
 novnc
 opencontainers
 rockylinux
@@ -18,5 +21,7 @@ sourceware
 texinfo
 tigervnc
 trixie
+venv
 vfpv
 websockify
+xscale

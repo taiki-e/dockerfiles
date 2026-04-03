@@ -169,7 +169,7 @@ if [[ ${#rust_files[@]} -gt 0 ]]; then
   has_public_crate=''
   has_root_crate=''
   for pkg in $(jq -c '. as $metadata | .workspace_members[] as $id | $metadata.packages[] | select(.id == $id)' <<<"${metadata}"); do
-    eval "$(jq -r '@sh "publish=\(.publish) MANIFEST_PATH=\(.MANIFEST_PATH)"' <<<"${pkg}")"
+    eval "$(jq -r '@sh "publish=\(.publish) MANIFEST_PATH=\(.manifest_path)"' <<<"${pkg}")"
     if ! grep -Eq '^ *\[lints(\.|\])' "${MANIFEST_PATH}"; then
       error "no [lints] table in ${MANIFEST_PATH}; please add '[lints]' with 'workspace = true'"
     fi

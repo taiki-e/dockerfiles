@@ -133,6 +133,8 @@ jobs:
           ARCH: ${{ matrix.arch }}
           QEMU_VERSION: ${{ matrix.qemu-version }}
           QEMU_TARGET: ${{ matrix.qemu-target }}
+      - run: TIDY_DEV=1 tools/tidy.sh
+        if: matrix.package == 'tidy'
 
   manifest:
     if: github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')

@@ -63,8 +63,7 @@ mkdir -p -- install-action
     git clone https://github.com/taiki-e/install-action.git --branch manifest-schema-0.2 manifests
     (
         cd -- manifests
-        # TODO: update to 14 days ago
-        commit=$({ git --no-pager log --before="13 days ago" || true; } | head -1 | cut -d' ' -f2)
+        commit=$({ git --no-pager log --before="14 days ago" || true; } | head -1 | cut -d' ' -f2)
         git checkout "${commit}"
     )
     cp -- /tmp/install.sh ./

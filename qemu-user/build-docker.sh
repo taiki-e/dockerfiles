@@ -6,8 +6,7 @@ trap -- 's=$?; printf >&2 "%s\n" "${0##*/}:${LINENO}: \`${BASH_COMMAND}\` exit w
 cd -- "$(dirname -- "$0")"/..
 
 # USAGE:
-#    PLATFORM=linux/amd64 ./qemu-user/build-docker.sh
-#    PLATFORM=linux/arm64/v8 ./qemu-user/build-docker.sh
+#    ./qemu-user/build-docker.sh
 
 if [[ $# -gt 0 ]]; then
   cat <<EOF
@@ -17,7 +16,12 @@ EOF
   exit 1
 fi
 package=$(basename -- "$(cd -- "$(dirname -- "$0")" && pwd)")
-platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
+platform=''
+if [[ -n "${PLATFORM:-}" ]]; then
+  platform="${PLATFORM}"
+elif [[ -n "${CI:-}" ]]; then
+  platform=linux/amd64,linux/arm64/v8
+fi
 
 # shellcheck source-path=SCRIPTDIR/..
 . ./tools/build-docker-shared.sh
@@ -37,11 +41,13 @@ build() {
   local build_args=(
     "${opencontainers_labels[@]}"
     --file "${dockerfile}" "${package}/"
-    --platform "${platform}"
     --tag "${full_tag}"
     --build-arg "ALPINE_VERSION=${alpine_latest}"
     --build-arg "QEMU_DPKG_VERSION=${dpkg_version}"
   )
+  if [[ -n "${platform}" ]]; then
+    build_args+=(--platform "${platform}")
+  fi
   if [[ "${version}" == "${latest}" ]]; then
     build_args+=(
       --tag "${repository}:latest"

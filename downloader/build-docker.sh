@@ -6,8 +6,7 @@ trap -- 's=$?; printf >&2 "%s\n" "${0##*/}:${LINENO}: \`${BASH_COMMAND}\` exit w
 cd -- "$(dirname -- "$0")"/..
 
 # USAGE:
-#    PLATFORM=linux/amd64 ./downloader/build-docker.sh
-#    PLATFORM=linux/arm64/v8 ./downloader/build-docker.sh
+#    ./downloader/build-docker.sh
 
 if [[ $# -gt 0 ]]; then
   cat <<EOF

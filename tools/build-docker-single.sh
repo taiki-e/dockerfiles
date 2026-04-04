@@ -7,7 +7,12 @@ cd -- "$(dirname -- "$0")"/..
 
 package="$1"
 shift
-platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
+platform=''
+if [[ -n "${PLATFORM:-}" ]]; then
+  platform="${PLATFORM}"
+elif [[ -n "${CI:-}" ]]; then
+  platform=linux/amd64,linux/arm64/v8
+fi
 
 # shellcheck source-path=SCRIPTDIR/..
 . ./tools/build-docker-shared.sh
@@ -18,10 +23,12 @@ build() {
   local build_args=(
     "${opencontainers_labels[@]}"
     --file "${dockerfile}" "${package}/"
-    --platform "${platform}"
     --tag "${tag}"
-    "$@"
   )
+  if [[ -n "${platform}" ]] && [[ "$*" != *"--platform"* ]]; then
+    build_args+=(--platform "${platform}")
+  fi
+  build_args+=("$@")
 
   if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
     x docker buildx build --provenance=false --push "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)

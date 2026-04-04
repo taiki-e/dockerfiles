@@ -6,8 +6,7 @@ trap -- 's=$?; printf >&2 "%s\n" "${0##*/}:${LINENO}: \`${BASH_COMMAND}\` exit w
 cd -- "$(dirname -- "$0")"/..
 
 # USAGE:
-#    PLATFORM=linux/amd64 ./vnc/build-docker.sh <DISTRO> [DOCKER_BUILD_OPTIONS]
-#    PLATFORM=linux/arm64/v8 ./vnc/build-docker.sh <DISTRO> [DOCKER_BUILD_OPTIONS]
+#    ./vnc/build-docker.sh <DISTRO> [DOCKER_BUILD_OPTIONS]
 
 if [[ $# -lt 1 ]]; then
   cat <<EOF
@@ -22,7 +21,12 @@ distro="${distro%:*}"
 distro_upper=$(tr '[:lower:]' '[:upper:]' <<<"${distro}")
 shift
 package=$(basename -- "$(cd -- "$(dirname -- "$0")" && pwd)")
-platform="${PLATFORM:-"linux/amd64,linux/arm64/v8"}"
+platform=''
+if [[ -n "${PLATFORM:-}" ]]; then
+  platform="${PLATFORM}"
+elif [[ -n "${CI:-}" ]]; then
+  platform=linux/amd64,linux/arm64/v8
+fi
 desktop="${DESKTOP:-}"
 
 # shellcheck source-path=SCRIPTDIR/..
@@ -34,13 +38,15 @@ build() {
   local build_args=(
     "${opencontainers_labels[@]}"
     --file "${dockerfile}" "${package}/"
-    --platform "${platform}"
     --tag "${full_tag}"
     --build-arg "DISTRO=${distro}"
     --build-arg "DISTRO_VERSION=${distro_version}"
     --build-arg "${distro_upper}_VERSION=${distro_version}"
   )
-  if [[ -n "${desktop:-}" ]]; then
+  if [[ -n "${platform}" ]] && [[ "$*" != *"--platform"* ]]; then
+    build_args+=(--platform "${platform}")
+  fi
+  if [[ -n "${desktop}" ]]; then
     build_args+=(
       --build-arg "DESKTOP=${desktop}"
     )

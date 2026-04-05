@@ -11,10 +11,10 @@ ARG BASE_URL=https://ftp.gnu.org/gnu/binutils
 # ARG BASE_URL=https://sourceware.org/pub/binutils/releases
 RUN mkdir -p -- /tmp/binutils-src
 RUN <<EOF
-curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused https://ftp.gnu.org/gnu/gnu-keyring.gpg \
+curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-all-errors https://ftp.gnu.org/gnu/gnu-keyring.gpg \
     | gpg --import -
-curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused -O "${BASE_URL}/binutils-${BINUTILS_VERSION}.tar.xz"
-curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused -O "${BASE_URL}/binutils-${BINUTILS_VERSION}.tar.xz.sig"
+curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-all-errors -O "${BASE_URL}/binutils-${BINUTILS_VERSION}.tar.xz"
+curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-all-errors -O "${BASE_URL}/binutils-${BINUTILS_VERSION}.tar.xz.sig"
 gpg --verify "binutils-${BINUTILS_VERSION}.tar.xz.sig" "binutils-${BINUTILS_VERSION}.tar.xz"
 tar xf "binutils-${BINUTILS_VERSION}.tar.xz" --strip-components 1 -C /tmp/binutils-src
 EOF
@@ -73,7 +73,7 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
 codename=$(grep -E '^VERSION_CODENAME=' /etc/os-release | cut -d= -f2)
 # shellcheck disable=SC2174
 mkdir -pm755 -- /etc/apt/keyrings
-curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused https://apt.llvm.org/llvm-snapshot.gpg.key \
+curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-all-errors https://apt.llvm.org/llvm-snapshot.gpg.key \
     | gpg --dearmor -o /etc/apt/keyrings/llvm-snapshot.gpg
 printf '%s\n' "deb [signed-by=/etc/apt/keyrings/llvm-snapshot.gpg] http://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-${LLVM_VERSION} main" \
     >"/etc/apt/sources.list.d/llvm-toolchain-${codename}-${LLVM_VERSION}.list"

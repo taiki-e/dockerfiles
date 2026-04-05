@@ -11,7 +11,7 @@ ARG QEMU_DPKG_VERSION
 RUN <<EOF
 dpkg_arch=$(dpkg --print-architecture)
 mkdir -p -- /tmp/qemu /qemu
-curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused "https://ftp.debian.org/debian/pool/main/q/qemu/qemu-user_${QEMU_DPKG_VERSION}_${dpkg_arch##*-}.deb" \
+curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-all-errors "https://ftp.debian.org/debian/pool/main/q/qemu/qemu-user_${QEMU_DPKG_VERSION}_${dpkg_arch##*-}.deb" \
     | dpkg-deb -xv - /tmp/qemu
 (
     cd -- /tmp/qemu/usr/bin

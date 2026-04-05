@@ -71,6 +71,27 @@ mkdir -p -- install-action
         ./install.sh
 )
 rm -rf -- install-action
+dpkg_arch=$(dpkg --print-architecture)
+# https://github.com/PowerShell/PowerShell/releases
+pwsh_version=7.6.0
+case "${dpkg_arch##*-}" in
+    amd64)
+        pwsh_arch=x64
+        hash=04517472cf57d7f9cbd93897da9bed467c73ca6063c29d7655ebc20aa1d6023f
+        ;;
+    arm64)
+        pwsh_arch=arm64
+        hash=dddf7564fb3b52dc26be5580fc5b4e08eb3fa65b094488aae6d4b3cad5fea460
+        ;;
+    *) printf >&2 '%s\n' "unsupported architecture '${dpkg_arch}'" && exit 1 ;;
+esac
+mkdir -p -- /usr/local/pwsh
+curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-all-errors -o pwsh.tar.gz "https://github.com/PowerShell/PowerShell/releases/download/v${pwsh_version}/powershell-${pwsh_version}-linux-${pwsh_arch}.tar.gz"
+sha256sum -c <<<"${hash}  pwsh.tar.gz"
+tar xf pwsh.tar.gz -C /usr/local/pwsh
+rm -- pwsh.tar.gz
+chmod +x /usr/local/pwsh/pwsh
+ln -s -- /usr/local/pwsh/pwsh /usr/local/bin/pwsh
 
 apt-get -qq -o Dpkg::Use-Pty=0 purge -y \
     curl \
@@ -104,5 +125,8 @@ python3 -m venv /usr/local/venv
 /usr/local/venv/bin/pip install --upgrade pip
 /usr/local/venv/bin/pip install --uploaded-prior-to="$(date -d '-14days' -Idate)" \
   yq
+EOF
+RUN <<EOF
+pwsh -Command 'Set-PSRepository -Name PSGallery -InstallationPolicy Trusted; Install-Module -Name PSScriptAnalyzer -Scope AllUsers; Set-PSRepository -Name PSGallery -InstallationPolicy Untrusted'
 EOF
 COPY /checks /checks

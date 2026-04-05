@@ -55,7 +55,7 @@ download_and_checksum() {
   local url="$1"
   local checksum="$2"
   info "downloading ${url}"
-  retry curl --proto '=https' --tlsv1.2 -fsSL "${url}" -o tmp
+  retry curl --proto '=https' --tlsv1.2 -fsSL --retry 10 -o tmp "${url}"
   info "verifying sha256 checksum for $(basename -- "${url}")"
   sha256sum -c - >/dev/null <<<"${checksum} *tmp"
 }

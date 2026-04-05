@@ -587,13 +587,11 @@ if [[ ${#docker_files[@]} -gt 0 ]]; then
     # Windows: failed to found fd created by <() ("/proc/*/fd/* (git bash/msys2 bash) /dev/fd/* (cygwin bash): openBinaryFile: does not exist (No such file or directory)" error)
     # DragonFly BSD: hang
     # Others: false negative
-    trap -- 'rm -- ./tools/.tidy-tmp; printf >&2 "%s\n" "${0##*/}: trapped SIGINT"; exit 1' SIGINT
-    printf '%s\n' "${text}" >|./tools/.tidy-tmp
-    if ! shellcheck --exclude "${shellcheck_exclude}" ./tools/.tidy-tmp | sed -E "s/\.\/tools\/\.tidy-tmp/$(sed_rhs_escape "${display_path}")/g"; then
+    printf '%s\n' "${text}" >|/tmp/tidy/script
+    if ! shellcheck --exclude "${shellcheck_exclude}" /tmp/tidy/script | sed -E "s/\/tmp\/tidy\/script/$(sed_rhs_escape "${display_path}")/g"; then
       error "check failed; please resolve the above shellcheck error(s)"
     fi
-    rm -- ./tools/.tidy-tmp
-    trap -- 'printf >&2 "%s\n" "${0##*/}: trapped SIGINT"; exit 1' SIGINT
+    rm -- /tmp/tidy/script
   }
   for dockerfile_path in ${docker_files[@]+"${docker_files[@]}"}; do
     dockerfile=$(parse-dockerfile "${dockerfile_path}")
@@ -699,6 +697,7 @@ if [[ ${#workflows[@]} -gt 0 ]] || [[ ${#actions[@]} -gt 0 ]]; then
   # Exclude SC2096 due to the way the temporary script is created.
   shellcheck_exclude=SC2086,SC2096,SC2129
   info "running \`shellcheck --exclude ${shellcheck_exclude}\` for scripts in .github/workflows/*.yml and **/action.yml"
+  # TODO: format by shfmt / PSScriptAnalyzer's Invoke-Formatter
   shellcheck_for_gha() {
     local text=$1
     local shell=$2
@@ -707,21 +706,27 @@ if [[ ${#workflows[@]} -gt 0 ]] || [[ ${#actions[@]} -gt 0 ]]; then
       return
     fi
     case "${shell}" in
-      bash* | sh*) ;;
+      bash* | sh*)
+        text="#!/usr/bin/env ${shell%' {0}'}"$'\n'"${text}"
+        # We don't use <(printf '%s\n' "${text}") here because:
+        # Windows: failed to found fd created by <() ("/proc/*/fd/* (git bash/msys2 bash) /dev/fd/* (cygwin bash): openBinaryFile: does not exist (No such file or directory)" error)
+        # DragonFly BSD: hang
+        # Others: false negative
+        printf '%s\n' "${text}" >|/tmp/tidy/script
+        if ! shellcheck --exclude "${shellcheck_exclude}" /tmp/tidy/script | sed -E "s/\/tmp\/tidy\/script/$(sed_rhs_escape "${display_path}")/g"; then
+          error "${display_path}: check failed; please resolve the above shellcheck error(s)"
+        fi
+        ;;
+      pwsh* | powershell*)
+        printf '%s\n' "${text}" >|/tmp/tidy/script
+        # shellcheck disable=SC2016
+        if ! pwsh -Command '$text = Get-Content /tmp/tidy/script -Raw; Invoke-ScriptAnalyzer -EnableExit -ScriptDefinition "$text"' | sed -E "s/\/tmp\/tidy\/script/$(sed_rhs_escape "${display_path}")/g"; then
+          error "${display_path}: check failed; please resolve the above PSScriptAnalyzer error(s)"
+        fi
+        ;;
       *) return ;;
     esac
-    text="#!/usr/bin/env ${shell%' {0}'}"$'\n'"${text}"
-    # We don't use <(printf '%s\n' "${text}") here because:
-    # Windows: failed to found fd created by <() ("/proc/*/fd/* (git bash/msys2 bash) /dev/fd/* (cygwin bash): openBinaryFile: does not exist (No such file or directory)" error)
-    # DragonFly BSD: hang
-    # Others: false negative
-    trap -- 'rm -- ./tools/.tidy-tmp; printf >&2 "%s\n" "${0##*/}: trapped SIGINT"; exit 1' SIGINT
-    printf '%s\n' "${text}" >|./tools/.tidy-tmp
-    if ! shellcheck --exclude "${shellcheck_exclude}" ./tools/.tidy-tmp | sed -E "s/\.\/tools\/\.tidy-tmp/$(sed_rhs_escape "${display_path}")/g"; then
-      error "check failed; please resolve the above shellcheck error(s)"
-    fi
-    rm -- ./tools/.tidy-tmp
-    trap -- 'printf >&2 "%s\n" "${0##*/}: trapped SIGINT"; exit 1' SIGINT
+    rm -- /tmp/tidy/script
   }
   for workflow_path in ${workflows[@]+"${workflows[@]}"}; do
     workflow=$(yq -c '.' "${workflow_path}")

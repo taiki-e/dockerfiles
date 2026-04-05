@@ -30,7 +30,7 @@ fi
 # https://tracker.debian.org/pkg/qemu
 latest=10.2
 dpkg_versions=(
-  11.0.0~rc1+ds-3
+  11.0.0~rc2+ds-2
   10.2.2+ds-1
   10.0.8+ds-0+deb13u1+b1
 )

@@ -64,7 +64,7 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     "${packages[@]}"
 (
     cd -- tmp
-    git clone git://sourceware.org/git/valgrind.git
+    git clone https://sourceware.org/git/valgrind.git
     cd -- valgrind
     git checkout "${VALGRIND_REF}"
     ./autogen.sh

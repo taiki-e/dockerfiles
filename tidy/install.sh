@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 set -CeEuo pipefail
 IFS=$'\n\t'
-# Adapted from https://github.com/taiki-e/install-action/blob/v2.71.0/main.sh
+# Adapted from https://github.com/taiki-e/install-action/blob/v2.75.4/main.sh
 
 rx() {
   (
@@ -158,14 +158,14 @@ read_manifest() {
   # usually preferred over linux-gnu binaries because they can avoid glibc version issues.
   # (rustc enables statically linking for linux-musl by default, except for mips.)
   host_platform="${host_arch}_linux_musl"
-  download_info=$(jq -r ".${host_platform}" <<<"${manifest}")
+  download_info=$(jq -r --arg p "${host_platform}" '.[$p]' <<<"${manifest}")
   if [[ "${download_info}" == "null" ]]; then
     # Even if host_env is musl, we won't issue an error here because it seems that in
     # some cases linux-gnu binaries will work on linux-musl hosts.
     # https://wiki.alpinelinux.org/wiki/Running_glibc_programs
     # TODO: However, a warning may make sense.
     host_platform="${host_arch}_linux_gnu"
-    download_info=$(jq -r ".${host_platform}" <<<"${manifest}")
+    download_info=$(jq -r --arg p "${host_platform}" '.[$p]' <<<"${manifest}")
   fi
 }
 read_download_info() {
@@ -180,7 +180,7 @@ read_download_info() {
   bin_in_archive=()
   if [[ "${url}" == "null" ]]; then
     local template
-    template=$(jq -c ".template.${host_platform}" "${manifest_dir}/${tool}.json")
+    template=$(jq -c --arg p "${host_platform}" '.template[$p]' "${manifest_dir}/${tool}.json")
     template="${template//\$\{version\}/${exact_version}}"
     url=$(jq -r '.url' <<<"${template}")
     tmp=$(jq -r '.bin' <<<"${template}")

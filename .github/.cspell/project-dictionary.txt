@@ -17,7 +17,6 @@ nodistro
 novnc
 opencontainers
 rockylinux
-sourceware
 texinfo
 tigervnc
 trixie

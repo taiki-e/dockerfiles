@@ -142,7 +142,7 @@ read_manifest() {
   local version="$2"
   local manifest
   rust_crate=$(jq -r '.rust_crate' "${manifest_dir}/${tool}.json")
-  manifest=$(jq -r ".[\"${version}\"]" "${manifest_dir}/${tool}.json")
+  manifest=$(jq -r --arg version "${version}" '.[$version]' "${manifest_dir}/${tool}.json")
   if [[ "${manifest}" == "null" ]]; then
     download_info="null"
     return 0
@@ -151,7 +151,7 @@ read_manifest() {
   if [[ "${exact_version}" == "null" ]]; then
     exact_version="${version}"
   else
-    manifest=$(jq -r ".[\"${exact_version}\"]" "${manifest_dir}/${tool}.json")
+    manifest=$(jq -r --arg version "${exact_version}" '.[$version]' "${manifest_dir}/${tool}.json")
   fi
 
   # Static-linked binaries compiled for linux-musl will also work on linux-gnu systems and are

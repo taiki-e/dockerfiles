@@ -377,7 +377,7 @@ if [[ -n "$(ls_files '*action.yml')" ]]; then
   for p in $(ls_files '*action.yml'); do
     if [[ "${p##*/}" == 'action.yml' ]]; then
       actions+=("${p}")
-      if ! grep -Fq 'shell: sh' "${p}"; then
+      if ! grep -Eq 'shell: (sh|/bin/sh|/usr/bin/env [^/]* /bin/sh)' "${p}"; then
         bash_files+=("${p}")
       fi
     fi
@@ -396,7 +396,7 @@ if [[ -n "${res}" ]]; then
   print_fenced "${res}"$'\n'
 fi
 # TODO: chmod|chown
-res=$({ grep -En '(^|[^0-9A-Za-z\."'\''-])(basename|cat|cd|cp|dirname|ln|ls|mkdir|mv|pushd|rm|rmdir|tee|touch|kill|trap)( +-[0-9A-Za-z]+)* +[^<>\|-]' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
+res=$({ grep -En '(^|[^0-9A-Za-z\."'\''-])(basename|cat|cd|cp|dirname|ln|ls|mkdir|mv|pushd|rm|rmdir|tee|touch|kill|trap)( +-[0-9A-Za-z]+)* +[^<>\|\]-]' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
 if [[ -n "${res}" ]]; then
   error "use \`--\` before path(s): see https://github.com/koalaman/shellcheck/issues/2707 / https://github.com/koalaman/shellcheck/issues/2612 / https://github.com/koalaman/shellcheck/issues/2305 / https://github.com/koalaman/shellcheck/issues/2157 / https://github.com/koalaman/shellcheck/issues/2121 / https://github.com/koalaman/shellcheck/issues/314 for more"
   print_fenced "${res}"$'\n'
@@ -423,11 +423,12 @@ if [[ -n "${res}" ]]; then
   print_fenced "${res}"$'\n'
 fi
 # TODO: multi-line case
-res=$({ grep -En '(^|[^0-9A-Za-z\."'\''-])(echo|printf )[^;)]* \|[^\|]' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
-if [[ -n "${res}" ]]; then
-  error "use faster \`<<<...\` instead of \`echo ... |\`/\`printf ... |\`: see https://github.com/koalaman/shellcheck/issues/2593 for more"
-  print_fenced "${res}"$'\n'
-fi
+# TODO: this cannot replace echo / printf without trailing newline.
+# res=$({ grep -En '(^|[^0-9A-Za-z\."'\''-])(echo|printf )[^;)]* \|[^\|]' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
+# if [[ -n "${res}" ]]; then
+#   error "use faster \`<<<...\` instead of \`echo ... |\`/\`printf ... |\`: see https://github.com/koalaman/shellcheck/issues/2593 for more"
+#   print_fenced "${res}"$'\n'
+# fi
 # style
 if [[ ${#grep_ere_files[@]} -gt 0 ]]; then
   # We intentionally do not check for occurrences in any other order (e.g., -iE, -i -E) here.
@@ -658,7 +659,7 @@ if [[ ${#workflows[@]} -gt 0 ]] || [[ ${#actions[@]} -gt 0 ]]; then
         setup=''
         install=''
         eval "$(jq -r 'if .run then @sh "RUN=\(.run) shell=\(.shell)" else @sh "uses=\(.uses) FALLBACK=\(.with.fallback) RUN=\(.with.run) prepare=\(.with.prepare) setup=\(.with.setup) install=\(.with.install) shell=\(.with.shell)" end' <<<"${step}")"
-        if [[ "${uses}" == */install-action@* ]]; then
+        if [[ "${uses}" == *'/install-action@'* ]]; then
           if [[ "${FALLBACK}" != 'none' ]]; then
             error "'fallback: none' must be set for install-action (${name}.steps[${n}])"
           fi

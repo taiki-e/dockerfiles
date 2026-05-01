@@ -318,7 +318,7 @@ for tool in "${tools[@]}"; do
         if [[ -z "${PROTOC:-}" ]]; then
           _bin_dir="${bin_dir}"
           info "setting PROTOC environment variable to '${_bin_dir}/protoc${exe}'"
-          printf '%s\n' "PROTOC=${_bin_dir}/protoc${exe}" >>"${GITHUB_ENV}"
+          printf 'PROTOC=%s\n' "${_bin_dir}/protoc${exe}" >>"${GITHUB_ENV}"
         fi
       )
       rm -rf -- "${tmp_dir}"

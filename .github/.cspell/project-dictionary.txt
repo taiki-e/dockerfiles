@@ -3,6 +3,7 @@ archlinux
 asmtest
 BUILDKIT
 buildx
+ELTS
 groff
 Idate
 LDFLAGS

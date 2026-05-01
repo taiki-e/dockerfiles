@@ -37,7 +37,7 @@ for path in "${prefix}"/bin/*; do
   fi
   if grep -Fq 'dynamically linked' <<<"${file_info}"; then
     printf '%s\n' "${file_info}"
-    printf >&2 '%s\n' "binaries must be statically linked: ${path}"
+    printf >&2 'binaries must be statically linked: %s\n' "${path}"
     exit 1
   fi
 done

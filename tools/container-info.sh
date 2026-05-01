@@ -6,44 +6,48 @@ IFS=$'\n\t'
 trap -- 's=$?; printf >&2 "%s\n" "${0##*/}:${LINENO}: \`${BASH_COMMAND}\` exit with ${s}"; exit ${s}' ERR
 cd -- "$(dirname -- "$0")"/..
 
+# https://www.debian.org/releases
 # https://wiki.debian.org/DebianReleases
 # https://hub.docker.com/_/debian
 # https://hub.docker.com/r/debian/eol
 # https://endoflife.date/debian
-# | version       | EoL        | glibc  |
-# | ------------- | ---------- | ------ |
-# | 13 (trixie)   | 2030-06-30 | 2.41   |
-# | 12 (bookworm) | 2028-06-10 | 2.36   |
-# | 11 (bullseye) | 2026-06-30 | 2.31   |
-# | 10 (buster)   | 2024-06-30 | 2.28   |
-# | 9 (stretch)   | 2022-07-01 | 2.24   |
-# | 8 (jessie)    | 2020-06-30 | 2.19   |
-# | 7 (wheezy)    | 2018-05-31 | 2.13   |
-# | 6 (squeeze)   | 2016-02-29 | 2.11.3 |
-# | 5 (lenny)     | 2012-02-06 | 2.7    |
-# | 4 (etch)      | 2010-02-15 | 2.3.6  |
-# | 3.1 (sarge)   | 2008-03-31 | 2.3.2  |
-# | 3.0 (woody)   | 2006-06-30 | 2.2.5  |
-# | 2.2 (potato)  | 2003-06-30 | 2.1.3  |
-# | 2.1 (slink)   | 2000-10-30 | 2.0.7  |
+# | version       | EoL        | LTS        | ELTS        | glibc  |
+# | ------------- | ---------- | ---------- | ----------- | ------ |
+# | 13 (trixie)   | 2028-08-09 | 2030-06-30 | 2035-06-30  | 2.41   |
+# | 12 (bookworm) | 2026-06-10 | 2028-06-30 | 2033-06-30  | 2.36   |
+# | 11 (bullseye) | 2024-08-14 | 2026-08-31 | 2031-06-30  | 2.31   |
+# | 10 (buster)   | 2022-09-10 | 2024-06-30 | 2029-06-30  | 2.28   |
+# | 9 (stretch)   | 2020-07-18 | 2022-07-01 | 2027-06-30  | 2.24   |
+# | 8 (jessie)    | 2018-06-17 | 2020-06-30 | 2025-06-30  | 2.19   |
+# | 7 (wheezy)    | 2016-04-25 | 2018-05-31 | ~2020-06-30 | 2.13   |
+# | 6 (squeeze)   | 2014-05-31 | 2016-02-29 |             | 2.11.3 |
+# | 5 (lenny)     | 2012-02-06 |            |             | 2.7    |
+# | 4 (etch)      | 2010-02-15 |            |             | 2.3.6  |
+# | 3.1 (sarge)   | 2008-03-31 |            |             | 2.3.2  |
+# | 3.0 (woody)   | 2006-06-30 |            |             | 2.2.5  |
+# | 2.2 (potato)  | 2003-06-30 |            |             | 2.1.3  |
+# | 2.1 (slink)   | 2000-09-30 | 2000-10-30 |             | 2.0.7  |
+# | 2.0 (hamm)    | 1999-02-15 |            |             | ?      |
 # debian:6 docker image uses legacy image format (use debian/eol images instead).
-# debian/eol:hamm-slim docker image (debian 2.0) is not available.
+# debian/eol:hamm-slim docker image is not available.
 debian_versions=(2.1 2.2 3.1 4 5 6 7 8 9 10 11 12 13 testing sid)
 debian_versions=()
 # https://wiki.ubuntu.com/Releases
 # https://hub.docker.com/_/ubuntu
 # https://endoflife.date/ubuntu
-# | version         | EoL        | ESM        | glibc |
-# | --------------- | ---------- | ---------- | ----- |
-# | 24.04 (noble)   | 2029-04-02 | 2036-04-25 | 2.39  |
-# | 22.04 (jammy)   | 2027-04-02 | 2032-04-09 | 2.35  |
-# | 20.04 (focal)   | 2025-04-02 | 2030-04-02 | 2.31  |
-# | 18.04 (bionic)  | 2023-04-02 | 2028-04-01 | 2.27  |
-# | 16.04 (xenial)  | 2021-04-02 | 2026-04-02 | 2.23  |
-# | 14.04 (trusty)  | 2019-04-02 | 2024-04-02 | 2.19  |
-# | 12.04 (precise) | 2017-04-28 | 2019-04-26 | 2.15  |
+# | version          | EoL        | ESM        | glibc |
+# | ---------------- | ---------- | ---------- | ----- |
+# | 26.04 (resolute) | 2031-05-31 | ?          | 2.?   |
+# | 24.04 (noble)    | 2029-04-02 | 2036-04-25 | 2.39  |
+# | 22.04 (jammy)    | 2027-04-02 | 2032-04-09 | 2.35  |
+# | 20.04 (focal)    | 2025-04-02 | 2030-04-02 | 2.31  |
+# | 18.04 (bionic)   | 2023-04-02 | 2028-04-01 | 2.27  |
+# | 16.04 (xenial)   | 2021-04-02 | 2026-04-02 | 2.23  |
+# | 14.04 (trusty)   | 2019-04-02 | 2024-04-02 | 2.19  |
+# | 12.04 (precise)  | 2017-04-28 | 2019-04-26 | 2.15  |
+# | 10.04 (lucid)    | 2013-05-09 |            | ?     |
 # ubuntu:10.04 docker image uses legacy image format.
-ubuntu_versions=(12.04 14.04 16.04 18.04 20.04 22.04 24.04 rolling devel)
+ubuntu_versions=(12.04 14.04 16.04 18.04 20.04 22.04 24.04 26.04 rolling devel)
 ubuntu_versions=()
 # https://alpinelinux.org/releases
 # https://hub.docker.com/_/alpine
@@ -64,15 +68,16 @@ ubuntu_versions=()
 # | 3.12    | 2022-05-01 | 1.1.24 |
 # | 3.11    | 2021-11-01 | 1.1.24 |
 # | 3.10    | 2021-05-01 | 1.1.22 |
-# | 3.9     | 2021-01-01 | 1.1.20 |
+# | 3.9     | 2020-11-01 | 1.1.20 |
 # | 3.8     | 2020-05-01 | 1.1.19 |
 # | 3.7     | 2019-11-01 | 1.1.18 |
-# | 3.6     | ?          | 1.1.16 |
-# | 3.5     | ?          | 1.1.15 |
-# | 3.4     | ?          | 1.1.14 |
-# | 3.3     | ?          | 1.1.12 |
-# | 3.2     | ?          | 1.1.11 |
-# | 3.1     | ?          | 1.1.5  |
+# | 3.6     | 2019-05-01 | 1.1.16 |
+# | 3.5     | 2018-11-01 | 1.1.15 |
+# | 3.4     | 2018-05-01 | 1.1.14 |
+# | 3.3     | 2017-11-01 | 1.1.12 |
+# | 3.2     | 2017-05-01 | 1.1.11 |
+# | 3.1     | 2016-11-01 | 1.1.5  |
+# | 3.0     | 2016-05-01 | ?      |
 # alpine:3.0 docker image is not available
 alpine_versions=(3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 3.15 3.16 3.17 3.18 3.19 3.20 3.21 3.22 edge)
 alpine_versions=()
@@ -81,6 +86,7 @@ alpine_versions=()
 # https://endoflife.date/fedora
 # | version | EoL        | glibc |
 # | ------- | ---------- | ----- |
+# | 43      | 2026-12-09 | 2.?   |
 # | 42      | 2026-05-13 | 2.41  |
 # | 41      | 2025-11-19 | 2.40  |
 # | 40      | 2025-05-13 | 2.39  |
@@ -104,6 +110,7 @@ alpine_versions=()
 # | 22      | ?          | 2.21  |
 # | 21      | ?          | 2.20  |
 # | 20      | ?          | 2.18  |
+# | 19      | ?          | ?     |
 # fedora:19 docker image is not available
 fedora_versions=(20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 rawhide)
 fedora_versions=()
@@ -140,14 +147,15 @@ centos_versions=()
 # https://endoflife.date/opensuse
 # | version | EoL        | glibc |
 # | ------- | ---------- | ----- |
-# | 15.6    | 2025-12-31 | 2.38  |
+# | 16.0    | 2027-10-31 | 2.40  |
+# | 15.6    | 2026-04-30 | 2.38  |
 # | 15.5    | 2024-12-31 | 2.31  |
 # | 15.4    | 2023-12-07 | 2.31  |
 # | 15.3    | 2022-12-31 | 2.31  |
 # | 15.2    | 2022-01-04 | 2.26  |
 # | 15.1    | 2021-02-02 | 2.26  |
 # | 15.0    | 2019-12-03 | 2.26  |
-opensuse_versions=(15.0 15.1 15.2 15.3 15.4 15.5 15.6 tumbleweed)
+opensuse_versions=(15.0 15.1 15.2 15.3 15.4 15.5 15.6 16.0 tumbleweed)
 opensuse_versions=()
 # https://hub.docker.com/_/archlinux
 arch_versions=(latest)
@@ -156,7 +164,7 @@ arch_versions=()
 container_info() {
   local container="$1"
   shift
-  printf '%s\n' "===== ${container} ====="
+  printf '===== %s =====\n' "${container}"
 
   # libc version
   case "${container}" in

@@ -83,7 +83,7 @@ case "${dpkg_arch##*-}" in
         pwsh_arch=arm64
         hash=dddf7564fb3b52dc26be5580fc5b4e08eb3fa65b094488aae6d4b3cad5fea460
         ;;
-    *) printf >&2 '%s\n' "unsupported architecture '${dpkg_arch}'" && exit 1 ;;
+    *) printf >&2 'unsupported architecture %s\n' "'${dpkg_arch}'" && exit 1 ;;
 esac
 mkdir -p -- /usr/local/pwsh
 curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-all-errors -o pwsh.tar.gz "https://github.com/PowerShell/PowerShell/releases/download/v${pwsh_version}/powershell-${pwsh_version}-linux-${pwsh_arch}.tar.gz"

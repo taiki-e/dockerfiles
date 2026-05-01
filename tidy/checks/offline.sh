@@ -194,8 +194,8 @@ if [[ ${#rust_files[@]} -gt 0 ]]; then
       elif [[ "${line}" =~ ${gfm_alert_re} ]]; then
         alert="${line#*[\!}"
         alert="${alert%%]*}"
-        alert=$(tr '[:lower:]' '[:upper:]' <<<"${alert%%]*}")
-        alert_lower=$(tr '[:upper:]' '[:lower:]' <<<"${alert}")
+        alert="${alert@U}"
+        alert_lower="${alert@L}"
         case "${alert}" in
           NOTE | TIP | IMPORTANT) alert_sign='ⓘ' ;;
           WARNING | CAUTION) alert_sign='⚠' ;;

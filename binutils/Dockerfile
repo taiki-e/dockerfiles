@@ -35,7 +35,7 @@ dpkg_arch=$(dpkg --print-architecture)
 case "${dpkg_arch##*-}" in
     amd64) target=x86_64-pc-linux-gnu ;;
     arm64) target=aarch64-unknown-linux-gnu ;;
-    *) printf >&2 '%s\n' "unsupported architecture '${dpkg_arch}'" && exit 1 ;;
+    *) printf >&2 'unsupported architecture %s\n' "'${dpkg_arch}'" && exit 1 ;;
 esac
 if [[ "${MODE}" != "binutils" ]]; then
     for tool in /binutils/bin/*; do

@@ -48,13 +48,13 @@ build() {
   )
 
   if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
-    x docker buildx build --provenance=false --push "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
+    x docker buildx build --provenance=false --push "${build_args[@]}" || (printf 'info: build log saved at %s\n' "${log_file}" && exit 1)
     x retry docker pull "${full_tag}"
     x docker history "${full_tag}"
   elif [[ "${platform}" == *","* ]]; then
-    x docker buildx build --provenance=false "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
+    x docker buildx build --provenance=false "${build_args[@]}" || (printf 'info: build log saved at %s\n' "${log_file}" && exit 1)
   else
-    x docker buildx build --provenance=false --load "${build_args[@]}" || (printf '%s\n' "info: build log saved at ${log_file}" && exit 1)
+    x docker buildx build --provenance=false --load "${build_args[@]}" || (printf 'info: build log saved at %s\n' "${log_file}" && exit 1)
     x docker history "${full_tag}"
   fi
   x docker system df
@@ -66,6 +66,6 @@ for mode in "${modes[@]}"; do
   log_file="${log_dir}/build-docker-${mode}-${time}.log"
   mkdir -p -- "${log_dir}"
   build 2>&1 | tee -- "${log_file}"
-  printf '%s\n' "info: build log saved at ${log_file}"
+  printf 'info: build log saved at %s\n' "${log_file}"
   x docker images "${repository}"
 done

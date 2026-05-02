@@ -406,6 +406,11 @@ if [[ -n "${res}" ]]; then
   error "do not modify these built-in bash variables: see https://github.com/koalaman/shellcheck/issues/2160 / https://github.com/koalaman/shellcheck/issues/2559 for more"
   print_fenced "${res}"$'\n'
 fi
+res=$({ grep -En '\-H ("|'"'"')?Authorization:' "${shell_files[@]}" "${docker_files[@]}" "${workflows[@]}" "${actions[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
+if [[ -n "${res}" ]]; then
+  error "use \`-H @-\` and \`<<<\"Authorization: ...\"\` instead of \`-H \"Authorization: ...\"\`"
+  print_fenced "${res}"$'\n'
+fi
 # perf
 res=$({ grep -En '(^|[^\\])\$\((cat) ' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
 if [[ -n "${res}" ]]; then

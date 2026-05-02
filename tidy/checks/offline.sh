@@ -396,7 +396,7 @@ if [[ -n "${res}" ]]; then
   print_fenced "${res}"$'\n'
 fi
 # TODO: chmod|chown
-res=$({ grep -En '(^|[^0-9A-Za-z\."'\''-])(basename|cat|cd|cp|dirname|ln|ls|mkdir|mv|pushd|rm|rmdir|tee|touch|kill|trap)( +-[0-9A-Za-z]+)* +[^<>\|\]-]' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
+res=$({ grep -En '(^|[^0-9A-Za-z\."'\''-])(basename|cat|cd|cp|dirname|ln|ls|mkdir|mv|pushd|rm|rmdir|tee|touch|kill|trap)( +-[0-9A-Za-z]+)* +[^<>\|\]-]' "${shell_files[@]}" "${docker_files[@]}" "${workflows[@]}" "${actions[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
 if [[ -n "${res}" ]]; then
   error "use \`--\` before path(s): see https://github.com/koalaman/shellcheck/issues/2707 / https://github.com/koalaman/shellcheck/issues/2612 / https://github.com/koalaman/shellcheck/issues/2305 / https://github.com/koalaman/shellcheck/issues/2157 / https://github.com/koalaman/shellcheck/issues/2121 / https://github.com/koalaman/shellcheck/issues/314 for more"
   print_fenced "${res}"$'\n'

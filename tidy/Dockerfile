@@ -60,7 +60,7 @@ rustup --version
 mkdir -p -- install-action
 (
     cd -- install-action
-    git clone https://github.com/taiki-e/install-action.git --branch manifest-schema-0.2 manifests
+    git clone https://github.com/taiki-e/install-action.git --branch manifest-schema-0.3 manifests
     (
         cd -- manifests
         commit=$({ git --no-pager log --before="14 days ago" || true; } | head -1 | cut -d' ' -f2)

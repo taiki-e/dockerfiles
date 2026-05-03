@@ -121,9 +121,9 @@ EOF
 RUN <<EOF
 python3 -m venv /usr/local/venv
 /usr/local/venv/bin/pip --version
-# --uploaded-prior-to requires pip 26.0.
+# --uploaded-prior-to with duration in days requires pip 26.1.
 /usr/local/venv/bin/pip install --upgrade pip
-/usr/local/venv/bin/pip install --uploaded-prior-to="$(date -d '-14days' -Idate)" yq
+/usr/local/venv/bin/pip install --uploaded-prior-to=P14D yq
 EOF
 RUN <<EOF
 pwsh -Command 'Set-PSRepository -Name PSGallery -InstallationPolicy Trusted; Install-Module -Name PSScriptAnalyzer -Scope AllUsers; Set-PSRepository -Name PSGallery -InstallationPolicy Untrusted'

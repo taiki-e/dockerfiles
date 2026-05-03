@@ -358,10 +358,10 @@ for p in $(ls_files '*.sh' '*Dockerfile*'); do
       bash_files+=("${p}") # TODO
       ;;
   esac
-  if grep -Eq '(^|[^0-9A-Za-z\."'\''-])(grep) -[A-Za-z]*E[^\)]' "${p}"; then
+  if grep -Eq '(^|[^0-9A-Za-z\."'"'"'-])(grep) -[A-Za-z]*E[^\)]' "${p}"; then
     grep_ere_files+=("${p}")
   fi
-  if grep -Eq '(^|[^0-9A-Za-z\."'\''-])(sed) -[A-Za-z]*E[^\)]' "${p}"; then
+  if grep -Eq '(^|[^0-9A-Za-z\."'"'"'-])(sed) -[A-Za-z]*E[^\)]' "${p}"; then
     sed_ere_files+=("${p}")
   fi
 done
@@ -396,12 +396,13 @@ if [[ -n "${res}" ]]; then
   print_fenced "${res}"$'\n'
 fi
 # TODO: chmod|chown
-res=$({ grep -En '(^|[^0-9A-Za-z\."'\''-])(basename|cat|cd|cp|dirname|ln|ls|mkdir|mv|pushd|rm|rmdir|tee|touch|kill|trap)( +-[0-9A-Za-z]+)* +[^<>\|\]-]' "${shell_files[@]}" "${docker_files[@]}" "${workflows[@]}" "${actions[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
+# Use grep -P because [^\]] is not handled well in grep -E
+res=$({ grep -Pn '(^|[^0-9A-Za-z\."'"'"'-])(basename|cat|cd|cp|dirname|ln|ls|mkdir|mv|pushd|rm|rmdir|tee|touch|kill|trap)( +-[0-9A-Za-z]+)* +[^<>|\]-]' "${shell_files[@]}" "${docker_files[@]}" "${workflows[@]}" "${actions[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
 if [[ -n "${res}" ]]; then
   error "use \`--\` before path(s): see https://github.com/koalaman/shellcheck/issues/2707 / https://github.com/koalaman/shellcheck/issues/2612 / https://github.com/koalaman/shellcheck/issues/2305 / https://github.com/koalaman/shellcheck/issues/2157 / https://github.com/koalaman/shellcheck/issues/2121 / https://github.com/koalaman/shellcheck/issues/314 for more"
   print_fenced "${res}"$'\n'
 fi
-res=$({ grep -En '(^|[^0-9A-Za-z\."'\''-])(LINES|RANDOM|PWD)=' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
+res=$({ grep -En '(^|[^0-9A-Za-z\."'"'"'-])(LINES|RANDOM|PWD)\+?=' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
 if [[ -n "${res}" ]]; then
   error "do not modify these built-in bash variables: see https://github.com/koalaman/shellcheck/issues/2160 / https://github.com/koalaman/shellcheck/issues/2559 for more"
   print_fenced "${res}"$'\n'
@@ -417,19 +418,19 @@ if [[ -n "${res}" ]]; then
   error "use faster \`\$(<file)\` instead of \$(cat -- file): see https://github.com/koalaman/shellcheck/issues/2493 for more"
   print_fenced "${res}"$'\n'
 fi
-res=$({ grep -En '(^|[^0-9A-Za-z\."'\''-])(command +-[vV]) ' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
+res=$({ grep -En '(^|[^0-9A-Za-z\."'"'"'-])(command +-[vV]) ' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
 if [[ -n "${res}" ]]; then
   error "use faster \`type -P\` instead of \`command -v\`: see https://github.com/koalaman/shellcheck/issues/1162 for more"
   print_fenced "${res}"$'\n'
 fi
-res=$({ grep -En '(^|[^0-9A-Za-z\."'\''-])(type) +-P +[^ ]+ +&>' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
+res=$({ grep -En '(^|[^0-9A-Za-z\."'"'"'-])(type) +-P +[^ ]+ +&>' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
 if [[ -n "${res}" ]]; then
   error "\`type -P\` doesn't output to stderr; use \`>\` instead of \`&>\`"
   print_fenced "${res}"$'\n'
 fi
 # TODO: multi-line case
 # TODO: this cannot replace echo / printf without trailing newline.
-# res=$({ grep -En '(^|[^0-9A-Za-z\."'\''-])(echo|printf )[^;)]* \|[^\|]' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
+# res=$({ grep -En '(^|[^0-9A-Za-z\."'"'"'-])(echo|printf )[^;)]* \|[^|]' "${bash_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
 # if [[ -n "${res}" ]]; then
 #   error "use faster \`<<<...\` instead of \`echo ... |\`/\`printf ... |\`: see https://github.com/koalaman/shellcheck/issues/2593 for more"
 #   print_fenced "${res}"$'\n'
@@ -438,14 +439,14 @@ fi
 if [[ ${#grep_ere_files[@]} -gt 0 ]]; then
   # We intentionally do not check for occurrences in any other order (e.g., -iE, -i -E) here.
   # This enforces the style and makes it easier to search.
-  res=$({ grep -En '(^|[^0-9A-Za-z\."'\''-])(grep) +([^-]|-[^EFP-]|--[^hv])' "${grep_ere_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
+  res=$({ grep -En '(^|[^0-9A-Za-z\."'"'"'-])(grep) +([^-]|-[^EFP-]|--[^hv])' "${grep_ere_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
   if [[ -n "${res}" ]]; then
     error "please always use ERE (grep -E) instead of BRE for code consistency within a file"
     print_fenced "${res}"$'\n'
   fi
 fi
 if [[ ${#sed_ere_files[@]} -gt 0 ]]; then
-  res=$({ grep -En '(^|[^0-9A-Za-z\."'\''-])(sed) +([^-]|-[^E-]|--[^hv])' "${sed_ere_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
+  res=$({ grep -En '(^|[^0-9A-Za-z\."'"'"'-])(sed) +([^-]|-[^E-]|--[^hv])' "${sed_ere_files[@]}" || true; } | { grep -Ev '^[^ ]+: *(#|//)' || true; } | LC_ALL=C sort)
   if [[ -n "${res}" ]]; then
     error "please always use ERE (sed -E) instead of BRE for code consistency within a file"
     print_fenced "${res}"$'\n'

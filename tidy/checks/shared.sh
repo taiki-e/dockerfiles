@@ -79,6 +79,7 @@ sed_rhs_escape() {
 # shellcheck disable=SC2034
 should_fail=''
 
+git() { command git -c core.fsmonitor=false "$@"; }
 # - `find` lists symlinks. `! ( -name <dir> -prune )` means recursively ignore <dir>. `cut` removes the leading `./`.
 #   This can be replaced with `fd -H -t l`.
 # - `git submodule status` lists submodules. The first `cut` removes the first character indicates status ( |+|-).

@@ -5,7 +5,6 @@ BUILDKIT
 buildx
 ELTS
 groff
-Idate
 LDFLAGS
 libclang
 libexec

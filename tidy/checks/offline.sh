@@ -632,14 +632,18 @@ if [[ ${#workflows[@]} -gt 0 ]] || [[ ${#actions[@]} -gt 0 ]]; then
       *) error "${workflow_path}: only 'contents: read' and weaker permissions are allowed at top level, but found '${permissions}'; if you want to use stronger permissions, please set job-level permissions" ;;
     esac
     default_shell=$(jq -r -c '.defaults.run.shell' <<<"${workflow}")
-    # github's default is https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#defaultsrunshell
-    re='^((/usr/bin/env .* )?/bin/)?bash --noprofile --norc -CeEux?o pipefail \{0}$'
-    if [[ ! "${default_shell}" =~ ${re} ]]; then
-      error "${workflow_path}: defaults.run.shell should match with '${re}'"
-      continue
-    fi
+    reusable_workflow_only=1
     # .steps == null means the job is the caller of reusable workflow
     for job in $(jq -c '.jobs | to_entries[] | select(.value.steps)' <<<"${workflow}"); do
+      if [[ -n "${reusable_workflow_only}" ]]; then
+        reusable_workflow_only=''
+        # github's default is https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#defaultsrunshell
+        re='^((/usr/bin/env .* )?/bin/)?bash --noprofile --norc -CeEux?o pipefail \{0}$'
+        if [[ ! "${default_shell}" =~ ${re} ]]; then
+          error "${workflow_path}: defaults.run.shell should match with '${re}'"
+          break
+        fi
+      fi
       name=$(jq -r '.key' <<<"${job}")
       job=$(jq -r '.value' <<<"${job}")
       eval "$(jq -r '@sh "RUNS_ON=\(."runs-on") TIMEOUT_MINUTES=\(."timeout-minutes") JOB_DEFAULT_SHELL=\(.defaults.run.shell)"' <<<"${job}")"
@@ -696,6 +700,15 @@ if [[ ${#workflows[@]} -gt 0 ]] || [[ ${#actions[@]} -gt 0 ]]; then
         _=$((n++))
       done
     done
+    if [[ -n "${reusable_workflow_only}" ]]; then
+      if [[ "${default_shell}" != 'null' ]]; then
+        error "${workflow_path}: defaults.run.shell is unused because all jobs are reusable workflows"
+      fi
+      default_env=$(jq -r -c '.env' <<<"${workflow}")
+      if [[ "${default_env}" != 'null' ]]; then
+        error "${workflow_path}: env is unused because all jobs are reusable workflows"
+      fi
+    fi
   done
   for action_path in ${actions[@]+"${actions[@]}"}; do
     runs=$(yq -c '.runs' "${action_path}")

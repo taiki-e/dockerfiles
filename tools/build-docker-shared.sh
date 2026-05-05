@@ -44,7 +44,8 @@ docker_buildx_build() {
     "$@"
   )
   if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
-    x docker buildx build --push --output type=image,oci-mediatypes=true,compression=zstd,compression-level=10,force-compression=true,push=true "${build_args[@]}"
+    # Note: using oci-mediatypes=true drops labels on https://github.com/<repo>/pkgs/container.
+    x docker buildx build --push --output type=image,compression=zstd,compression-level=10,force-compression=true,push=true "${build_args[@]}"
     x retry docker pull "${tag}"
     x docker history "${tag}"
   elif [[ "${platform:-}" == *","* ]]; then

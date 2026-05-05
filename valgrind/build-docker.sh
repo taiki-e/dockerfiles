@@ -50,6 +50,10 @@ build() {
   esac
   local dockerfile="${package}/Dockerfile"
   local full_tag="${repository}:${valgrind_version}-${arch}${target:+"-${target}"}"
+  labels=(
+    "${common_labels[@]}"
+    "org.opencontainers.image.version=${valgrind_version}"
+  )
   local valgrind_ref="${valgrind_version}"
   if [[ "${valgrind_ref}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     valgrind_ref="VALGRIND_${valgrind_ref//\./_}"

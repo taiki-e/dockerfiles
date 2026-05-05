@@ -27,6 +27,9 @@ docker_manifest() {
   if [[ "${version}" == "${latest}" ]]; then
     tags+=("${repository}:latest")
   fi
+  # TODO: Add org.opencontainers.image.* annotations
+  # docker manifest command doesn't have option for it, may be blocked by https://github.com/docker/buildx/issues/2956.
+  # https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#adding-a-description-to-multi-arch-images
   for tag in "${tags[@]}"; do
     local args=()
     for arch in "${arches[@]}"; do

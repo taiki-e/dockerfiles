@@ -38,6 +38,10 @@ dpkg_versions=(
 build() {
   local dockerfile="${package}/Dockerfile"
   local full_tag="${repository}:${version}"
+  labels=(
+    "${common_labels[@]}"
+    "org.opencontainers.image.version=${version}"
+  )
   local build_args=(
     --file "${dockerfile}" "${package}/"
     --tag "${full_tag}"

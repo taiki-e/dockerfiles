@@ -35,6 +35,10 @@ desktop="${DESKTOP:-}"
 build() {
   local dockerfile="${package}/${base}.Dockerfile"
   local full_tag="${repository}:${distro}-${distro_version/-slim/}${desktop:+"-${desktop}"}"
+  labels=(
+    "${common_labels[@]}"
+    "org.opencontainers.image.version=${distro}-${distro_version/-slim/}"
+  )
   local build_args=(
     --file "${dockerfile}" "${package}/"
     --tag "${full_tag}"

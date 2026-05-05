@@ -30,22 +30,33 @@ export BUILDKIT_STEP_LOG_MAX_SIZE=10485760
 owner="${OWNER:-taiki-e}"
 repository="ghcr.io/${owner}/${package:?}"
 revision=$(git rev-parse HEAD)
+common_labels=(
+  # https://specs.opencontainers.org/image-spec/annotations/
+  "org.opencontainers.image.source=https://github.com/${owner}/dockerfiles"
+  "org.opencontainers.image.revision=${revision}"
+  "org.opencontainers.image.documentation=https://github.com/${owner}/dockerfiles/blob/${revision}/${package}/README.md"
+)
+labels=(
+  "${common_labels[@]}"
+  "org.opencontainers.image.version="
+)
 time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
+# TODO: Add org.opencontainers.image.* annotations
+# annotation-index seems to drop labels passed by --label.
+# https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#adding-a-description-to-multi-arch-images
 docker_buildx_build() {
   local tag="$1"
   shift
-  local build_args=(
-    --provenance=false
-    # https://specs.opencontainers.org/image-spec/annotations/
-    --label "org.opencontainers.image.source=https://github.com/${owner}/dockerfiles"
-    --label "org.opencontainers.image.revision=${revision}"
-    --label "org.opencontainers.image.documentation=https://github.com/${owner}/dockerfiles/blob/${revision}/${package}/README.md"
-    "$@"
-  )
+  local build_args=(--provenance=false)
+  for label in "${labels[@]}"; do
+    build_args+=(--label "${label}")
+  done
+  build_args+=("$@")
   if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
+    local output='type=image,compression=zstd,compression-level=10,force-compression=true,push=true'
     # Note: using oci-mediatypes=true drops labels on https://github.com/<repo>/pkgs/container.
-    x docker buildx build --push --output type=image,compression=zstd,compression-level=10,force-compression=true,push=true "${build_args[@]}"
+    x docker buildx build --push --output "${output}" "${build_args[@]}"
     x retry docker pull "${tag}"
     x docker history "${tag}"
   elif [[ "${platform:-}" == *","* ]]; then

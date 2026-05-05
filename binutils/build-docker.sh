@@ -37,6 +37,10 @@ esac
 build() {
   local dockerfile="${package}/Dockerfile"
   local full_tag="${repository}:${version}-${docker_arch}"
+  labels=(
+    "${common_labels[@]}"
+    "org.opencontainers.image.version=${version}"
+  )
   local build_args=(
     --file "${dockerfile}" "${package}/"
     --platform "${platform}"

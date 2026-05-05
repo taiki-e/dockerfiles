@@ -42,28 +42,30 @@ labels=(
 )
 time=$(date -u '+%Y-%m-%d-%H-%M-%S')
 
-# TODO: Add org.opencontainers.image.* annotations
-# annotation-index seems to drop labels passed by --label.
-# https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#adding-a-description-to-multi-arch-images
 docker_buildx_build() {
   local tag="$1"
   shift
   local build_args=(--provenance=false)
+  # Note: using oci-mediatypes=true drops labels passed by --label,
+  # but is needed for incompatibility with containerd (https://github.com/containerd/containerd/issues/9263).
+  # annotation-index also drops labels passed by --label.
+  local output='type=image,oci-mediatypes=true'
   for label in "${labels[@]}"; do
     build_args+=(--label "${label}")
+    if [[ "${platform:-}" == *","* ]]; then
+      output+=",annotation-index.${label}"
+    fi
   done
   build_args+=("$@")
   if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
-    # Note: using oci-mediatypes=true drops labels on https://github.com/<repo>/pkgs/container,
-    # but is needed for incompatibility with podman.
-    local output='type=image,oci-mediatypes=true,compression=zstd,compression-level=10,force-compression=true,push=true'
+    output+=',compression=zstd,compression-level=10,force-compression=true,push=true'
     x docker buildx build --push --output "${output}" "${build_args[@]}"
     x retry docker pull "${tag}"
     x docker history "${tag}"
   elif [[ "${platform:-}" == *","* ]]; then
-    x docker buildx build "${build_args[@]}"
+    x docker buildx build --output "${output}" "${build_args[@]}"
   else
-    x docker buildx build --load "${build_args[@]}"
+    x docker buildx build --load --output "${output}" "${build_args[@]}"
     x docker history "${tag}"
   fi
   x docker system df

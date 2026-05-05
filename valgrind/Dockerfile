@@ -67,6 +67,12 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     git clone https://sourceware.org/git/valgrind.git
     cd -- valgrind
     git checkout "${VALGRIND_REF}"
+    if [[ "${VALGRIND_REF}" == 'VALGRIND_3_27_0' ]]; then
+        git config --global user.email ""
+        git config --global user.name "builder"
+        # https://sourceware.org/git/?p=valgrind.git;a=commit;h=f742af1dff1ce09cb4d9a3dd449201a244886eb3
+        git cherry-pick f742af1dff1ce09cb4d9a3dd449201a244886eb3
+    fi
     ./autogen.sh
     ./configure "${configure_args[@]}"
     make -j"$(nproc)"

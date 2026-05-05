@@ -54,8 +54,9 @@ docker_buildx_build() {
   done
   build_args+=("$@")
   if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
-    local output='type=image,compression=zstd,compression-level=10,force-compression=true,push=true'
-    # Note: using oci-mediatypes=true drops labels on https://github.com/<repo>/pkgs/container.
+    # Note: using oci-mediatypes=true drops labels on https://github.com/<repo>/pkgs/container,
+    # but is needed for incompatibility with podman.
+    local output='type=image,oci-mediatypes=true,compression=zstd,compression-level=10,force-compression=true,push=true'
     x docker buildx build --push --output "${output}" "${build_args[@]}"
     x retry docker pull "${tag}"
     x docker history "${tag}"

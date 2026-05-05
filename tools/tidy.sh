@@ -37,7 +37,7 @@ image='ghcr.io/taiki-e/tidy'
 if [[ -n "${TIDY_DEV:-}" ]]; then
   image+=':latest'
 else
-  image+='@sha256:4d7ec52a86bd3c0a2d96627b0ec3aa534afc02c2d56fc9a898df64e29aa03312'
+  image+='@sha256:74a0aa628d55dfb82ed71d6f36242a2a31c78181266e4738cbae97b2b9892092'
 fi
 user="$(id -u):$(id -g)"
 workdir=$(pwd)
@@ -121,6 +121,7 @@ docker_run() {
 set +e
 docker_run \
   --mount "type=bind,source=${workdir},target=${workdir}" --workdir "${workdir}" \
+  --mount "type=bind,source=${workdir}/.git,target=${workdir}/.git,readonly" \
   --mount "type=bind,source=${tmp}/tmp,target=/tmp/tidy" \
   --mount "type=bind,source=${tmp}/pwsh-cache,target=/.cache/powershell" \
   --mount "type=bind,source=${tmp}/pwsh-local,target=/.local/share/powershell" \

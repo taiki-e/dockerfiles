@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   tidy:
-    uses: taiki-e/github-actions/.github/workflows/tidy.yml@5f549ff6b21e9a853f5f613784d5db27746fd2bc # main
+    uses: taiki-e/github-actions/.github/workflows/tidy.yml@2474ed4664eb8903c151603a9d841512c069f7f6 # main
     permissions:
       contents: write # for creating branch for pr
       pull-requests: write # unused (used in `codegen-automerge: true` case)
@@ -120,7 +120,7 @@ jobs:
       packages: write # for pushing to ghcr
     steps:
       - uses: taiki-e/checkout-action@7d1e50e93dc4fb3bba58f85018fadf77898aee8b # v1.4.2
-      - uses: taiki-e/github-actions/setup-docker@5f549ff6b21e9a853f5f613784d5db27746fd2bc # main # zizmor: ignore[stale-action-refs]
+      - uses: taiki-e/github-actions/setup-docker@2474ed4664eb8903c151603a9d841512c069f7f6 # main # zizmor: ignore[stale-action-refs]
       - run: |
           docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin <<<"${GITHUB_TOKEN}"
           printf 'PUSH_TO_GHCR=1\n' >>"${GITHUB_ENV}"

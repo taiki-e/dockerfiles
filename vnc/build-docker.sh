@@ -36,7 +36,6 @@ build() {
   local dockerfile="${package}/${base}.Dockerfile"
   local full_tag="${repository}:${distro}-${distro_version/-slim/}${desktop:+"-${desktop}"}"
   local build_args=(
-    "${opencontainers_labels[@]}"
     --file "${dockerfile}" "${package}/"
     --tag "${full_tag}"
     --build-arg "DISTRO=${distro}"
@@ -64,17 +63,7 @@ build() {
   fi
   build_args+=("$@")
 
-  if [[ -n "${PUSH_TO_GHCR:-}" ]]; then
-    x docker buildx build --provenance=false --push "${build_args[@]}" || (printf 'info: build log saved at %s\n' "${log_file}" && exit 1)
-    x retry docker pull "${full_tag}"
-    x docker history "${full_tag}"
-  elif [[ "${platform}" == *","* ]]; then
-    x docker buildx build --provenance=false "${build_args[@]}" || (printf 'info: build log saved at %s\n' "${log_file}" && exit 1)
-  else
-    x docker buildx build --provenance=false --load "${build_args[@]}" || (printf 'info: build log saved at %s\n' "${log_file}" && exit 1)
-    x docker history "${full_tag}"
-  fi
-  x docker system df
+  docker_buildx_build "${full_tag}" "${build_args[@]}"
 }
 
 log_dir="tmp/log/${package}/${distro}-${distro_version}"
@@ -92,7 +81,7 @@ case "${distro}" in
     ;;
   *) bail "unrecognized distro '${distro}'" ;;
 esac
+printf 'info: build log will be saved at %s\n' "${log_file}"
 build "$@" 2>&1 | tee -- "${log_file}"
-printf 'info: build log saved at %s\n' "${log_file}"
 
 x docker images "${repository}"

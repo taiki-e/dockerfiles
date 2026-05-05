@@ -10,6 +10,7 @@ libclang
 libexec
 lintian
 marm
+mediatypes
 mfloat
 mfpu
 nodesource

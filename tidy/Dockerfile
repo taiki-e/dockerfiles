@@ -29,7 +29,8 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     xz-utils
 du -h -d1 /usr/share/
 
-codename=$(grep -E '^VERSION_CODENAME=' /etc/os-release | cut -d= -f2)
+# shellcheck source=/dev/null
+codename=$(. /etc/os-release; printf '%s\n' "${VERSION_CODENAME}")
 # shellcheck disable=SC2174
 mkdir -pm755 -- /etc/apt/keyrings
 curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-all-errors https://apt.llvm.org/llvm-snapshot.gpg.key \

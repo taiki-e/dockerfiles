@@ -100,7 +100,8 @@ case "${DISTRO}:${DISTRO_VERSION%-slim}" in
     # LLVM version of ubuntu 24.04 is 18, debian 13 is 19
     ubuntu:24.04 | ubuntu:2[5-9].* | ubuntu:devel | debian:1[3-9] | debian:testing | debian:sid) ;;
     *)
-        codename=$(grep -E '^VERSION_CODENAME=' /etc/os-release | cut -d= -f2)
+        # shellcheck source=/dev/null
+        codename=$(. /etc/os-release; printf '%s\n' "${VERSION_CODENAME}")
         # shellcheck disable=SC2174
         mkdir -pm755 -- /etc/apt/keyrings
         curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-connrefused https://apt.llvm.org/llvm-snapshot.gpg.key \

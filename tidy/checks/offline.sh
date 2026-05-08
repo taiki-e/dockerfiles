@@ -341,6 +341,7 @@ docker_files=()
 bash_files=()
 grep_ere_files=()
 sed_ere_files=()
+pwsh_files=()
 for p in $(ls_files '*.sh' '*Dockerfile*'); do
   case "${p}" in
     tests/fixtures/* | */tests/fixtures/* | *.json) continue ;;
@@ -365,6 +366,9 @@ for p in $(ls_files '*.sh' '*Dockerfile*'); do
     sed_ere_files+=("${p}")
   fi
 done
+for p in $(ls_files '*.ps1'); do
+  pwsh_files+=("${p}")
+done
 workflows=()
 actions=()
 if [[ -d .github/workflows ]]; then
@@ -377,7 +381,7 @@ if [[ -n "$(ls_files '*action.yml')" ]]; then
   for p in $(ls_files '*action.yml'); do
     if [[ "${p##*/}" == 'action.yml' ]]; then
       actions+=("${p}")
-      if ! grep -Eq 'shell: (sh|/bin/sh|/usr/bin/env [^/]* /bin/sh)' "${p}"; then
+      if ! grep -Eq " +shell: ('\")?(sh|.*/sh)" "${p}"; then
         bash_files+=("${p}")
       fi
     fi
@@ -463,6 +467,13 @@ info "running \`shellcheck \$(git ls-files '*.sh')\`"
 if ! shellcheck "${shell_files[@]}"; then
   error "check failed; please resolve the above shellcheck error(s)"
 fi
+info "running PSScriptAnalyzer for \`\$(git ls-files '*.ps1')\`"
+for script in "${pwsh_files[@]}"; do
+  # shellcheck disable=SC2016
+  if ! pwsh -Command '$text = Get-Content "'"${script}"'" -Raw; Invoke-ScriptAnalyzer -EnableExit -ScriptDefinition "$text"'; then
+    error "check failed; please resolve the above PSScriptAnalyzer error(s)"
+  fi
+done
 # Check scripts in dockerfile.
 if [[ ${#docker_files[@]} -gt 0 ]]; then
   # Exclude SC2096 due to the way the temporary script is created.
@@ -589,7 +600,7 @@ fi
 if [[ ${#workflows[@]} -gt 0 ]] || [[ ${#actions[@]} -gt 0 ]]; then
   # Exclude SC2096 due to the way the temporary script is created.
   shellcheck_exclude=SC2086,SC2096,SC2129
-  info "running \`shellcheck --exclude ${shellcheck_exclude}\` for scripts in .github/workflows/*.yml and **/action.yml"
+  info "running \`shellcheck --exclude ${shellcheck_exclude}\` and PSScriptAnalyzer for scripts in .github/workflows/*.yml and **/action.yml"
   # TODO: format by shfmt / PSScriptAnalyzer's Invoke-Formatter
   shellcheck_for_gha() {
     local text=$1
@@ -599,7 +610,11 @@ if [[ ${#workflows[@]} -gt 0 ]] || [[ ${#actions[@]} -gt 0 ]]; then
       return
     fi
     case "${shell}" in
-      bash* | sh*)
+      bash* | */bash* | *' bash'* | sh* | */sh* | *' sh'*)
+        case "${shell}" in
+          bash* | */bash* | *' bash'*) shell=$(sed -E 's/.*( |\/)bash/bash/' <<<"${shell}") ;;
+          sh* | */sh* | *' sh'*) shell=$(sed -E 's/.*( |\/)sh/sh/' <<<"${shell}") ;;
+        esac
         text="#!/usr/bin/env ${shell%' {0}'}"$'\n'"${text}"
         # We don't use <(printf '%s\n' "${text}") here because:
         # Windows: failed to found fd created by <() ("/proc/*/fd/* (git bash/msys2 bash) /dev/fd/* (cygwin bash): openBinaryFile: does not exist (No such file or directory)" error)

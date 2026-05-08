@@ -28,8 +28,8 @@ cd -- "$(dirname -- "$0")"/..
 # | 2.2 (potato)  | 2003-06-30 |            |             | 2.1.3  |
 # | 2.1 (slink)   | 2000-09-30 | 2000-10-30 |             | 2.0.7  |
 # | 2.0 (hamm)    | 1999-02-15 |            |             | ?      |
-# debian:6 docker image uses legacy image format (use debian/eol images instead).
-# debian/eol:hamm-slim docker image is not available.
+# debian:6 uses legacy image format (use debian/eol images instead).
+# debian/eol:hamm-slim is not available.
 debian_versions=(2.1 2.2 3.1 4 5 6 7 8 9 10 11 12 13 testing sid)
 debian_versions=()
 # https://wiki.ubuntu.com/Releases
@@ -46,7 +46,7 @@ debian_versions=()
 # | 14.04 (trusty)   | 2019-04-02 | 2024-04-02 | 2.19  |
 # | 12.04 (precise)  | 2017-04-28 | 2019-04-26 | 2.15  |
 # | 10.04 (lucid)    | 2013-05-09 |            | ?     |
-# ubuntu:10.04 docker image uses legacy image format.
+# ubuntu:10.04 uses legacy image format.
 ubuntu_versions=(12.04 14.04 16.04 18.04 20.04 22.04 24.04 26.04 rolling devel)
 ubuntu_versions=()
 # https://alpinelinux.org/releases
@@ -78,14 +78,15 @@ ubuntu_versions=()
 # | 3.2     | 2017-05-01 | 1.1.11 |
 # | 3.1     | 2016-11-01 | 1.1.5  |
 # | 3.0     | 2016-05-01 | ?      |
-# alpine:3.0 docker image is not available
-alpine_versions=(3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 3.15 3.16 3.17 3.18 3.19 3.20 3.21 3.22 edge)
+# alpine:3.0 is not available
+alpine_versions=(3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 3.15 3.16 3.17 3.18 3.19 3.20 3.21 3.22 3.23 edge)
 alpine_versions=()
 # https://docs.fedoraproject.org/en-US/releases
 # https://hub.docker.com/_/fedora
 # https://endoflife.date/fedora
 # | version | EoL        | glibc |
 # | ------- | ---------- | ----- |
+# | 44      | 2027-02-02 | 2.?   |
 # | 43      | 2026-12-09 | 2.?   |
 # | 42      | 2026-05-13 | 2.41  |
 # | 41      | 2025-11-19 | 2.40  |
@@ -111,8 +112,8 @@ alpine_versions=()
 # | 21      | ?          | 2.20  |
 # | 20      | ?          | 2.18  |
 # | 19      | ?          | ?     |
-# fedora:19 docker image is not available
-fedora_versions=(20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 rawhide)
+# fedora:19 is not available
+fedora_versions=(20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 rawhide)
 fedora_versions=()
 # https://hub.docker.com/_/rockylinux
 # https://endoflife.date/rocky-linux

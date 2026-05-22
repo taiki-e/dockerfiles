@@ -28,7 +28,6 @@ packages=(
     patch
     sudo
     unzip
-    wget
     xz-utils
     zsh
 )

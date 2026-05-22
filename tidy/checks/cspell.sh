@@ -48,7 +48,7 @@ if [[ -e .cspell.json ]] || [[ -e .github/.cspell ]]; then
   config_old=$(<.cspell.json)
   config_new=$({ grep -Ev '^ *//' <<<"${config_old}" || true; } | jq 'del(.dictionaries[] | select(index("organization-dictionary") | not)) | del(.dictionaryDefinitions[] | select(.name == "organization-dictionary" | not))')
   mkdir -p -- /tmp/tidy/.github
-  ln -s -- "$(pwd)"/.github/.cspell /tmp/tidy/.github
+  ln -s -- "${PWD}"/.github/.cspell /tmp/tidy/.github
   printf '%s\n' "${config_new}" >|/tmp/tidy/.cspell.json
   dependencies_words=''
   if [[ -n "${has_rust}" ]]; then

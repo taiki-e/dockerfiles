@@ -18,14 +18,14 @@ fi
 
 # Referred by both Rust and Markdown check.
 markdown_files=()
-while IFS=$'\n' read -r; do markdown_files+=("${REPLY}"); done < <(ls_files '*.md')
+while IFS= read -r; do markdown_files+=("${REPLY}"); done < <(ls_files '*.md')
 if [[ ${TIDY_EXPECTED_MARKDOWN_FILE_COUNT:-${#markdown_files[@]}} -ne ${#markdown_files[@]} ]]; then
   error "expected ${TIDY_EXPECTED_MARKDOWN_FILE_COUNT} of Markdown files, but found ${#markdown_files[@]}; consider updating TIDY_EXPECTED_MARKDOWN_FILE_COUNT env var"
 fi
 
 # Rust (if exists)
 rust_files=()
-while IFS=$'\n' read -r; do rust_files+=("${REPLY}"); done < <(ls_files '*.rs')
+while IFS= read -r; do rust_files+=("${REPLY}"); done < <(ls_files '*.rs')
 if [[ ${TIDY_EXPECTED_RUST_FILE_COUNT:-${#rust_files[@]}} -ne ${#rust_files[@]} ]]; then
   error "expected ${TIDY_EXPECTED_RUST_FILE_COUNT} of Rust files, but found ${#rust_files[@]}; consider updating TIDY_EXPECTED_RUST_FILE_COUNT env var"
 fi
@@ -175,7 +175,7 @@ if [[ ${#rust_files[@]} -gt 0 ]]; then
     leading_spaces=''
     first_line=1
     ignore=''
-    while IFS='' read -rd$'\a' line; do
+    while IFS= read -rd$'\a' line; do
       if [[ -n "${ignore}" ]]; then
         if [[ "${line}" == '<!-- tidy:sync-markdown-to-rustdoc:ignore:end -->'* ]]; then
           ignore=''
@@ -253,7 +253,7 @@ check_hidden clippy.toml deny.toml rustfmt.toml
 # C/C++/Protobuf (if exists)
 clang_format_ext=('*.c' '*.h' '*.cpp' '*.hpp' '*.proto')
 clang_format_files=()
-while IFS=$'\n' read -r; do clang_format_files+=("${REPLY}"); done < <(ls_files "${clang_format_ext[@]}")
+while IFS= read -r; do clang_format_files+=("${REPLY}"); done < <(ls_files "${clang_format_ext[@]}")
 if [[ ${TIDY_EXPECTED_CLANG_FORMAT_FILE_COUNT:-${#clang_format_files[@]}} -ne ${#clang_format_files[@]} ]]; then
   error "expected ${TIDY_EXPECTED_CLANG_FORMAT_FILE_COUNT} of C/C++/Protobuf files, but found ${#clang_format_files[@]}; consider updating TIDY_EXPECTED_CLANG_FORMAT_FILE_COUNT env var"
 fi
@@ -277,7 +277,7 @@ check_alt '.hpp extension' 'other extensions' "$(ls_files '*.hh' '*.hp' '*.hxx' 
 # YAML/HTML/CSS/JavaScript/JSON (if exists)
 prettier_ext=('*.css' '*.html' '*.js' '*.json' '*.yml' '*.yaml')
 prettier_files=()
-while IFS=$'\n' read -r; do prettier_files+=("${REPLY}"); done < <(ls_files "${prettier_ext[@]}")
+while IFS= read -r; do prettier_files+=("${REPLY}"); done < <(ls_files "${prettier_ext[@]}")
 if [[ ${TIDY_EXPECTED_PRETTIER_FILE_COUNT:-${#prettier_files[@]}} -ne ${#prettier_files[@]} ]]; then
   error "expected ${TIDY_EXPECTED_PRETTIER_FILE_COUNT} of YAML/HTML/CSS/JavaScript/JSON files, but found ${#prettier_files[@]}; consider updating TIDY_EXPECTED_PRETTIER_FILE_COUNT env var"
 fi
@@ -299,7 +299,7 @@ check_alt '.yml extension' '.yaml extension' "$(ls_files '*.yaml' | { grep -Fv '
 
 # TOML (if exists)
 toml_files=()
-while IFS=$'\n' read -r; do toml_files+=("${REPLY}"); done < <(ls_files '*.toml')
+while IFS= read -r; do toml_files+=("${REPLY}"); done < <(ls_files '*.toml')
 if [[ ${TIDY_EXPECTED_TOML_FILE_COUNT:-${#toml_files[@]}} -ne ${#toml_files[@]} ]]; then
   error "expected ${TIDY_EXPECTED_TOML_FILE_COUNT} of TOML files, but found ${#toml_files[@]}; consider updating TIDY_EXPECTED_TOML_FILE_COUNT env var"
 fi

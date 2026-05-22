@@ -22,7 +22,7 @@ set +C
 /tmp/binutils-src/configure \
   --prefix="${prefix}" \
   --enable-targets=all \
-  --with-debug-prefix-map="$(pwd)"= \
+  --with-debug-prefix-map="${PWD}"= \
   --disable-nls \
   &>build.log || (tail <build.log -5000 && exit 1)
 make -j"$(nproc)" &>build.log || (tail <build.log -5000 && exit 1)

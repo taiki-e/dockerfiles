@@ -236,7 +236,7 @@ manifest_dir="$(dirname -- "$0")/manifests"
 tool="${INPUT_TOOL:-}"
 tools=()
 if [[ -n "${tool}" ]]; then
-  while read -rd,; do
+  while IFS= read -rd,; do
     tools+=("${REPLY}")
   done < <(normalize_comma_or_space_separated "${tool}")
 fi

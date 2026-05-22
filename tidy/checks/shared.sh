@@ -89,7 +89,7 @@ while IFS= read -r; do
   find_prune+=(\! \( -name "${REPLY}" -prune \))
 done < <(sed -E 's/#.*//g; s/^[ \t]+//g; s/\/[ \t]+$//g; /^$/d' .gitignore)
 exclude_from_ls_files=()
-while IFS=$'\n' read -r; do
+while IFS= read -r; do
   exclude_from_ls_files+=("${REPLY}")
 done < <({
   find . "${find_prune[@]}" -type l | cut -c3-
@@ -97,7 +97,7 @@ done < <({
   git ls-files --deleted
 } | LC_ALL=C sort -u)
 exclude_from_ls_files_no_symlink=()
-while IFS=$'\n' read -r; do
+while IFS= read -r; do
   exclude_from_ls_files_no_symlink+=("${REPLY}")
 done < <({
   git submodule status | cut -c2- | cut -d' ' -f2

@@ -49,11 +49,9 @@ jobs:
           - package: build-base
             distro: ubuntu:22.04
           - package: build-base
-            distro: ubuntu:24.04 # latest
+            distro: ubuntu:24.04
           - package: build-base
-            distro: ubuntu:26.04
-          - package: build-base
-            distro: ubuntu:25.10 # rolling
+            distro: ubuntu:26.04 # latest, rolling
           - package: build-base
             distro: debian:11
           - package: build-base
@@ -105,9 +103,9 @@ jobs:
           - package: vnc
             distro: ubuntu:22.04
           - package: vnc
-            distro: ubuntu:24.04 # latest
+            distro: ubuntu:24.04
           - package: vnc
-            distro: ubuntu:26.04
+            distro: ubuntu:26.04 # latest
           - package: vnc
             distro: debian:11
           - package: vnc

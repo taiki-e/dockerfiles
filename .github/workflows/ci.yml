@@ -27,6 +27,7 @@ jobs:
       security-events: write # for github/codeql-action/*
 
   build:
+    needs: tidy
     strategy:
       fail-fast: false
       matrix:

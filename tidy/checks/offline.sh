@@ -646,6 +646,14 @@ if [[ ${#workflows[@]} -gt 0 ]] || [[ ${#actions[@]} -gt 0 ]]; then
       null) error "${workflow_path}: top level permissions not found; it must be 'contents: read' or weaker permissions" ;;
       *) error "${workflow_path}: only 'contents: read' and weaker permissions are allowed at top level, but found '${permissions}'; if you want to use stronger permissions, please set job-level permissions" ;;
     esac
+    if [[ "$(basename -- "${workflow_path}")" != 'tidy.yml' ]] && [[ -n "$(jq -c '.jobs | to_entries[] | select(.key == "tidy")' <<<"${workflow}")" ]]; then
+      for job in $(jq -c '.jobs | to_entries[]' <<<"${workflow}"); do
+        eval "$(jq -r '@sh "name=\(."key") NEEDS=(\(.value.needs))"' <<<"${job}")"
+        if [[ "${name}" != 'tidy' ]] && [[ "${NEEDS[0]}" == 'null' ]]; then
+          error "${workflow_path}: all jobs must be run after 'tidy' job, but '${name}' doesn't"
+        fi
+      done
+    fi
     default_shell=$(jq -r -c '.defaults.run.shell' <<<"${workflow}")
     reusable_workflow_only=1
     # .steps == null means the job is the caller of reusable workflow

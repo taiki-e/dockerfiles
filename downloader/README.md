@@ -12,7 +12,7 @@ As a stage of [multi-stage build][multi-stage-build]. (The original purpose of t
 ```dockerfile
 FROM ghcr.io/taiki-e/downloader AS downloader
 ARG URL=...
-RUN wget "$URL"
+RUN aria2c "$URL"
 
 FROM ubuntu
 COPY --from=downloader ... ...

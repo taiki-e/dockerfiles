@@ -1,5 +1,5 @@
 almalinux
-archlinux
+amazonlinux
 asmtest
 BUILDKIT
 buildx
@@ -17,7 +17,9 @@ nodesource
 nodistro
 novnc
 opencontainers
+oraclelinux
 rockylinux
+rootfs
 texinfo
 tigervnc
 trixie

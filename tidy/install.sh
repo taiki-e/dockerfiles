@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 set -CeEuo pipefail
 IFS=$'\n\t'
-# Adapted from https://github.com/taiki-e/install-action/blob/v2.75.4/main.sh
+# Adapted from https://github.com/taiki-e/install-action/blob/v2.81.4/main.sh.
 
 rx() {
   (
@@ -22,17 +22,17 @@ retry() {
 }
 bail() {
   if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
-    printf '::error::%s\n' "$*"
+    printf '::error::install-action: %s\n' "$*"
   else
-    printf >&2 'error: %s\n' "$*"
+    printf >&2 'error: install-action: %s\n' "$*"
   fi
   exit 1
 }
 warn() {
   if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
-    printf '::warning::%s\n' "$*"
+    printf '::warning::install-action: %s\n' "$*"
   else
-    printf >&2 'warning: %s\n' "$*"
+    printf >&2 'warning: install-action: %s\n' "$*"
   fi
 }
 info() {
@@ -44,11 +44,11 @@ normalize_comma_or_space_separated() {
   if [[ "${list}" == *","* ]]; then
     # If a comma is contained, consider it is a comma-separated list.
     # Drop leading and trailing whitespaces in each element.
-    sed -E 's/ *, */,/g; s/^.//' <<<",${list},"
+    sed -E 's/ *\+ */+/g; s/ *, */,/g; s/^.//; s/,,$/,/' <<<",${list},"
   else
     # Otherwise, consider it is a whitespace-separated list.
     # Convert whitespace characters into comma.
-    sed -E 's/ +/,/g; s/^.//' <<<" ${list} "
+    sed -E 's/ *\+ */+/g; s/ +/,/g; s/^.//' <<<" ${list} "
   fi
 }
 download_and_checksum() {
@@ -117,6 +117,12 @@ download_and_extract() {
         *.gz)
           mv -- tmp "${bin_in_archive#\./}.gz"
           gzip -d "${bin_in_archive#\./}.gz"
+          for tmp in "${bin_in_archive[@]}"; do
+            mv -- "${tmp}" "${bin_dir}/"
+          done
+          ;;
+        *.deb)
+          dpkg-deb -x tmp .
           for tmp in "${bin_in_archive[@]}"; do
             mv -- "${tmp}" "${bin_dir}/"
           done
@@ -228,10 +234,6 @@ if [[ $# -gt 0 ]]; then
   bail "invalid argument '$1'"
 fi
 
-export RUSTUP_MAX_RETRIES=10
-export DEBIAN_FRONTEND=noninteractive
-manifest_dir="$(dirname -- "$0")/manifests"
-
 # Inputs
 tool="${INPUT_TOOL:-}"
 tools=()
@@ -247,33 +249,32 @@ if [[ ${#tools[@]} -eq 0 ]]; then
   exit 0
 fi
 
-# Refs: https://github.com/rust-lang/rustup/blob/HEAD/rustup-init.sh
+# Refs:
+# - https://github.com/rust-lang/rustup/blob/HEAD/rustup-init.sh
+# - https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#runner-context
+# NB: Sync with tools/ci/tool-list.sh.
 exe=''
 host_os=linux
-# NB: Sync with tools/ci/tool-list.sh.
-case "$(uname -m)" in
+ldd_version=$(ldd --version 2>&1 || true)
+if [[ "${ldd_version}" == *'musl'* ]]; then
+  host_env=musl
+else
+  host_env=gnu
+fi
+host_arch="$(uname -m)"
+case "${host_arch}" in
   aarch64 | arm64) host_arch=aarch64 ;;
-  # Ignore 32-bit Arm for now, as we need to consider the version and whether hard-float is supported.
-  # https://github.com/rust-lang/rustup/pull/593
-  # https://github.com/cross-rs/cross/pull/1018
-  # And support for 32-bit Arm will be removed in near future.
-  # https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/#removal-of-operating-system-support-with-node24
-  # Does it seem only armv7l+ is supported?
-  # https://github.com/actions/runner/blob/v2.321.0/src/Misc/externals.sh#L178
-  # https://github.com/actions/runner/issues/688
-  xscale | arm | armv*l) bail "32-bit Arm runner is not supported yet by this action; if you need support for this platform, please submit an issue at <https://github.com/taiki-e/install-action>" ;;
   ppc64le) host_arch=powerpc64le ;;
   riscv64) host_arch=riscv64 ;;
   s390x) host_arch=s390x ;;
-  # Very few tools provide prebuilt binaries for these.
-  loongarch64 | mips | mips64 | ppc | ppc64 | sun4v) bail "$(uname -m) runner is not supported yet by this action; if you need support for this platform, please submit an issue at <https://github.com/taiki-e/install-action>" ;;
+  # On these platforms, we just use the result of `uname -m` as host_arch, and always fallback to `cargo install`.
+  xscale | arm | armv*l | loongarch64 | mips | mips64 | ppc | ppc64 | sun4v) ;;
   # GitHub Actions Runner supports x86_64/AArch64/Arm Linux and x86_64/AArch64 Windows/macOS.
   # https://github.com/actions/runner/blob/v2.332.0/.github/workflows/build.yml#L24
   # https://docs.github.com/en/actions/reference/runners/self-hosted-runners#supported-processor-architectures
   # And IBM provides runners for powerpc64le/s390x Linux.
   # https://github.com/IBM/actionspz
   # So we can assume x86_64 unless it has a known non-x86_64 uname -m result.
-  # TODO: uname -m on windows-11-arm returns "x86_64"
   *) host_arch=x86_64 ;;
 esac
 info "host platform: ${host_arch}_${host_os}"
@@ -282,21 +283,131 @@ install_action_dir="/usr/local"
 tmp_dir="${install_action_dir}/tmp"
 cargo_bin="${install_action_dir}/bin"
 
+export CARGO_NET_RETRY=10
+export RUSTUP_MAX_RETRIES=10
+
+export DEBIAN_FRONTEND=noninteractive
+manifest_dir="$(dirname -- "$0")/manifests"
+
 for tool in "${tools[@]}"; do
-  if [[ "${tool}" == *"@"* ]]; then
+  additional=''
+  if [[ "${tool}" == *'+'* ]]; then
+    additional="${tool#*+}"
+    tool="${tool%%+*}"
+  fi
+  if [[ "${tool}" == *'@'* ]]; then
     version="${tool#*@}"
     tool="${tool%@*}"
-    if [[ ! "${version}" =~ ^([1-9][0-9]*(\.[0-9]+(\.[0-9]+)?)?|0\.[1-9][0-9]*(\.[0-9]+)?|^0\.0\.[0-9]+)(-[0-9A-Za-z\.-]+)?$|^latest$ ]]; then
-      if [[ ! "${version}" =~ ^([1-9][0-9]*(\.[0-9]+(\.[0-9]+)?)?|0\.[1-9][0-9]*(\.[0-9]+)?|^0\.0\.[0-9]+)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^latest$ ]]; then
-        bail "install-action does not support semver operators: '${version}'"
+    if [[ "${tool}" != 'rust' ]]; then
+      if [[ ! "${version}" =~ ^([1-9][0-9]*(\.[0-9]+(\.[0-9]+)?)?|0\.[1-9][0-9]*(\.[0-9]+)?|^0\.0\.[0-9]+)(-[0-9A-Za-z\.-]+)?$|^latest$ ]]; then
+        if [[ ! "${version}" =~ ^([1-9][0-9]*(\.[0-9]+(\.[0-9]+)?)?|0\.[1-9][0-9]*(\.[0-9]+)?|^0\.0\.[0-9]+)(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$|^latest$ ]]; then
+          bail "semver operators are not supported in 'tool' input option: '${version}'"
+        fi
+        bail "install-action v2 does not support semver build-metadata: '${version}'; if you need these supports again, please submit an issue at <https://github.com/taiki-e/install-action>"
       fi
-      bail "install-action v2 does not support semver build-metadata: '${version}'; if you need these supports again, please submit an issue at <https://github.com/taiki-e/install-action>"
     fi
   else
     version=latest
   fi
+  if [[ -n "${additional}" ]]; then
+    case "${tool}" in
+      rust) ;;
+      *) bail "<tool_name>+<additional> syntax is not supported for ${tool}" ;;
+    esac
+  fi
   installed_bin=()
   case "${tool}" in
+    rust)
+      if [[ "${version}" == 'latest' ]]; then
+        version=stable
+      fi
+      info "installing ${tool}@${version}"
+      rustup_args=(--profile minimal)
+      if [[ -n "${additional}" ]]; then
+        component=''
+        target=''
+        while IFS= read -rd+; do
+          case "${REPLY}" in
+            # Last checked: nightly-2026-05-03
+            # rustup component list
+            # rustup target list
+            cargo | cargo-* | clippy | clippy-* | llvm-* | miri | miri-* | rust-* | rustc-* | rustfmt | rustfmt-*) component+=",${REPLY}" ;;
+            *) target+=",${REPLY}" ;;
+          esac
+        done <<<"${additional}+"
+        if [[ -n "${component}" ]]; then
+          if [[ "${component}," == *',miri,'* ]] && [[ "${component}," != *',rust-src,'* ]]; then
+            component+=',rust-src'
+          fi
+          rustup_args+=(--component "${component#,}")
+        fi
+        if [[ -n "${target}" ]]; then
+          rustup_args+=(--target "${target#,}")
+        fi
+      fi
+      if type -P rustup >/dev/null; then
+        # --no-self-update is necessary because the windows environment cannot self-update rustup.exe.
+        rx retry rustup toolchain add "${version}" --no-self-update "${rustup_args[@]}"
+        rx rustup default "${version}"
+      else
+        # https://github.com/rust-lang/rustup/tags
+        # Run tools/rustup-hash.sh to get sha256 hash.
+        rustup_version=1.29.0
+        # https://rust-lang.github.io/rustup/installation/other.html#manual-installation
+        rust_target=''
+        checksum=''
+        rust_target="${host_arch}-unknown-${host_os}-${host_env}"
+        case "${host_arch}" in
+          x86_64)
+            case "${host_env}" in
+              gnu) checksum=4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10 ;;
+              musl) checksum=9cd3fda5fd293890e36ab271af6a786ee22084b5f6c2b83fd8323cec6f0992c1 ;;
+            esac
+            ;;
+          aarch64)
+            case "${host_env}" in
+              gnu) checksum=9732d6c5e2a098d3521fca8145d826ae0aaa067ef2385ead08e6feac88fa5792 ;;
+              musl) checksum=88761caacddb92cd79b0b1f939f3990ba1997d701a38b3e8dd6746a562f2a759 ;;
+            esac
+            ;;
+          powerpc64le)
+            case "${host_env}" in
+              gnu) checksum=4bfff85bd3967d988e14567aa9cc6ab0ea386f0ffeff0f9f14d23f0103bf1f97 ;;
+              musl) checksum=e15d033af90b7a55d170aac2d82cc28ddd96dbfcdda7c6d4eb8cb064a99c4646 ;;
+            esac
+            ;;
+          riscv64)
+            rust_target="${host_arch}gc-unknown-${host_os}-${host_env}"
+            # riscv64gc-unknown-linux-musl is tier 2 without host tools
+            case "${host_env}" in
+              gnu) checksum=7e43f2b2e6307d61da17a4dff61e6bceef408b8189822df64e1094590d2a70f9 ;;
+            esac
+            ;;
+          s390x)
+            # s390x-unknown-linux-musl is tier 3
+            case "${host_env}" in
+              gnu) checksum=66c2c132428b6b77803facb02cbdf33b89d20c00bd20da142be8cb651f2e7cd8 ;;
+            esac
+            ;;
+        esac
+        if [[ -z "${rust_target}" ]] || [[ -z "${checksum}" ]]; then
+          bail "unsupported host platform ${host_arch}_${host_os} for ${tool}"
+        fi
+        url="https://static.rust-lang.org/rustup/archive/${rustup_version}/${rust_target}/rustup-init${exe}"
+        mkdir -p -- "${tmp_dir}"
+        (
+          cd -- "${tmp_dir}"
+          download_and_checksum "${url}" "${checksum}"
+          mv -- tmp rustup-init
+          case "${host_os}" in
+            linux | macos) chmod +x ./rustup-init ;;
+          esac
+          rx retry ./rustup-init -y --default-toolchain "${version}" --no-modify-path "${rustup_args[@]}"
+        )
+        rm -rf -- "${tmp_dir}"
+      fi
+      installed_bin=("rustc${exe}" "cargo${exe}")
+      ;;
     protoc)
       info "installing ${tool}@${version}"
       read_manifest "protoc" "${version}"
@@ -331,7 +442,7 @@ for tool in "${tools[@]}"; do
 
       read_manifest "${tool}" "${version}"
       if [[ "${download_info}" == "null" ]]; then
-        bail "${tool}@${version} for '${host_arch}_${host_os}' is not supported"
+        bail "${tool} is supported but version ${version} for '${host_arch}_${host_os}' is not supported"
       fi
 
       info "installing ${tool}@${version}"

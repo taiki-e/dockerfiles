@@ -50,13 +50,6 @@ for tool in /usr/bin/clang*-"${LLVM_VERSION}"; do
 done
 clang-format --version
 npm --version
-# We need to use nightly rustfmt because we use the unstable formatting options of rustfmt.
-curl --proto '=https' --tlsv1.2 -fsSL --retry 10 --retry-all-errors https://sh.rustup.rs \
-  | sh -s -- -y --profile minimal --default-toolchain nightly --no-modify-path --component rustfmt
-chmod -R a+w "${RUSTUP_HOME}" "${CARGO_HOME}"
-rustc --version
-cargo --version
-rustup --version
 mkdir -p -- install-action
 (
     cd -- install-action
@@ -67,8 +60,10 @@ mkdir -p -- install-action
         git checkout "${commit}"
     )
     cp -- /tmp/install.sh ./
-    INPUT_TOOL=parse-dockerfile,shfmt,shellcheck,taplo,zizmor \
+    # We need to use nightly rustfmt because we use the unstable formatting options of rustfmt.
+    INPUT_TOOL=parse-dockerfile,rust@nightly+rustfmt,shfmt,shellcheck,taplo,zizmor \
         ./install.sh
+    chmod -R a+w "${RUSTUP_HOME}" "${CARGO_HOME}"
 )
 rm -rf -- install-action
 dpkg_arch=$(dpkg --print-architecture)

@@ -11,15 +11,6 @@ ARG ALPINE_VERSION
 # - Download-related packages (bzip2, curl, dpkg, libarchive-tools, tar, unzip, xz)
 #   are not necessarily needed for build, but they are small enough (about 4MB).
 RUN <<EOF
-case "${ALPINE_VERSION}" in
-    edge) ;;
-    *)
-        cat >>/etc/apk/repositories <<EOF2
-https://dl-cdn.alpinelinux.org/alpine/edge/main
-https://dl-cdn.alpinelinux.org/alpine/edge/community
-EOF2
-        ;;
-esac
 cat -- /etc/apk/repositories
 apk --no-cache update -q
 apk --no-cache upgrade

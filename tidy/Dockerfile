@@ -107,6 +107,7 @@ RUN <<EOF
 npm config set min-release-age=14 --location=global
 npm config set ignore-scripts=true --location=global
 npm config set allow-git=none --location=global
+npm config set allow-remote=none --location=global
 npm config set engine-strict=true --location=global
 npm config set strict-peer-deps=true --location=global
 npm install cspell --location=global

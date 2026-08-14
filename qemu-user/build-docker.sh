@@ -28,9 +28,9 @@ fi
 
 # https://ftp.debian.org/debian/pool/main/q/qemu
 # https://tracker.debian.org/pkg/qemu
-latest=11.0
+latest=11.1
 dpkg_versions=(
-  11.1.0~rc1+ds-1
+  11.1.0+ds-1
   11.0.3+ds-2
   10.0.11+ds-0+deb13u1+b1
 )

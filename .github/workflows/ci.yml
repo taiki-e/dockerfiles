@@ -111,7 +111,7 @@ jobs:
       packages: write # for pushing to ghcr
     steps:
       - uses: taiki-e/checkout-action@7d1e50e93dc4fb3bba58f85018fadf77898aee8b # v1.4.2
-      - uses: taiki-e/github-actions/setup-docker@e6a1170cbd07eb898017958967912976fce18f2d # 2026.7.3
+      - uses: taiki-e/github-actions/setup-docker@dc24bff2366e8ddeea5e0e4168df3d6f4b93f596 # 2026.8.8
       - run: |
           docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin <<<"${GITHUB_TOKEN}"
           printf 'PUSH_TO_GHCR=1\n' >>"${GITHUB_ENV}"

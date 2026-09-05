@@ -64,9 +64,9 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     "${packages[@]}"
 (
     cd -- tmp
-    git clone https://sourceware.org/git/valgrind.git
+    # https://sourceware.org/sourceware-25-roadmap.html
+    git clone --depth=1 --branch "${VALGRIND_REF}" https://git.sr.ht/~sourceware/valgrind
     cd -- valgrind
-    git checkout "${VALGRIND_REF}"
     ./autogen.sh
     ./configure "${configure_args[@]}"
     make -j"$(nproc)"

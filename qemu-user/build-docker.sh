@@ -31,7 +31,7 @@ fi
 latest=11.1
 dpkg_versions=(
   11.1.1+ds-1
-  10.0.11+ds-0+deb13u1+b1
+  10.0.13+ds-0+deb13u1
 )
 
 build() {

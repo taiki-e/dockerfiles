@@ -56,7 +56,7 @@ jobs:
           - package: build-base
             distro: debian:testing
           - package: build-base
-            distro: alpine:3.23 # latest
+            distro: alpine:3.24 # latest
           - package: build-base
             distro: alpine:edge
           # --------------------------------------------------------------------

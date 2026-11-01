@@ -75,4 +75,4 @@ docker_buildx_build() {
 ubuntu_latest=26.04
 ubuntu_rolling=26.04
 debian_latest=13
-alpine_latest=3.23
+alpine_latest=3.24

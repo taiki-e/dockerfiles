@@ -10,6 +10,7 @@ ARG ARCH
 ARG VALGRIND_REF
 RUN --mount=type=cache,target=/var/cache,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    --mount=type=bind,source=./patches,target=/tmp/patches \
     --mount=type=bind,source=./default.supp,target=/tmp/default.supp <<EOF
 packages=()
 packages+=(
@@ -67,6 +68,9 @@ apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recomm
     # https://sourceware.org/sourceware-25-roadmap.html
     git clone --depth=1 --branch "${VALGRIND_REF}" https://git.sr.ht/~sourceware/valgrind
     cd -- valgrind
+    if [[ -f /tmp/patches/"${VALGRIND_REF}".diff ]]; then
+        git apply -- /tmp/patches/"${VALGRIND_REF}".diff
+    fi
     ./autogen.sh
     ./configure "${configure_args[@]}"
     make -j"$(nproc)"

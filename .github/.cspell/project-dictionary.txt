@@ -3,6 +3,7 @@ amazonlinux
 asmtest
 BUILDKIT
 buildx
+dotprod
 ELTS
 groff
 LDFLAGS

@@ -23,8 +23,8 @@ package=$(basename -- "$(cd -- "$(dirname -- "$0")" && pwd)")
 . ./tools/build-docker-shared.sh
 
 # https://valgrind.org/docs/manual/dist.news.html
-valgrind_version=3.27.1
-valgrind_latest=3.27.1
+valgrind_version=3.28.0
+valgrind_latest=3.28.0
 
 build() {
   local target="$1"

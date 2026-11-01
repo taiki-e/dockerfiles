@@ -1,2 +1,3 @@
 **
 !default.supp
+!patches/*.diff

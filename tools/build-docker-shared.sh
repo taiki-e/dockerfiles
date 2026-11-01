@@ -73,6 +73,6 @@ docker_buildx_build() {
 
 # See also tools/container-info.sh
 ubuntu_latest=26.04
-ubuntu_rolling=26.04
+ubuntu_rolling=26.10
 debian_latest=13
 alpine_latest=3.24

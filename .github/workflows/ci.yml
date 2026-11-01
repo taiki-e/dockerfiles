@@ -48,7 +48,9 @@ jobs:
           - package: build-base
             distro: ubuntu:24.04
           - package: build-base
-            distro: ubuntu:26.04 # latest, rolling
+            distro: ubuntu:26.04 # latest
+          - package: build-base
+            distro: ubuntu:26.10 # rolling
           - package: build-base
             distro: debian:12
           - package: build-base

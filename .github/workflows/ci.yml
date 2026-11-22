@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   tidy:
-    uses: taiki-e/github-actions/.github/workflows/tidy.yml@07c8b42e7ad077d40127201ac62770c6eb31893e # 2026.11.1
+    uses: taiki-e/github-actions/.github/workflows/tidy.yml@a2bc8ad241bd3c7fa2ba3239d7dca7a032a17095 # 2026.11.22
     permissions:
       security-events: write # for github/codeql-action/*
 
@@ -114,7 +114,7 @@ jobs:
       packages: write # for pushing to ghcr
     steps:
       - uses: taiki-e/checkout-action@7d1e50e93dc4fb3bba58f85018fadf77898aee8b # v1.4.2
-      - uses: taiki-e/github-actions/setup-docker@07c8b42e7ad077d40127201ac62770c6eb31893e # 2026.11.1
+      - uses: taiki-e/github-actions/setup-docker@a2bc8ad241bd3c7fa2ba3239d7dca7a032a17095 # 2026.11.22
       - run: |
           docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin <<<"${GITHUB_TOKEN}"
           printf 'PUSH_TO_GHCR=1\n' >>"${GITHUB_ENV}"

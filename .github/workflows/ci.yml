@@ -65,10 +65,6 @@ jobs:
           # downloader
           - package: downloader
           # --------------------------------------------------------------------
-          # qemu-user
-          # TODO: curl: (23) Failure writing output to destination, passed 1369 returned 0
-          # - package: qemu-user
-          # --------------------------------------------------------------------
           # tidy
           - package: tidy
           # --------------------------------------------------------------------
@@ -127,8 +123,6 @@ jobs:
           PACKAGE: ${{ matrix.package }}
           DISTRO: ${{ matrix.distro }}
           ARCH: ${{ matrix.arch }}
-          QEMU_VERSION: ${{ matrix.qemu-version }}
-          QEMU_TARGET: ${{ matrix.qemu-target }}
       - run: docker logout ghcr.io
         if: always() && github.repository_owner == 'taiki-e' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
       - run: TIDY_DEV=1 tools/tidy.sh
